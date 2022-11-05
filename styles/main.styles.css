@@ -1,0 +1,8 @@
+.main-body-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #eee;
+  min-width: 100vw;
+  min-height: 100vh;
+}
