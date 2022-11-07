@@ -4,34 +4,36 @@ import {
   UserOutlined,
   SettingFilled,
   LogoutOutlined,
-  AreaChartOutlined,
-  AliwangwangFilled,
-  CopyFilled,
+  BarChartOutlined,
+  TeamOutlined,
+  SnippetsOutlined,
   UsergroupAddOutlined,
 } from "@ant-design/icons";
 import Cookies from "js-cookie";
+import AdminPage from "../components/Admin";
+import VisitorPage from "../components/Visitor";
 
 const Sider = ({ selectedIndex }) => {
   let [items, setItems] = useState([
     {
       label: "Dashboard",
       key: "dashboard",
-      icon: <AreaChartOutlined />,
+      icon: <BarChartOutlined />,
     },
     {
-      label: "Manage Admins Page",
+      label: "Manage Admin",
       key: "admin",
       icon: <UsergroupAddOutlined />,
     },
     {
-      label: "Senior Citizen Page",
-      key: "senior",
-      icon: <AliwangwangFilled />,
+      label: "Visitor Page",
+      key: "visitor",
+      icon: <TeamOutlined />,
     },
     {
       label: "Report",
       key: "report",
-      icon: <CopyFilled />,
+      icon: <SnippetsOutlined />,
       style: {
         paddingRight: "40px",
       },
@@ -46,11 +48,7 @@ const Sider = ({ selectedIndex }) => {
   }, []);
 
   return (
-    <Layout.Sider
-      style={{
-        minHeight: "92vh",
-      }}
-    >
+    <Layout.Sider collapsible theme="light">
       <div style={{ height: "25vh", backgroundColor: "#fff" }} />
       <Menu
         onClick={selectedIndex}
@@ -128,7 +126,10 @@ const Header = () => {
 const Content = ({ selectedKey }) => {
   return (
     <div style={{ backgroundColor: "#eee", height: "100%", padding: "10px" }}>
-      TEST
+      {selectedKey == "dashboard" ? "dashboard" : null}
+      {selectedKey == "admin" ? <AdminPage /> : null}
+      {selectedKey == "visitor" ? <VisitorPage /> : null}
+      {selectedKey == "report" ? "report" : null}
     </div>
   );
 };
