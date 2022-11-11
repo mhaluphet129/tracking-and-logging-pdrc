@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Menu, Layout, Avatar, Modal, Button, Typography } from "antd";
+import {
+  Menu,
+  Layout,
+  Avatar,
+  Modal,
+  Button,
+  Typography,
+  Tag,
+  Tooltip,
+  Space,
+} from "antd";
 import {
   UserOutlined,
   SettingFilled,
@@ -7,11 +17,17 @@ import {
   BarChartOutlined,
   TeamOutlined,
   SnippetsOutlined,
-  UsergroupAddOutlined,
+  WarningOutlined,
+  CheckCircleOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import Cookies from "js-cookie";
-import AdminPage from "../components/Admin";
+import axios from "axios";
 import VisitorPage from "../components/Visitor";
+import DashboardPage from "../components/Dashboard";
+import Profiler from "../assets/utilities/profiler";
+import io from "socket.io-client";
+let socket;
 
 const Sider = ({ selectedIndex }) => {
   let [items, setItems] = useState([
@@ -20,11 +36,7 @@ const Sider = ({ selectedIndex }) => {
       key: "dashboard",
       icon: <BarChartOutlined />,
     },
-    {
-      label: "Manage Admin",
-      key: "admin",
-      icon: <UsergroupAddOutlined />,
-    },
+
     {
       label: "Visitor Page",
       key: "visitor",
@@ -64,9 +76,25 @@ const Sider = ({ selectedIndex }) => {
 
 const Header = () => {
   const [showModal, setShowModal] = useState(false);
-
   const [currentUser, setCurrentUser] = useState({ name: "", lastname: "" });
+  const [isConnected, setIsConnected] = useState(false);
+  const [keyPair, setKeypair] = useState("");
 
+  useEffect(() => {
+    fetch("/api/socket").finally(() => {
+      socket = io();
+
+      socket.emit("is-connected");
+      socket.on("connection-status", (status) => {
+        setIsConnected(status);
+      });
+
+      socket.on("room-connected", (data) => {
+        Cookies.set("key", data);
+        setKeypair(data);
+      });
+    });
+  });
   useEffect(() => {
     setCurrentUser(JSON.parse(Cookies.get("currentUser")));
   }, [Cookies.get("currentUser")]);
@@ -79,6 +107,21 @@ const Header = () => {
         alignItems: "center",
       }}
     >
+      <Space style={{ marginRight: "auto" }}>
+        <Tooltip title="Generate a new key and disconnect current device.">
+          <Button size="small" onClick={() => socket.emit("new-key")}>
+            <ReloadOutlined />
+          </Button>
+        </Tooltip>
+        <Tooltip
+          title={isConnected ? "Connected" : "Not Connected to any device"}
+        >
+          <Tag color={isConnected ? "success" : "red"}>
+            <Typography.Text strong>{keyPair.toUpperCase()}</Typography.Text>
+            {isConnected ? <CheckCircleOutlined /> : <WarningOutlined />}
+          </Tag>
+        </Tooltip>
+      </Space>
       <Modal
         open={showModal}
         onCancel={() => setShowModal(false)}
@@ -102,8 +145,8 @@ const Header = () => {
             style={{ marginLeft: "5px" }}
             type="primary"
             onClick={() => {
-              Cookies.remove("user");
-              Cookies.set("loggedIn", "false");
+              Cookies.remove("currentUser");
+              Cookies.remove("loggedIn");
               window.location.reload();
             }}
           >
@@ -126,8 +169,7 @@ const Header = () => {
 const Content = ({ selectedKey }) => {
   return (
     <div style={{ backgroundColor: "#eee", height: "100%", padding: "10px" }}>
-      {selectedKey == "dashboard" ? "dashboard" : null}
-      {selectedKey == "admin" ? <AdminPage /> : null}
+      {selectedKey == "dashboard" ? <DashboardPage /> : null}
       {selectedKey == "visitor" ? <VisitorPage /> : null}
       {selectedKey == "report" ? "report" : null}
     </div>
@@ -150,6 +192,31 @@ const Footer = () => {
         SENIOR CITIZEN
       </Typography.Title>
     </div>
+  );
+};
+
+export default () => {
+  const [openModal, setOpenModal] = useState(false);
+  const [data, setData] = useState({});
+
+  fetch("/api/socket").finally(() => {
+    socket = io();
+
+    socket.on("open-profile", async (id) => {
+      if (id != null) {
+        let res = await axios.get("/api/visitor", {
+          params: { id, mode: "get-visitor" },
+        });
+
+        if (res.data.status == 200) {
+          setData(res.data.data);
+          setOpenModal(true);
+        } else message.error("Error on scanning the QR code");
+      }
+    });
+  });
+  return (
+    <Profiler openModal={openModal} setOpenModal={setOpenModal} data={data} />
   );
 };
 

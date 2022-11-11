@@ -15,10 +15,12 @@ import {
 import moment from "moment";
 import axios from "axios";
 import Records from "./records";
+import Profiler from "../../../assets/utilities/profiler";
 
 const UpdateSenior = ({ open, close, data, refresh, updateOpen }) => {
   const [edited, setEdited] = useState(false);
   const [openHistory, setOpenHistory] = useState(false);
+  const [openProfile, setOpenProfile] = useState(false);
   const [inputData, setInputData] = useState({
     name: "",
     middlename: "",
@@ -63,6 +65,9 @@ const UpdateSenior = ({ open, close, data, refresh, updateOpen }) => {
         title=" "
         extra={[
           <Space>
+            <Button type="link" onClick={() => setOpenProfile(true)}>
+              Open Profile
+            </Button>
             <Button
               type="link"
               onClick={() => {
@@ -200,6 +205,11 @@ const UpdateSenior = ({ open, close, data, refresh, updateOpen }) => {
           updateOpen();
         }}
         id="09"
+      />
+      <Profiler
+        openModal={openProfile}
+        setOpenModal={setOpenProfile}
+        data={data}
       />
     </>
   );

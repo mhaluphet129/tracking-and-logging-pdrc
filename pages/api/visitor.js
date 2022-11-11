@@ -87,6 +87,20 @@ export default async function handler(req, res) {
               });
             resolve();
           }
+          case "get-visitor": {
+            const { id } = req.query;
+
+            return await Visitor.findOne({ _id: id })
+              .then((e) => {
+                res.json({ status: 200, message: "Success", data: e });
+                resolve();
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
         }
       });
     case "POST": {

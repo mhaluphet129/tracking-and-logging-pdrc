@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { Form, Input, Button, Alert, Modal, message } from "antd";
+import { MobileView, BrowserView } from "react-device-detect";
+import { QRCamera } from "../assets/utilities";
 import axios from "axios";
 
 export default () => {
@@ -43,165 +45,172 @@ export default () => {
   };
 
   return (
-    <div className="main-body-login">
-      <Modal
-        open={openModal}
-        title={`Setup account for email '${email}'`}
-        onCancel={() => setOpenModal(false)}
-        footer={[
-          <Button type="primary" onClick={form.submit}>
-            Update
-          </Button>,
-        ]}
-      >
-        <Form
-          form={form}
-          onFinish={async (val) => {
-            const { confirm, password } = val;
-            if (confirm != password) {
-              message.error("password and confirm password didn't match.");
-              return;
-            }
+    <>
+      <div className="main-body-login">
+        <BrowserView>
+          <Modal
+            open={openModal}
+            title={`Setup account for email '${email}'`}
+            onCancel={() => setOpenModal(false)}
+            footer={[
+              <Button type="primary" onClick={form.submit}>
+                Update
+              </Button>,
+            ]}
+          >
+            <Form
+              form={form}
+              onFinish={async (val) => {
+                const { confirm, password } = val;
+                if (confirm != password) {
+                  message.error("password and confirm password didn't match.");
+                  return;
+                }
 
-            let { data } = await axios.post("/api/auth", {
-              payload: {
-                ...val,
-                email,
-                mode: "new-user",
-              },
-            });
+                let { data } = await axios.post("/api/auth", {
+                  payload: {
+                    ...val,
+                    email,
+                    mode: "new-user",
+                  },
+                });
 
-            if (data.status == 200) {
-              Cookies.set("currentUser", JSON.stringify(data.currentUser));
-              Cookies.set("loggedIn", "true");
-              message.success(data.message);
-              window.location.reload();
-            }
-          }}
-          labelCol={{ span: 7 }}
-        >
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[
-              {
-                required: true,
-                message: "This is required.",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Lastname"
-            name="lastname"
-            rules={[
-              {
-                required: true,
-                message: "This is required.",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Password"
-            name="password"
-            rules={[
-              {
-                required: true,
-                message: "This is required.",
-              },
-            ]}
-          >
-            <Input.Password />
-          </Form.Item>
-          <Form.Item
-            label="Confirm Password"
-            name="confirm"
-            rules={[
-              {
-                required: true,
-                message: "This is required.",
-              },
-            ]}
-          >
-            <Input.Password />
-          </Form.Item>
-        </Form>
-      </Modal>
-      <Form
-        labelCol={{
-          span: 24,
-        }}
-        wrapperCol={{
-          span: 24,
-        }}
-        labelAlign="right"
-        style={{
-          width: 400,
-          padding: 30,
-          background: "#fff",
-        }}
-        onFinish={handleLogin}
-      >
-        {isError.show && (
-          <Alert
-            description={isError.description}
-            onClose={() => setIsError({ show: false, description: "" })}
-            type="error"
-            closable
-          />
-        )}
-        <Form.Item
-          label="Email"
-          name="email"
-          rules={[
-            {
-              required: true,
-              message: "Please input your email!",
-            },
-          ]}
-        >
-          <Input
-            size="large"
-            addonAfter={
-              <Button
-                type="link"
-                style={{ padding: 0.1 }}
-                onClick={handleNewUser}
+                if (data.status == 200) {
+                  Cookies.set("currentUser", JSON.stringify(data.currentUser));
+                  Cookies.set("loggedIn", "true");
+                  message.success(data.message);
+                  window.location.reload();
+                }
+              }}
+              labelCol={{ span: 7 }}
+            >
+              <Form.Item
+                label="Name"
+                name="name"
+                rules={[
+                  {
+                    required: true,
+                    message: "This is required.",
+                  },
+                ]}
               >
-                new user
-              </Button>
-            }
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </Form.Item>
-
-        <Form.Item
-          label="Password"
-          name="password"
-          rules={[
-            {
-              required: true,
-              message: "Please input your password!",
-            },
-          ]}
-        >
-          <Input.Password />
-        </Form.Item>
-
-        <Form.Item>
-          <Button
-            type="primary"
-            style={{ width: "100%" }}
-            htmlType="submit"
-            onClick={() => setIsError({ show: false, description: "" })}
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Lastname"
+                name="lastname"
+                rules={[
+                  {
+                    required: true,
+                    message: "This is required.",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[
+                  {
+                    required: true,
+                    message: "This is required.",
+                  },
+                ]}
+              >
+                <Input.Password />
+              </Form.Item>
+              <Form.Item
+                label="Confirm Password"
+                name="confirm"
+                rules={[
+                  {
+                    required: true,
+                    message: "This is required.",
+                  },
+                ]}
+              >
+                <Input.Password />
+              </Form.Item>
+            </Form>
+          </Modal>
+          <Form
+            labelCol={{
+              span: 24,
+            }}
+            wrapperCol={{
+              span: 24,
+            }}
+            labelAlign="right"
+            style={{
+              width: 400,
+              padding: 30,
+              background: "#fff",
+            }}
+            onFinish={handleLogin}
           >
-            Log In
-          </Button>
-        </Form.Item>
-      </Form>
-    </div>
+            {isError.show && (
+              <Alert
+                description={isError.description}
+                onClose={() => setIsError({ show: false, description: "" })}
+                type="error"
+                closable
+              />
+            )}
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your email!",
+                },
+              ]}
+            >
+              <Input
+                size="large"
+                addonAfter={
+                  <Button
+                    type="link"
+                    style={{ padding: 0.1 }}
+                    onClick={handleNewUser}
+                  >
+                    new user
+                  </Button>
+                }
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Password"
+              name="password"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your password!",
+                },
+              ]}
+            >
+              <Input.Password />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                style={{ width: "100%" }}
+                htmlType="submit"
+                onClick={() => setIsError({ show: false, description: "" })}
+              >
+                Log In
+              </Button>
+            </Form.Item>
+          </Form>
+        </BrowserView>
+        <MobileView>
+          <QRCamera />
+        </MobileView>
+      </div>
+    </>
   );
 };
