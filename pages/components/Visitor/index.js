@@ -196,11 +196,6 @@ const VisitorPage = () => {
             return { open: false, data: { ...e.data } };
           })
         }
-        updateOpen={() =>
-          setUpdateVisitor((e) => {
-            return { open: true, data: { ...e.data } };
-          })
-        }
         data={updateVisitor.data}
         refresh={() => setTrigger(trigger + 1)}
       />

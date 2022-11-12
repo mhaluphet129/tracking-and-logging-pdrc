@@ -14,12 +14,10 @@ import {
 } from "antd";
 import moment from "moment";
 import axios from "axios";
-import Records from "./records";
-import Profiler from "../../../assets/utilities/profiler";
+import { Profiler } from "../../../assets/utilities";
 
 const UpdateSenior = ({ open, close, data, refresh, updateOpen }) => {
   const [edited, setEdited] = useState(false);
-  const [openHistory, setOpenHistory] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
   const [inputData, setInputData] = useState({
     name: "",
@@ -68,15 +66,7 @@ const UpdateSenior = ({ open, close, data, refresh, updateOpen }) => {
             <Button type="link" onClick={() => setOpenProfile(true)}>
               Open Profile
             </Button>
-            <Button
-              type="link"
-              onClick={() => {
-                setOpenHistory(true);
-                close();
-              }}
-            >
-              View Records
-            </Button>
+
             <Button type="primary" disabled={!edited} onClick={handleSave}>
               SAVE
             </Button>
@@ -198,14 +188,6 @@ const UpdateSenior = ({ open, close, data, refresh, updateOpen }) => {
           </Form>
         </Spin>
       </Drawer>
-      <Records
-        open={openHistory}
-        close={() => {
-          setOpenHistory(false);
-          updateOpen();
-        }}
-        id="09"
-      />
       <Profiler
         openModal={openProfile}
         setOpenModal={setOpenProfile}
