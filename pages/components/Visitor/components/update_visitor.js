@@ -16,7 +16,7 @@ import moment from "moment";
 import axios from "axios";
 import { Profiler } from "../../../assets/utilities";
 
-const UpdateSenior = ({ open, close, data, refresh, updateOpen }) => {
+const UpdateSenior = ({ open, close, data, refresh }) => {
   const [edited, setEdited] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
   const [inputData, setInputData] = useState({

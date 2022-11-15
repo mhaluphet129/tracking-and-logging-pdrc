@@ -12,9 +12,10 @@ import {
 } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 
-import { AddVisitor, UpdateVisitor, AddHistory } from "./components";
+import { AddVisitor, UpdateVisitor } from "./components";
 import { IDGen } from "../../assets/utilities";
 import axios from "axios";
+import moment from "moment";
 
 const VisitorPage = () => {
   const [showAddVisitor, setShowAddVisitor] = useState(false);
@@ -27,8 +28,8 @@ const VisitorPage = () => {
   const [trigger, setTrigger] = useState(0);
   const [_searchName, setSearchName] = useState("");
   const timerRef = useRef(null);
-  const [openModal, setOpenModal] = useState(false);
   const [load, setLoad] = useState("");
+  const [recentVisit, setRecentVisit] = useState([]);
 
   const column = [
     {
@@ -67,15 +68,21 @@ const VisitorPage = () => {
 
   const column2 = [
     {
-      title: "ID",
-      render: (_, row) => <Typography.Link>6323adse</Typography.Link>,
+      title: "VISIT ID",
+      align: "center",
+      render: (_, row) => (
+        <Typography.Link>{IDGen(row?._id, 6)}</Typography.Link>
+      ),
     },
     {
       title: "Name",
       render: (_, row) => (
         <Typography>
-          {row.name}
-          {row?.middlename ? " " + row?.middlename : ""} {row.lastname}
+          {row?.visitorId.name}
+          {row?.visitorId.middlename
+            ? " " + row?.visitorId.middlename
+            : ""}{" "}
+          {row?.visitorId.lastname}
         </Typography>
       ),
     },
@@ -83,7 +90,12 @@ const VisitorPage = () => {
       title: "Time",
       render: (_, row) => (
         <Typography.Text>
-          <Tag color="success">IN</Tag>March 13, 2019
+          {row?.timeOutDone ? (
+            <Tag color="error">OUT</Tag>
+          ) : (
+            <Tag color="success">IN</Tag>
+          )}
+          {moment(row?.data).format("MMM DD, YYYY")}
         </Typography.Text>
       ),
     },
@@ -121,6 +133,10 @@ const VisitorPage = () => {
         params: { mode: "fetch-all", search: _searchName },
       });
       if (data.status == 200) setVisitors(data.visitor);
+      let res = await axios.get("/api/visit", {
+        params: { mode: "fetch-recent" },
+      });
+      if (res.data.status == 200) setRecentVisit(res.data.data);
       setLoad("");
     };
     fetchVisitor();
@@ -176,12 +192,7 @@ const VisitorPage = () => {
           <Space style={{ marginBottom: 5, padding: 6 }}>
             <Typography.Text strong>Recent Visit</Typography.Text>
           </Space>
-          <Table
-            columns={column2}
-            dataSource={[
-              { name: "Ley", middlename: "middle", lastname: "last" },
-            ]}
-          />
+          <Table columns={column2} dataSource={recentVisit} />
         </Col>
       </Row>
       <AddVisitor
@@ -199,7 +210,6 @@ const VisitorPage = () => {
         data={updateVisitor.data}
         refresh={() => setTrigger(trigger + 1)}
       />
-      <AddHistory open={openModal} close={() => setOpenModal(false)} />
     </div>
   );
 };

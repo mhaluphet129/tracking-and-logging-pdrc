@@ -26,6 +26,40 @@ export default async function handler(req, res) {
                   .json({ success: false, message: "Error: " + err });
               });
           }
+          case "fetch-recent": {
+            return await Visit.find({})
+              .populate("visitorId")
+              .sort({ createdAt: -1 })
+              .then((e) => {
+                res.json({ status: 200, data: e });
+                resolve();
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
+
+          case "visit-out": {
+            return await Visit.findOneAndUpdate(
+              { _id: req.query.id },
+              {
+                $set: {
+                  timeOutDone: true,
+                },
+              }
+            )
+              .then((e) => {
+                res.json({ status: 200 });
+                resolve();
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
         }
       });
     case "POST": {

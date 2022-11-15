@@ -17,6 +17,7 @@ import {
   Checkbox,
   Tooltip,
   Badge,
+  Popconfirm,
 } from "antd";
 import moment from "moment";
 import {
@@ -62,6 +63,7 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
       prisonerName: val.prisonerName,
       relationship: val.relationship,
       depositItems: val.depositItems,
+      date: val.date,
     };
 
     setLoader("registering");
@@ -103,15 +105,13 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
       title: "Status",
       align: "center",
       render: (_, row) => (
-        <Tag
-          color={
-            row?.status[row?.status.length - 1].name == "TIME IN"
-              ? "success"
-              : "error"
-          }
-        >
-          {row?.status[row?.status.length - 1].name}
-        </Tag>
+        <Space direction="vertical">
+          {!row?.timeOutDone ? (
+            <Tag color="success">TIME IN</Tag>
+          ) : (
+            <Tag color="error">TIME OUT</Tag>
+          )}
+        </Space>
       ),
     },
     {
@@ -236,16 +236,31 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
                 >
                   VISIT IN
                 </Button>
-                <Button
-                  type="primary"
-                  style={{ width: 200 }}
-                  size="large"
-                  icon={<LogoutOutlined />}
-                  ghost
-                  danger
+                <Popconfirm
+                  title="Just confirming."
+                  onConfirm={async () => {
+                    setLoader("registering");
+                    let res = await axios.get("/api/visit", {
+                      params: { mode: "visit-out", id: visitData[0]._id },
+                    });
+                    if (res.data.status == 200) {
+                      setTrigger(trigger + 1);
+                      message.success("Timed OUT.");
+                    }
+                    setLoader("");
+                  }}
                 >
-                  VISIT OUT
-                </Button>
+                  <Button
+                    type="primary"
+                    style={{ width: 200 }}
+                    size="large"
+                    icon={<LogoutOutlined />}
+                    ghost
+                    danger
+                  >
+                    VISIT OUT
+                  </Button>
+                </Popconfirm>
               </Space>
               <strong>Recent Visit</strong>
               <Table

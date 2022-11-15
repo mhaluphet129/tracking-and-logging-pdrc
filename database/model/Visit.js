@@ -35,7 +35,7 @@ let VisitSchema = new mongoose.Schema(
     visitorId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "visitor",
+      ref: "Visitor",
     },
     timeIn: {
       type: String,
@@ -43,6 +43,14 @@ let VisitSchema = new mongoose.Schema(
     },
     timeOut: {
       type: String,
+      required: true,
+    },
+    timeOutDone: {
+      type: Boolean,
+      default: false,
+    },
+    date: {
+      type: Date,
       required: true,
     },
     prisonerName: {
