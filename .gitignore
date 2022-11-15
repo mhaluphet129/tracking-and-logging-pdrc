@@ -10,7 +10,6 @@
 
 #protected variables
 .env
-/certificates
 
 # next.js
 /.next/
