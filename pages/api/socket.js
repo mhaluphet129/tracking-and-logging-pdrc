@@ -31,7 +31,6 @@ const SocketHandler = (req, res) => {
       socket.on("new-key", () => {
         key = IDGen(v4(), 6);
         isConnected = false;
-        console.log(key);
         socket.emit("room-connected", key);
         socket.broadcast.emit("connection-status", isConnected);
         socket.broadcast.emit("on-getKey", key);

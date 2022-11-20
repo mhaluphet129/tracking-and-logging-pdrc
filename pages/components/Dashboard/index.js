@@ -151,7 +151,6 @@ export default () => {
       />
       <Card>
         {contextHolder}
-        <Typography.Text>SANAOL</Typography.Text>
         <Row>
           <Col span={4}>
             <Space direction="vertical">

@@ -41,6 +41,7 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
   const [refViolation, setRefViolation] = useState(false);
   const [trigger, setTrigger] = useState(0);
   const [durationType, setDurationType] = useState("hours");
+  const [isTimeOut, setIsTimeOut] = useState(true);
 
   let depositOptions = ["Food", "Money", "Clothes"];
   let filteredOptions = depositOptions.filter((e) => !depositItems.includes(e));
@@ -104,8 +105,11 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
           {!row?.timeOutDone ? (
             <Tag color="success">TIME IN</Tag>
           ) : (
-            <Tag color="error">TIME OUT</Tag>
+            <Tag color="warning">TIME OUT</Tag>
           )}
+          {row?.remarks.filter((e) => e.hasViolation)?.length > 0 ? (
+            <Tag color="error">Violation</Tag>
+          ) : null}
         </Space>
       ),
     },
@@ -154,6 +158,14 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
   ];
 
   useEffect(async () => {
+    let res = await axios.get("/api/visitor", {
+      params: { mode: "check-isTimeIn", id: data?._id },
+    });
+
+    if (res.data.status == 200) setIsTimeOut(res.data.data.timeOut);
+  }, [data?._id]);
+
+  useEffect(async () => {
     QRCode.toString(data?._id?.toString(), function (err, url) {
       setQr(parse(url || ""));
     });
@@ -168,10 +180,12 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
 
     if (res.data.status == 200) {
       setVisitData(res.data.data);
-
       if (res.data.data != null) {
-        let remarks = res.data.data[0]?.remarks;
-        setRefViolation(remarks?.filter((e) => e.hasViolation).length > 0);
+        res.data.data.forEach((e) => {
+          e.remarks.forEach((e2) => {
+            if (e2.hasViolation) setRefViolation(true);
+          });
+        });
       }
     }
     setLoader("");
@@ -216,43 +230,55 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
           </Col>
           <Col span={16}>
             <Space direction="vertical">
-              <Space>
-                <Button
-                  type="primary"
-                  size="large"
-                  style={{ width: 200 }}
-                  icon={<LoginOutlined />}
-                  onClick={() => setVisitIn(true)}
-                  ghost
-                >
-                  VISIT IN
-                </Button>
-                <Popconfirm
-                  title="Just confirming."
-                  onConfirm={async () => {
-                    setLoader("registering");
-                    let res = await axios.get("/api/visit", {
-                      params: { mode: "visit-out", id: visitData[0]._id },
-                    });
-                    if (res.data.status == 200) {
-                      setTrigger(trigger + 1);
-                      message.success("Timed OUT.");
-                    }
-                    setLoader("");
-                  }}
-                >
+              <>
+                {!isTimeOut ? (
                   <Button
                     type="primary"
-                    style={{ width: 200 }}
                     size="large"
-                    icon={<LogoutOutlined />}
+                    style={{ width: 200 }}
+                    icon={<LoginOutlined />}
+                    onClick={() => setVisitIn(true)}
                     ghost
-                    danger
                   >
-                    VISIT OUT
+                    VISIT IN
                   </Button>
-                </Popconfirm>
-              </Space>
+                ) : (
+                  <Space>
+                    <Popconfirm
+                      title="Just confirming."
+                      onConfirm={async () => {
+                        setLoader("registering");
+                        let res = await axios.get("/api/visit", {
+                          params: { mode: "visit-out", id: visitData[0]._id },
+                        });
+                        if (res.data.status == 200) {
+                          setTrigger(trigger + 1);
+                          message.success("Timed OUT.");
+                        }
+                        setLoader("");
+                      }}
+                    >
+                      <Button
+                        type="primary"
+                        style={{ width: 200 }}
+                        size="large"
+                        icon={<LogoutOutlined />}
+                        ghost
+                        danger
+                      >
+                        Check Out
+                      </Button>
+                    </Popconfirm>
+                    <Button
+                      size="large"
+                      icon={<LogoutOutlined />}
+                      style={{ width: 200 }}
+                    >
+                      Quick Check-Out
+                    </Button>
+                  </Space>
+                )}
+              </>
               <strong>Recent Visit</strong>
               <Table
                 columns={columns}
@@ -276,11 +302,13 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
                   ),
                 }}
                 pagination={{
-                  pageSize: 4,
+                  pageSize: 6,
                 }}
-                // rowClassName={(record, index) =>
-                //   record.amount > 50 ? "red" : "green"
-                // }
+                rowClassName={(row) =>
+                  row?.remarks.filter((e) => e.hasViolation)?.length > 0
+                    ? "red"
+                    : "green"
+                }
               />
             </Space>
           </Col>
@@ -307,29 +335,6 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
             colon={false}
             onFinish={handleFinish}
           >
-            <Form.Item
-              label="Name"
-              name="name"
-              initialValue={`${data?.name} ${data?.middlename ?? ""} ${
-                data?.lastname
-              }`}
-            >
-              <Input disabled />
-            </Form.Item>
-            <Form.Item
-              label="Address"
-              name="address"
-              initialValue={data?.address}
-            >
-              <Input disabled />
-            </Form.Item>
-            <Form.Item
-              label="Contact Number"
-              name="contactNumber"
-              initialValue={data?.contactNumber}
-            >
-              <Input disabled />
-            </Form.Item>
             <Form.Item name="prisonerName" label="Name of prisoner">
               <Input />
             </Form.Item>
@@ -391,7 +396,17 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
               justifyContent: "space-between",
             }}
           >
-            <Typography>Remarks</Typography>
+            <Typography>
+              Remarks (
+              <Typography.Text italic type="secondary" style={{ fontSize: 13 }}>
+                {" "}
+                <span style={{ color: "red", fontStyle: "normal" }}>
+                  Red*
+                </span>{" "}
+                means violation
+              </Typography.Text>{" "}
+              )
+            </Typography>
             <Button onClick={() => setOpenAddRemarks(true)}>Add Remarks</Button>
           </Space>
         }

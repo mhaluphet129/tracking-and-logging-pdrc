@@ -32,18 +32,6 @@ export default () => {
     }
   };
 
-  const handleNewUser = async () => {
-    if (email != "") {
-      let { data } = await axios.get("/api/auth", { params: { email } });
-      console.log(data);
-      if (data.status == 200) setOpenModal(true);
-      else {
-        if (data.status == 404) message.error(data.message);
-        else message.warning(data.message);
-      }
-    }
-  };
-
   return (
     <>
       <div className="main-body-login">
@@ -167,19 +155,7 @@ export default () => {
                 },
               ]}
             >
-              <Input
-                size="large"
-                addonAfter={
-                  <Button
-                    type="link"
-                    style={{ padding: 0.1 }}
-                    onClick={handleNewUser}
-                  >
-                    new user
-                  </Button>
-                }
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <Input size="large" onChange={(e) => setEmail(e.target.value)} />
             </Form.Item>
 
             <Form.Item

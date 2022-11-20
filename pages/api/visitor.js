@@ -1,4 +1,5 @@
 import Visitor from "../../database/model/Visitor";
+import Visit from "../../database/model/Visit";
 import dbConnect from "../../database/dbConnect";
 
 export default async function handler(req, res) {
@@ -93,6 +94,28 @@ export default async function handler(req, res) {
             return await Visitor.findOne({ _id: id })
               .then((e) => {
                 res.json({ status: 200, message: "Success", data: e });
+                resolve();
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
+          case "check-isTimeIn": {
+            const { id } = req.query;
+            return await Visit.find({ visitorId: id })
+              .then((e) => {
+                let timeOut = true;
+
+                e.forEach((e) => {
+                  timeOut = e.timeOutDone;
+                });
+                res.json({
+                  status: 200,
+                  message: "Success",
+                  data: { timeOut },
+                });
                 resolve();
               })
               .catch((err) => {

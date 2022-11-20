@@ -34,40 +34,12 @@ export default async function handler(req, res) {
                     message: "Login Successfully",
                     currentUser: e,
                   });
-                } else if (e?.password == null) {
-                  res.json({
-                    status: 200,
-                    message: "New User",
-                  });
                 } else {
                   res.status(200).json({
                     status: 403,
                     message: "Wrong Password",
                   });
                 }
-                resolve();
-              })
-              .catch(() => {
-                res.status(500).json({ message: "Error in the server." });
-              });
-          }
-          case "new-user": {
-            const payload = req.body.payload;
-
-            delete payload.mode;
-            delete payload.confirm;
-
-            return await Admin.findOneAndUpdate(
-              { email: payload.email },
-              { $set: { ...payload } },
-              { new: true }
-            )
-              .then((e) => {
-                res.json({
-                  status: 200,
-                  message: "Successfully updated the account",
-                  currentUser: e,
-                });
                 resolve();
               })
               .catch(() => {

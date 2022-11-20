@@ -38,12 +38,12 @@ const Sider = ({ selectedIndex }) => {
       icon: <BarChartOutlined />,
     },
     {
-      label: "Visitor Page",
+      label: "Visitors Profile",
       key: "visitor",
       icon: <TeamOutlined />,
     },
     {
-      label: "Visitor Logs",
+      label: "Visit Logs",
       key: "visitor-log",
       icon: <SnippetsOutlined />,
     },

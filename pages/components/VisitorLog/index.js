@@ -8,13 +8,6 @@ const VisitorLog = () => {
   const [recentVisit, setRecentVisit] = useState([]);
   const column2 = [
     {
-      title: "VISIT ID",
-      align: "center",
-      render: (_, row) => (
-        <Typography.Link>{IDGen(row?._id, 6)}</Typography.Link>
-      ),
-    },
-    {
       title: "Name",
       render: (_, row) => (
         <Typography>
@@ -27,17 +20,12 @@ const VisitorLog = () => {
       ),
     },
     {
-      title: "Time",
-      render: (_, row) => (
-        <Typography.Text>
-          {row?.timeOutDone ? (
-            <Tag color="error">OUT</Tag>
-          ) : (
-            <Tag color="success">IN</Tag>
-          )}
-          {moment(row?.data).format("MMM DD, YYYY")}
-        </Typography.Text>
-      ),
+      title: "Date",
+      render: (_, row) => moment(row?.date).format("MMM DD, YYYY"),
+    },
+    {
+      title: "Time In/Check In",
+      render: (_, row) => moment(row?.timeIn).format("hh:mm:ss a"),
     },
   ];
 
