@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import "antd/dist/antd.css";
 import "../styles/main.styles.css";
 
@@ -9,10 +9,10 @@ function MyApp({ Component, pageProps }) {
     <>
       <Head>
         {/* <link rel='shortcut icon' href='/logo-icon.svg' /> */}
-        <title>AgriSUPPORT</title>
+        <title>PDRC - Visitour Tracking and Logging System</title>
         <meta
           name="description"
-          content="This system develop to help MAGRO manage farmers, farmworkers and fisherfolk data and information to be manage."
+          content="This system develop to help PDRC staff to manage visitor data and information."
         />
       </Head>
       <Component {...pageProps} />

@@ -1,5 +1,6 @@
 import Visit from "../../database/model/Visit";
 import dbConnect from "../../database/dbConnect";
+import moment from "moment";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -60,6 +61,22 @@ export default async function handler(req, res) {
                   .json({ success: false, message: "Error: " + err });
               });
           }
+          case "visit-with-timers": {
+            return await Visit.find({
+              timeOutDone: false,
+              // timeOut: { $gte: moment() },
+            })
+              .populate("visitorId")
+              .sort({ timeOut: -1 })
+              .then((e) => {
+                res.json({ status: 200, data: e });
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
         }
       });
     case "POST": {
@@ -69,11 +86,6 @@ export default async function handler(req, res) {
         switch (mode) {
           case "new-visit": {
             let newVisit = Visit(req.body.payload.data);
-            newVisit.status = [
-              {
-                name: "TIME IN",
-              },
-            ];
             return await newVisit
               .save()
               .then(() => {

@@ -4,32 +4,37 @@ import {
   Table,
   Typography,
   Space,
-  Tooltip,
   AutoComplete,
   Col,
   Row,
-  Tag,
+  notification,
 } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 
 import { AddVisitor, UpdateVisitor } from "./components";
-import { IDGen } from "../../assets/utilities";
+import { IDGen, Timer } from "../../assets/utilities";
 import axios from "axios";
 import moment from "moment";
 
 const VisitorPage = () => {
   const [showAddVisitor, setShowAddVisitor] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [updateVisitor, setUpdateVisitor] = useState({
-    open: false,
-    data: null,
-  });
   const [visitors, setVisitors] = useState([]);
   const [trigger, setTrigger] = useState(0);
   const [_searchName, setSearchName] = useState("");
   const timerRef = useRef(null);
   const [load, setLoad] = useState("");
-  const [recentVisit, setRecentVisit] = useState([]);
+  const [visitorWithTimer, setVisitorWithTimer] = useState();
+  const [dismissClick, setDismmissClick] = useState({
+    show: false,
+    index: null,
+  });
+  const [updateVisitor, setUpdateVisitor] = useState({
+    open: false,
+    data: null,
+  });
+
+  const [api, contextHolder] = notification.useNotification();
 
   const column = [
     {
@@ -68,36 +73,65 @@ const VisitorPage = () => {
 
   const column2 = [
     {
-      title: "VISIT ID",
-      align: "center",
-      render: (_, row) => (
-        <Typography.Link>{IDGen(row?._id, 6)}</Typography.Link>
-      ),
-    },
-    {
-      title: "Name",
+      title: "Visitor Name",
       render: (_, row) => (
         <Typography>
           {row?.visitorId.name}
           {row?.visitorId.middlename
             ? " " + row?.visitorId.middlename
             : ""}{" "}
-          {row?.visitorId.lastname}
+          {row.visitorId.lastname}
         </Typography>
       ),
     },
     {
-      title: "Time",
-      render: (_, row) => (
-        <Typography.Text>
-          {row?.timeOutDone ? (
-            <Tag color="error">OUT</Tag>
-          ) : (
-            <Tag color="success">IN</Tag>
-          )}
-          {moment(row?.data).format("MMM DD, YYYY")}
-        </Typography.Text>
-      ),
+      title: "Time left",
+      align: "center",
+      width: 200,
+      render: (_, row, i) =>
+        moment(row?.timeOut).diff(moment()) > 0 ? (
+          <Timer
+            endDate={row?.timeOut}
+            reload={() => setTrigger(trigger + 1)}
+            end={() => {
+              setTrigger(trigger + 1);
+              api["warning"]({
+                message: "Time Visit",
+                description: "Some visitor exceed visit duration.",
+                duration: 0,
+              });
+            }}
+          />
+        ) : dismissClick.show && dismissClick.index == i ? (
+          <Space>
+            <Button
+              onClick={async () => {
+                let res = await axios.get("/api/visit", {
+                  params: { mode: "visit-out", id: row._id },
+                });
+                if (res.data.status == 200) {
+                  setTrigger(trigger + 1);
+                  setDismmissClick({ show: false, index: null });
+                }
+              }}
+              type="primary"
+            >
+              Confirm
+            </Button>
+            <Button
+              onClick={() => setDismmissClick({ show: false, index: null })}
+            >
+              Cancel
+            </Button>
+          </Space>
+        ) : (
+          <Button
+            onClick={() => setDismmissClick({ show: true, index: i })}
+            danger
+          >
+            DISMISS
+          </Button>
+        ),
     },
   ];
 
@@ -134,9 +168,9 @@ const VisitorPage = () => {
       });
       if (data.status == 200) setVisitors(data.visitor);
       let res = await axios.get("/api/visit", {
-        params: { mode: "fetch-recent" },
+        params: { mode: "visit-with-timers" },
       });
-      if (res.data.status == 200) setRecentVisit(res.data.data);
+      if (res.data.status == 200) setVisitorWithTimer(res.data.data);
       setLoad("");
     };
     fetchVisitor();
@@ -144,6 +178,7 @@ const VisitorPage = () => {
 
   return (
     <div>
+      {contextHolder}
       <Row>
         <Col span={13}>
           <Space style={{ marginBottom: 5 }}>
@@ -188,11 +223,19 @@ const VisitorPage = () => {
             loading={load == "fetch"}
           />
         </Col>
-        <Col offset={1} span={10}>
+        <Col span={10} offset={1}>
           <Space style={{ marginBottom: 5, padding: 6 }}>
-            <Typography.Text strong>Recent Visit</Typography.Text>
+            <Typography.Text strong>Visit limit Timers</Typography.Text>
           </Space>
-          <Table columns={column2} dataSource={recentVisit} />
+          <Table
+            dataSource={visitorWithTimer}
+            columns={column2}
+            rowKey={(row) => row._id}
+            pagination={{
+              pageSize: 8,
+            }}
+            loading={load == "fetch"}
+          />
         </Col>
       </Row>
       <AddVisitor

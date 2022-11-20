@@ -26,6 +26,7 @@ import axios from "axios";
 import VisitorPage from "../components/Visitor";
 import DashboardPage from "../components/Dashboard";
 import Profiler from "../assets/utilities/profiler";
+import VisitorLog from "../components/VisitorLog";
 import io from "socket.io-client";
 let socket;
 
@@ -36,11 +37,15 @@ const Sider = ({ selectedIndex }) => {
       key: "dashboard",
       icon: <BarChartOutlined />,
     },
-
     {
       label: "Visitor Page",
       key: "visitor",
       icon: <TeamOutlined />,
+    },
+    {
+      label: "Visitor Logs",
+      key: "visitor-log",
+      icon: <SnippetsOutlined />,
     },
     {
       label: "Report",
@@ -171,6 +176,7 @@ const Content = ({ selectedKey }) => {
     <div style={{ backgroundColor: "#eee", height: "100%", padding: "10px" }}>
       {selectedKey == "dashboard" ? <DashboardPage /> : null}
       {selectedKey == "visitor" ? <VisitorPage /> : null}
+      {selectedKey == "visitor-log" ? <VisitorLog /> : null}
       {selectedKey == "report" ? "report" : null}
     </div>
   );

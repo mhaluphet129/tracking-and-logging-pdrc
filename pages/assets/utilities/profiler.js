@@ -5,7 +5,6 @@ import {
   Space,
   Form,
   Input,
-  DatePicker,
   Select,
   Modal,
   Button,
@@ -18,6 +17,7 @@ import {
   Tooltip,
   Badge,
   Popconfirm,
+  InputNumber,
 } from "antd";
 import moment from "moment";
 import {
@@ -35,12 +35,12 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
   const [visitData, setVisitData] = useState([]);
   const [depositItems, setDepositItems] = useState([]);
   const [visitIn, setVisitIn] = useState(false);
-  const [errorDate, setErrorDate] = useState(false);
   const [openRemarks, setOpenRemarks] = useState({ show: false, data: null });
   const [hasViolation, setHasViolation] = useState(false);
   const [openAddRemarks, setOpenAddRemarks] = useState(false);
   const [refViolation, setRefViolation] = useState(false);
   const [trigger, setTrigger] = useState(0);
+  const [durationType, setDurationType] = useState("hours");
 
   let depositOptions = ["Food", "Money", "Clothes"];
   let filteredOptions = depositOptions.filter((e) => !depositItems.includes(e));
@@ -50,20 +50,15 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
       message.warning("Please fill the required input.");
       return;
     }
-    if (val.timeInOut[1] == null) {
-      message.warning("Time OUT is blank. Please provide");
-      setErrorDate(true);
-      return;
-    }
 
     let obj = {
       visitorId: data._id,
-      timeIn: val.timeInOut[0],
-      timeOut: val.timeInOut[1],
+      timeIn: moment(),
+      timeOut: moment().add(val?.duration, durationType),
       prisonerName: val.prisonerName,
       relationship: val.relationship,
       depositItems: val.depositItems,
-      date: val.date,
+      date: moment(),
     };
 
     setLoader("registering");
@@ -125,10 +120,6 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
         `${moment(row?.timeIn).format("hh:mm A")} - ${moment(
           row?.timeOut
         ).format("hh:mm A")}`,
-    },
-    {
-      title: "Prisoner's Name",
-      render: (_, row) => row?.prisonerName,
     },
     {
       align: "center",
@@ -271,8 +262,9 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
                 expandable={{
                   expandedRowRender: (row) => (
                     <p>
-                      Relationship to Prisoner: {row?.relationship}, Deposited
-                      Items:{" "}
+                      Visit Prisoner: {row?.prisonerName} <br />
+                      Relationship to Prisoner: {row?.relationship} <br />
+                      Deposited Items:{" "}
                       {row?.depositItems.length > 0 ? (
                         row?.depositItems.map((e, i) => <Tag key={i}>{e}</Tag>)
                       ) : (
@@ -344,19 +336,22 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
             <Form.Item label="Relation to prisoner" name="relationship">
               <Input />
             </Form.Item>
-            <Form.Item label="Date" name="date" initialValue={moment()}>
-              <DatePicker format="MMM DD YYYY" />
-            </Form.Item>
-            <Form.Item
-              label="Time IN/OUT"
-              initialValue={[moment(), null]}
-              name="timeInOut"
-            >
-              <DatePicker.RangePicker
-                placeholder={["Time IN", "Time OUT"]}
-                format="hh:mm A"
-                picker="time"
-                status={errorDate ? "error" : null}
+            <Form.Item label="Visit Duration" name="duration">
+              <InputNumber
+                placeholder={`max: ${durationType == "minutes" ? 120 : 2}`}
+                addonAfter={
+                  <Select
+                    style={{ width: 100 }}
+                    onChange={(e) => setDurationType(e)}
+                    value={durationType}
+                  >
+                    <Select.Option value="minutes">Minutes</Select.Option>
+                    <Select.Option value="hours">Hour</Select.Option>
+                  </Select>
+                }
+                min={0}
+                max={durationType == "minutes" ? 120 : 2}
+                style={{ width: "100%" }}
               />
             </Form.Item>
             <Form.Item

@@ -38,11 +38,11 @@ let VisitSchema = new mongoose.Schema(
       ref: "Visitor",
     },
     timeIn: {
-      type: String,
+      type: Date,
       required: true,
     },
     timeOut: {
-      type: String,
+      type: Date,
       required: true,
     },
     timeOutDone: {
