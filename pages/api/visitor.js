@@ -124,6 +124,25 @@ export default async function handler(req, res) {
                   .json({ success: false, message: "Error: " + err });
               });
           }
+          case "remove": {
+            const { id } = req.query;
+
+            return await Visitor.findOneAndDelete({ _id: id })
+              .then(async () => {
+                await Visit.deleteMany({ visitorId: id }).catch((err) => {
+                  res
+                    .status(500)
+                    .json({ success: false, message: "Error: " + err });
+                });
+                res.json({ status: 200, message: "Removed successfully" });
+                resolve();
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
         }
       });
     case "POST": {

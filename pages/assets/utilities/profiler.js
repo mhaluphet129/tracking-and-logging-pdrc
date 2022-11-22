@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Row,
   Col,
   Space,
   Form,
   Input,
-  Select,
   Modal,
   Button,
-  Spin,
   message,
   Tag,
   Table,
@@ -16,67 +14,33 @@ import {
   Checkbox,
   Tooltip,
   Badge,
-  Popconfirm,
-  InputNumber,
 } from "antd";
-import moment from "moment";
 import {
   LoginOutlined,
   LogoutOutlined,
   QuestionCircleOutlined,
 } from "@ant-design/icons";
+import moment from "moment";
 import QRCode from "qrcode";
 import parse from "html-react-parser";
 import axios from "axios";
+
+import { SettingsContext } from "../../context";
+import { VisitForm } from "../../components/Visitor/components";
 
 const Profiler = ({ openModal, setOpenModal, data }) => {
   const [qr, setQr] = useState("");
   const [loader, setLoader] = useState("");
   const [visitData, setVisitData] = useState([]);
-  const [depositItems, setDepositItems] = useState([]);
   const [visitIn, setVisitIn] = useState(false);
   const [openRemarks, setOpenRemarks] = useState({ show: false, data: null });
   const [hasViolation, setHasViolation] = useState(false);
   const [openAddRemarks, setOpenAddRemarks] = useState(false);
   const [refViolation, setRefViolation] = useState(false);
   const [trigger, setTrigger] = useState(0);
-  const [durationType, setDurationType] = useState("hours");
   const [isTimeOut, setIsTimeOut] = useState(true);
 
-  let depositOptions = ["Food", "Money", "Clothes"];
-  let filteredOptions = depositOptions.filter((e) => !depositItems.includes(e));
-
-  const handleFinish = async (val) => {
-    if (val.prisonerName == null || val.relationship == null) {
-      message.warning("Please fill the required input.");
-      return;
-    }
-
-    let obj = {
-      visitorId: data._id,
-      timeIn: moment(),
-      timeOut: moment().add(val?.duration, durationType),
-      prisonerName: val.prisonerName,
-      relationship: val.relationship,
-      depositItems: val.depositItems,
-      date: moment(),
-    };
-
-    setLoader("registering");
-    let res = await axios.post("/api/visit", {
-      payload: {
-        mode: "new-visit",
-        data: obj,
-      },
-    });
-    setLoader("");
-
-    if (res.data.status == 200) {
-      setVisitIn(false);
-      message.success(res.data.message);
-      setTrigger(trigger + 1);
-    }
-  };
+  const { setVisitHour, visitHour } = useContext(SettingsContext);
 
   const handleFinishRemarks = async (val) => {
     val = { ...val, hasViolation };
@@ -193,12 +157,18 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
 
   return (
     <>
+      <VisitForm
+        open={visitIn}
+        setOpen={setVisitIn}
+        data={data}
+        setTrigger={setTrigger}
+      />
       <Modal
         open={openModal}
         closable={false}
         footer={null}
         width={1100}
-        onCancel={() => setOpenModal(false)}
+        onCancel={() => setOpenModal({ show: false, data: null })}
       >
         <Row>
           <Col span={8}>
@@ -231,51 +201,75 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
           <Col span={16}>
             <Space direction="vertical">
               <>
-                {!isTimeOut ? (
-                  <Button
-                    type="primary"
-                    size="large"
-                    style={{ width: 200 }}
-                    icon={<LoginOutlined />}
-                    onClick={() => setVisitIn(true)}
-                    ghost
+                {isTimeOut ? (
+                  <Tooltip
+                    title={
+                      moment().isAfter(moment(visitHour))
+                        ? "Visiting hour is close"
+                        : null
+                    }
                   >
-                    VISIT IN
-                  </Button>
+                    <Button
+                      type="primary"
+                      size="large"
+                      style={{ width: 200 }}
+                      icon={<LoginOutlined />}
+                      onClick={() => setVisitIn(true)}
+                      disabled={moment().isAfter(moment(visitHour))}
+                      ghost
+                    >
+                      VISIT IN
+                    </Button>
+                  </Tooltip>
                 ) : (
                   <Space>
-                    <Popconfirm
-                      title="Just confirming."
-                      onConfirm={async () => {
-                        setLoader("registering");
-                        let res = await axios.get("/api/visit", {
-                          params: { mode: "visit-out", id: visitData[0]._id },
-                        });
-                        if (res.data.status == 200) {
-                          setTrigger(trigger + 1);
-                          message.success("Timed OUT.");
-                        }
-                        setLoader("");
-                      }}
+                    <Tooltip
+                      title={
+                        moment().isAfter(moment(visitHour))
+                          ? "Visiting hour is close"
+                          : null
+                      }
                     >
                       <Button
                         type="primary"
                         style={{ width: 200 }}
                         size="large"
                         icon={<LogoutOutlined />}
+                        disabled={moment().isAfter(moment(visitHour))}
+                        onClick={async () => {
+                          setLoader("registering");
+                          let res = await axios.get("/api/visit", {
+                            params: { mode: "visit-out", id: visitData[0]._id },
+                          });
+                          if (res.data.status == 200) {
+                            setTrigger(trigger + 1);
+                            message.success("Timed OUT.");
+                          }
+                          setLoader("");
+                        }}
                         ghost
                         danger
                       >
                         Check Out
                       </Button>
-                    </Popconfirm>
-                    <Button
-                      size="large"
-                      icon={<LogoutOutlined />}
-                      style={{ width: 200 }}
+                    </Tooltip>
+
+                    <Tooltip
+                      title={
+                        moment().isAfter(moment(visitHour))
+                          ? "Visiting hour is close"
+                          : null
+                      }
                     >
-                      Quick Check-Out
-                    </Button>
+                      <Button
+                        size="large"
+                        icon={<LogoutOutlined />}
+                        style={{ width: 200 }}
+                        disabled={moment().isAfter(moment(visitHour))}
+                      >
+                        Quick Check-Out
+                      </Button>
+                    </Tooltip>
                   </Space>
                 )}
               </>
@@ -314,78 +308,7 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
           </Col>
         </Row>
       </Modal>
-      <Modal
-        open={visitIn}
-        onCancel={() => setVisitIn(false)}
-        closable={false}
-        footer={null}
-        title="Visitation Form"
-        destroyOnClose
-      >
-        <Spin spinning={loader == "registering"}>
-          <Form
-            labelCol={{
-              flex: "150px",
-            }}
-            labelAlign="left"
-            labelWrap
-            wrapperCol={{
-              flex: 1,
-            }}
-            colon={false}
-            onFinish={handleFinish}
-          >
-            <Form.Item name="prisonerName" label="Name of prisoner">
-              <Input />
-            </Form.Item>
-            <Form.Item label="Relation to prisoner" name="relationship">
-              <Input />
-            </Form.Item>
-            <Form.Item label="Visit Duration" name="duration">
-              <InputNumber
-                placeholder={`max: ${durationType == "minutes" ? 120 : 2}`}
-                addonAfter={
-                  <Select
-                    style={{ width: 100 }}
-                    onChange={(e) => setDurationType(e)}
-                    value={durationType}
-                  >
-                    <Select.Option value="minutes">Minutes</Select.Option>
-                    <Select.Option value="hours">Hour</Select.Option>
-                  </Select>
-                }
-                min={0}
-                max={durationType == "minutes" ? 120 : 2}
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-            <Form.Item
-              label="Deposit Items"
-              name="depositItems"
-              initialValue={depositItems}
-            >
-              <Select
-                mode="multiple"
-                onChange={setDepositItems}
-                options={filteredOptions.map((item) => ({
-                  value: item,
-                  label: item,
-                }))}
-              />
-            </Form.Item>
-            <Form.Item noStyle>
-              <Button
-                type="primary"
-                style={{ width: "100%" }}
-                htmlType="submit"
-                size="large"
-              >
-                SUBMIT
-              </Button>
-            </Form.Item>
-          </Form>
-        </Spin>
-      </Modal>
+
       <Modal
         open={openRemarks.show}
         onCancel={() => setOpenRemarks({ show: false, data: null })}

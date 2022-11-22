@@ -7,12 +7,21 @@ import {
   AutoComplete,
   Col,
   Row,
+  Tooltip,
   notification,
+  Popconfirm,
+  message,
 } from "antd";
-import { UserAddOutlined } from "@ant-design/icons";
+import {
+  UserAddOutlined,
+  LoginOutlined,
+  EditOutlined,
+  EyeOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 
-import { AddVisitor, UpdateVisitor } from "./components";
-import { IDGen, Timer } from "../../assets/utilities";
+import { AddVisitor, UpdateVisitor, VisitForm } from "./components";
+import { IDGen, Timer, Profiler } from "../../assets/utilities";
 import axios from "axios";
 import moment from "moment";
 
@@ -25,12 +34,17 @@ const VisitorPage = () => {
   const timerRef = useRef(null);
   const [load, setLoad] = useState("");
   const [visitorWithTimer, setVisitorWithTimer] = useState();
+  const [openProfile, setOpenProfile] = useState({ show: false, data: null });
   const [dismissClick, setDismmissClick] = useState({
     show: false,
     index: null,
   });
   const [updateVisitor, setUpdateVisitor] = useState({
     open: false,
+    data: null,
+  });
+  const [openVisitForm, setOpenVisitForm] = useState({
+    show: false,
     data: null,
   });
 
@@ -46,6 +60,7 @@ const VisitorPage = () => {
     },
     {
       title: "Name",
+      width: 150,
       render: (_, row) => (
         <Typography>
           {row.name}
@@ -55,12 +70,13 @@ const VisitorPage = () => {
     },
     {
       title: "Age",
-      width: 50,
+      width: 1,
       render: (_, row) => <Typography>{row.age}</Typography>,
     },
     {
       title: "Address",
       align: "center",
+      width: 250,
       render: (_, row) => <Typography>{row.address}</Typography>,
     },
     {
@@ -68,6 +84,84 @@ const VisitorPage = () => {
       width: 150,
       align: "center",
       render: (_, row) => <Typography>{row?.gender}</Typography>,
+    },
+    {
+      title: "Actions",
+      align: "center",
+      render: (_, row) => (
+        <>
+          <Row style={{ display: "flex", justifyContent: "space-around" }}>
+            <Col>
+              <Tooltip title="Check In">
+                <Typography.Link
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenVisitForm({ show: true, data: row });
+                  }}
+                >
+                  <LoginOutlined />
+                </Typography.Link>
+              </Tooltip>
+            </Col>
+            <Col>
+              <Tooltip title="Edit">
+                <Typography.Link
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setUpdateVisitor({ open: true, data: row });
+                  }}
+                >
+                  <EditOutlined />
+                </Typography.Link>
+              </Tooltip>
+            </Col>
+          </Row>
+          <Row style={{ display: "flex", justifyContent: "space-around" }}>
+            <Col>
+              <Tooltip title="View">
+                <Typography.Link
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenProfile({ show: true, data: row });
+                  }}
+                >
+                  <EyeOutlined />
+                </Typography.Link>
+              </Tooltip>
+            </Col>
+            <Col>
+              <Tooltip title="Delete">
+                <Popconfirm
+                  title="Are you sure ?"
+                  okText="Confirm"
+                  onConfirm={async (e) => {
+                    e.stopPropagation();
+                    let { data } = await axios.get("/api/visitor", {
+                      params: {
+                        mode: "remove",
+                        id: row?._id,
+                      },
+                    });
+
+                    if (data.status == 200) {
+                      setTrigger(trigger + 1);
+                      message.success(data.message);
+                    } else message.error(data.message);
+                  }}
+                >
+                  <Typography.Link
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    <DeleteOutlined />
+                  </Typography.Link>
+                </Popconfirm>
+              </Tooltip>
+            </Col>
+          </Row>
+        </>
+      ),
     },
   ];
 
@@ -180,7 +274,7 @@ const VisitorPage = () => {
     <div>
       {contextHolder}
       <Row>
-        <Col span={13}>
+        <Col span={14}>
           <Space style={{ marginBottom: 5 }}>
             <Button
               onClick={() => setShowAddVisitor(true)}
@@ -215,15 +309,13 @@ const VisitorPage = () => {
             dataSource={visitors}
             columns={column}
             onRow={(data) => {
-              return {
-                onClick: () => setUpdateVisitor({ open: true, data }),
-              };
+              return { onClick: () => setOpenProfile({ show: true, data }) };
             }}
             rowKey={(row) => row._id}
             loading={load == "fetch"}
           />
         </Col>
-        <Col span={10} offset={1}>
+        <Col span={9} offset={1}>
           <Space style={{ marginBottom: 5, padding: 6 }}>
             <Typography.Text strong>Visit limit Timers</Typography.Text>
           </Space>
@@ -252,6 +344,17 @@ const VisitorPage = () => {
         }
         data={updateVisitor.data}
         refresh={() => setTrigger(trigger + 1)}
+      />
+      <Profiler
+        openModal={openProfile.show}
+        setOpenModal={setOpenProfile}
+        data={openProfile.data}
+      />
+      <VisitForm
+        open={openVisitForm.show}
+        setOpen={setOpenVisitForm}
+        data={openVisitForm.data}
+        setTrigger={() => {}}
       />
     </div>
   );

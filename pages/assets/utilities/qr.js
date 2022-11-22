@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
-import { Input, Button, Space, message } from "antd";
+import { Input, Button, Space, message, Typography } from "antd";
 import io from "socket.io-client";
 import { CheckCircleOutlined } from "@ant-design/icons";
+import moment from "moment";
+import { SettingsContext } from "../../context";
 
 let socket;
 
@@ -11,6 +13,7 @@ const QRCamera = () => {
   const [load, setLoad] = useState("");
   const [key, setKey] = useState("");
   const [inputKey, setInputKey] = useState("");
+  const { visitHour } = useContext(SettingsContext);
 
   const handleConnect = () => {
     setLoad("connecting");
@@ -56,38 +59,54 @@ const QRCamera = () => {
 
   return (
     <>
-      <div>
-        <div id="reader" style={{ alignSelf: "flex-start" }} />
-      </div>
-      <div>
-        {connected ? (
-          <Space
-            style={{ display: "flex", justifyContent: "center", marginTop: 10 }}
-          >
-            <CheckCircleOutlined /> Connected <br />
-            <Button
-              onClick={() => {
-                setConnected(false);
-                socket.emit("disconnected");
-              }}
-            >
-              DISCONNECT
-            </Button>
-          </Space>
-        ) : (
-          <Space
-            style={{ display: "flex", justifyContent: "center", marginTop: 10 }}
-          >
-            <Input
-              onChange={(e) => setInputKey(e.target.value)}
-              value={inputKey}
-            />
-            <Button onClick={handleConnect} loading={load == "connecting"}>
-              CONNECT
-            </Button>
-          </Space>
-        )}
-      </div>
+      {moment().isBefore(visitHour) ? (
+        <>
+          <div>
+            <div id="reader" style={{ alignSelf: "flex-start" }} />
+          </div>
+          <div>
+            {connected ? (
+              <Space
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: 10,
+                }}
+              >
+                <CheckCircleOutlined /> Connected <br />
+                <Button
+                  onClick={() => {
+                    setConnected(false);
+                    socket.emit("disconnected");
+                  }}
+                >
+                  DISCONNECT
+                </Button>
+              </Space>
+            ) : (
+              <Space
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: 10,
+                }}
+              >
+                <Input
+                  onChange={(e) => setInputKey(e.target.value)}
+                  value={inputKey}
+                />
+                <Button onClick={handleConnect} loading={load == "connecting"}>
+                  CONNECT
+                </Button>
+              </Space>
+            )}
+          </div>
+        </>
+      ) : (
+        <Typography.Text>
+          Visiting hours is limited to 2:00PM only.
+        </Typography.Text>
+      )}
     </>
   );
 };

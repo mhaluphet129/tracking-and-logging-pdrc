@@ -1,15 +1,14 @@
-import { createContext } from "react";
+import React, { createContext, useState } from "react";
 
 export const SettingsContext = createContext();
 
 function SettingsContextProvider(props) {
-  function notifyAdmin() {
-    alert(1);
-  }
+  let [visitHour, setVisitHour] = useState({ hour: 14, minute: 0 });
   return (
     <SettingsContext.Provider
       value={{
-        notifyAdmin,
+        setVisitHour,
+        visitHour,
       }}
     >
       {props.children}

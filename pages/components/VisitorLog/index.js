@@ -11,11 +11,11 @@ const VisitorLog = () => {
       title: "Name",
       render: (_, row) => (
         <Typography>
-          {row?.visitorId.name}
-          {row?.visitorId.middlename
+          {row?.visitorId?.name}
+          {row?.visitorId?.middlename
             ? " " + row?.visitorId.middlename
             : ""}{" "}
-          {row?.visitorId.lastname}
+          {row?.visitorId?.lastname}
         </Typography>
       ),
     },
@@ -25,7 +25,11 @@ const VisitorLog = () => {
     },
     {
       title: "Time In/Check In",
-      render: (_, row) => moment(row?.timeIn).format("hh:mm:ss a"),
+      render: (_, row) => moment(row?.timeIn).format("hh:mm a"),
+    },
+    {
+      title: "Time Out/Check Out",
+      render: (_, row) => moment(row?.timeOut).format("hh:mm a"),
     },
   ];
 
