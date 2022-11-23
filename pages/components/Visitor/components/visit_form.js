@@ -7,20 +7,28 @@ import {
   InputNumber,
   Select,
   Button,
+  Space,
+  Tag,
   message,
+  Tooltip,
 } from "antd";
 import moment from "moment";
 import axios from "axios";
+import { PlusOutlined } from "@ant-design/icons";
 
-const VisitForm = ({ open, setOpen, data, setTrigger }) => {
-  const [depositItems, setDepositItems] = useState([]);
+const VisitForm = ({ open, close, data, setTrigger }) => {
   const [durationType, setDurationType] = useState("hours");
-  let depositOptions = ["Food", "Money", "Clothes"];
-  let filteredOptions = depositOptions.filter((e) => !depositItems.includes(e));
   const [loader, setLoader] = useState("");
+  const [items, setItems] = useState([]);
+  const [openAddItems, setOpenAddItems] = useState(false);
+  const [itemsInfo, setItemsInfo] = useState({ name: "", description: "" });
 
   const handleFinish = async (val) => {
-    if (val.prisonerName == null || val.relationship == null) {
+    if (
+      val.prisonerName == null ||
+      val.relationship == null ||
+      val.duration == null
+    ) {
       message.warning("Please fill the required input.");
       return;
     }
@@ -31,8 +39,8 @@ const VisitForm = ({ open, setOpen, data, setTrigger }) => {
       timeOut: moment().add(val?.duration, durationType),
       prisonerName: val.prisonerName,
       relationship: val.relationship,
-      depositItems: val.depositItems,
       date: moment(),
+      items,
     };
 
     setLoader("registering");
@@ -45,84 +53,181 @@ const VisitForm = ({ open, setOpen, data, setTrigger }) => {
     setLoader("");
 
     if (res.data.status == 200) {
-      setOpen({ show: false, data: null });
+      close();
       message.success(res.data.message);
-      setTrigger(trigger + 1);
+      setTrigger((trigger) => trigger + 1);
     }
   };
   return (
-    <Modal
-      open={open}
-      onCancel={() => setOpen(false)}
-      closable={false}
-      footer={null}
-      title="Visitation Form"
-      destroyOnClose
-    >
-      <Spin spinning={loader == "registering"}>
-        <Form
-          labelCol={{
-            flex: "150px",
-          }}
-          labelAlign="left"
-          labelWrap
-          wrapperCol={{
-            flex: 1,
-          }}
-          colon={false}
-          onFinish={handleFinish}
-        >
-          <Form.Item name="prisonerName" label="Name of prisoner">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Relation to prisoner" name="relationship">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Visit Duration" name="duration">
-            <InputNumber
-              placeholder={`max: ${durationType == "minutes" ? 120 : 2}`}
-              addonAfter={
-                <Select
-                  style={{ width: 100 }}
-                  onChange={(e) => setDurationType(e)}
-                  value={durationType}
-                >
-                  <Select.Option value="minutes">Minutes</Select.Option>
-                  <Select.Option value="hours">Hour</Select.Option>
-                </Select>
-              }
-              min={0}
-              max={durationType == "minutes" ? 120 : 2}
-              style={{ width: "100%" }}
-            />
-          </Form.Item>
-          <Form.Item
-            label="Deposit Items"
-            name="depositItems"
-            initialValue={depositItems}
+    <>
+      <Modal
+        open={open}
+        onCancel={() => {
+          close();
+          setItems([]);
+        }}
+        closable={false}
+        footer={null}
+        title="Visitation Form"
+        destroyOnClose
+      >
+        <Spin spinning={loader == "registering"}>
+          <Form
+            labelCol={{
+              flex: "150px",
+            }}
+            labelAlign="left"
+            labelWrap
+            wrapperCol={{
+              flex: 1,
+            }}
+            colon={false}
+            onFinish={handleFinish}
           >
-            <Select
-              mode="multiple"
-              onChange={setDepositItems}
-              options={filteredOptions.map((item) => ({
-                value: item,
-                label: item,
-              }))}
-            />
-          </Form.Item>
-          <Form.Item noStyle>
-            <Button
-              type="primary"
-              style={{ width: "100%" }}
-              htmlType="submit"
-              size="large"
-            >
-              SUBMIT
-            </Button>
-          </Form.Item>
-        </Form>
-      </Spin>
-    </Modal>
+            <Form.Item name="prisonerName" label="Name of prisoner">
+              <Input />
+            </Form.Item>
+            <Form.Item label="Relation to prisoner" name="relationship">
+              <Input />
+            </Form.Item>
+            <Form.Item label="Visit Duration" name="duration">
+              <InputNumber
+                placeholder={`max: ${durationType == "minutes" ? 120 : 2}`}
+                addonAfter={
+                  <Select
+                    style={{ width: 100 }}
+                    onChange={(e) => setDurationType(e)}
+                    value={durationType}
+                  >
+                    <Select.Option value="minutes">Minutes</Select.Option>
+                    <Select.Option value="hours">Hour</Select.Option>
+                  </Select>
+                }
+                min={0}
+                max={durationType == "minutes" ? 120 : 2}
+                style={{ width: "100%" }}
+              />
+            </Form.Item>
+            <Form.Item label="Deposit Items List">
+              {!openAddItems && (
+                <Button
+                  icon={<PlusOutlined />}
+                  onClick={() => setOpenAddItems(true)}
+                  style={{ marginTop: 10 }}
+                >
+                  Add new Items
+                </Button>
+              )}
+              {items?.length > 0 && (
+                <div style={{ marginLeft: 150 }}>
+                  {items?.map((e, i) => (
+                    <Tooltip key={e + i} title={e?.description}>
+                      <Tag
+                        style={{ marginTop: 5 }}
+                        onClose={(___) => {
+                          ___.preventDefault();
+                          setItems((_) => _.filter((__) => __.name != e.name));
+                        }}
+                        closable
+                      >
+                        {e.name}
+                      </Tag>
+                    </Tooltip>
+                  ))}
+                </div>
+              )}
+
+              {openAddItems && (
+                <>
+                  <Space
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "end",
+                      marginTop: 10,
+                    }}
+                  >
+                    Name:{" "}
+                    <Input
+                      style={{
+                        width: 320,
+                      }}
+                      placeholder="(Required)"
+                      onChange={(e) =>
+                        setItemsInfo((_) => {
+                          return {
+                            ..._,
+                            name: e.target.value,
+                          };
+                        })
+                      }
+                      value={itemsInfo.name}
+                    />
+                  </Space>
+                  <Space
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "end",
+                    }}
+                  >
+                    Description:{" "}
+                    <Input.TextArea
+                      value={itemsInfo.description}
+                      style={{
+                        width: 320,
+                        marginTop: 10,
+                      }}
+                      onChange={(e) =>
+                        setItemsInfo((_) => {
+                          return {
+                            ..._,
+                            description: e.target.value,
+                          };
+                        })
+                      }
+                    />
+                  </Space>
+                  <Button
+                    icon={<PlusOutlined />}
+                    style={{ marginTop: 10, float: "right" }}
+                    onClick={() => {
+                      if (itemsInfo.name == "") {
+                        message.warning("Item name is blank.");
+                        return;
+                      }
+
+                      if (
+                        items.filter((e) => e.name == itemsInfo.name).length ==
+                        0
+                      ) {
+                        setItems((e) => [
+                          ...e,
+                          { ...itemsInfo, ownerId: data?._id },
+                        ]);
+                        setItemsInfo({ name: "", description: "" });
+                      }
+                    }}
+                  >
+                    Add to query
+                  </Button>
+                </>
+              )}
+            </Form.Item>
+            <Form.Item noStyle>
+              <Button
+                type="primary"
+                style={{ width: "100%" }}
+                htmlType="submit"
+                size="large"
+              >
+                SUBMIT
+              </Button>
+            </Form.Item>
+          </Form>
+        </Spin>
+      </Modal>
+    </>
   );
 };
 

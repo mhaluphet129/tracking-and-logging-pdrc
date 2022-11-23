@@ -20,6 +20,7 @@ import {
   WarningOutlined,
   CheckCircleOutlined,
   ReloadOutlined,
+  BlockOutlined,
 } from "@ant-design/icons";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -47,13 +48,18 @@ const Sider = ({ selectedIndex }) => {
       key: "visitor-log",
       icon: <SnippetsOutlined />,
     },
+    // {
+    //   label: "Report",
+    //   key: "report",
+    //   icon: <SnippetsOutlined />,
+    //   style: {
+    //     paddingRight: "40px",
+    //   },
+    // },
     {
-      label: "Report",
-      key: "report",
-      icon: <SnippetsOutlined />,
-      style: {
-        paddingRight: "40px",
-      },
+      label: "Inventory Page",
+      key: "inventory",
+      icon: <BlockOutlined />,
     },
   ]);
 

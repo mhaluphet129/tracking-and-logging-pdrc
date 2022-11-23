@@ -67,9 +67,6 @@ let VisitSchema = new mongoose.Schema(
     remarks: {
       type: [RemarksSchema],
     },
-    depositItems: {
-      type: [String],
-    },
   },
   { timestamps: true }
 );

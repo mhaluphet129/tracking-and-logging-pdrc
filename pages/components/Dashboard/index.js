@@ -41,6 +41,12 @@ export default () => {
   let [max, setMax] = useState(10);
   const [api, contextHolder] = notification.useNotification();
   const [openProfile, setOpenProfile] = useState({ show: false, data: null });
+  const [cardData, setCardData] = useState({
+    totalVisitor: 0,
+    totalVisit: 0,
+    totalVisitMonth: 0,
+  });
+
   const options = {
     responsive: true,
     plugins: {
@@ -123,12 +129,20 @@ export default () => {
     (async () => {
       let { data } = await axios.get("/api/dashboard");
       const newState = [...dashbardNumericalData];
+
       if (data.status == 200) {
-        for (let i = 0; i < data.data.length; i++) {
-          if (data.data[i].count > max) setMax(Math.max(data.data[i].count));
-          newState[data.data[i]._id - 1] = data.data[i].count;
+        for (let i = 0; i < data.data?.graphValue.length; i++) {
+          if (data.data?.graphValue[i].count > max)
+            setMax(Math.max(data.data?.graphValue[i].count));
+          newState[data.data?.graphValue[i]._id - 1] =
+            data.data?.graphValue[i].count;
           setDashbardNumericalData(newState);
         }
+        setCardData({
+          totalVisitor: data.data?.totalVisitor,
+          totalVisit: data.data?.totalVisit,
+          totalVisitMonth: data.data?.totalVisitMonth,
+        });
       }
     })();
   }, []);
@@ -158,16 +172,16 @@ export default () => {
                 title="Total Visitor"
                 style={{ textAlign: "center", width: "100%" }}
               >
-                1,078
-              </Card>
-              <Card
-                title="Total Visitor this Month"
-                style={{ textAlign: "center" }}
-              >
-                1,078
+                {cardData.totalVisitor}
               </Card>
               <Card title="Total Visits" style={{ textAlign: "center" }}>
-                1,078
+                {cardData.totalVisit}
+              </Card>
+              <Card
+                title="Total Visits this Month"
+                style={{ textAlign: "center" }}
+              >
+                {cardData.totalVisitMonth}
               </Card>
             </Space>
           </Col>

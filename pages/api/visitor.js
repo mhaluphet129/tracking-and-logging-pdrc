@@ -57,37 +57,7 @@ export default async function handler(req, res) {
                   .json({ success: false, message: "Error: " + err });
               });
           }
-          case "filter-visitor": {
-            const { filter } = req.query;
-            let _ = JSON.parse(filter);
 
-            let option = [];
-
-            if (_.hasOwnProperty("gender")) option.push({ gender: _.gender });
-            if (_.hasOwnProperty("withPension"))
-              option.push({ "pensionStatus.withPension": _.withPension });
-            if (_.hasOwnProperty("address"))
-              option.push({ address: _.address });
-            if (_.hasOwnProperty("status"))
-              option.push({ status: { $in: [..._.status] } });
-            if (_.hasOwnProperty("ageRange"))
-              option.push({
-                age: {
-                  $gte: _.ageRange.from,
-                  $lte: _.ageRange.to,
-                },
-              });
-            await Visitor.find({ $and: [...option] })
-              .then((e) => {
-                res.json({ status: 200, searchData: e });
-              })
-              .catch((err) => {
-                res
-                  .status(500)
-                  .json({ success: false, message: "Error: " + err });
-              });
-            resolve();
-          }
           case "get-visitor": {
             const { id } = req.query;
 
@@ -167,7 +137,6 @@ export default async function handler(req, res) {
           }
           case "update-visitor": {
             const { id } = req.body.payload;
-            console.log("im called");
 
             delete req.body.payload.data._id;
             delete req.body.payload.data.createdAt;

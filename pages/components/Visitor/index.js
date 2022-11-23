@@ -287,7 +287,7 @@ const VisitorPage = () => {
                 width: 200,
               }}
               loading={loading}
-              placeholder="Search by Name/ID"
+              placeholder="Search by Name"
               filterOption={(inputValue, option) =>
                 option.value
                   ?.toUpperCase()
@@ -349,12 +349,13 @@ const VisitorPage = () => {
         openModal={openProfile.show}
         setOpenModal={setOpenProfile}
         data={openProfile.data}
+        setTrigger2={setTrigger}
       />
       <VisitForm
         open={openVisitForm.show}
-        setOpen={setOpenVisitForm}
+        close={() => setOpenVisitForm({ show: false, data: null })}
         data={openVisitForm.data}
-        setTrigger={() => {}}
+        setTrigger={setTrigger}
       />
     </div>
   );

@@ -1,6 +1,8 @@
 import Visit from "../../database/model/Visit";
 import dbConnect from "../../database/dbConnect";
 import moment from "moment";
+import Item from "../../database/model/Item";
+var ObjectId = require("mongodb").ObjectId;
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -15,7 +17,19 @@ export default async function handler(req, res) {
           case "get-visit-data": {
             const { id } = req.query;
 
-            return await Visit.find({ visitorId: id })
+            return await Visit.aggregate([
+              {
+                $match: { visitorId: ObjectId(id) },
+              },
+              {
+                $lookup: {
+                  from: "items",
+                  localField: "_id",
+                  foreignField: "visitId",
+                  as: "depositItems",
+                },
+              },
+            ])
               .sort({ createdAt: -1 })
               .then((e) => {
                 res.json({ status: 200, data: e });
@@ -78,6 +92,63 @@ export default async function handler(req, res) {
                   .json({ success: false, message: "Error: " + err });
               });
           }
+          case "search-visit": {
+            const { searchKeyword } = req.query;
+
+            return await Visit.find({})
+              .populate("visitorId")
+              .collation({ locale: "en" })
+              .sort({ name: 1 })
+              .then((e) => {
+                let filter = e.filter(
+                  (_) =>
+                    _.visitorId?.name?.search(searchKeyword) > -1 ||
+                    _.visitorId?.middlename?.search(searchKeyword) > -1 ||
+                    _.visitorId?.lastname?.search(searchKeyword) > -1
+                );
+                res.json({ status: 200, searchData: filter });
+                resolve();
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
+          case "filter-date": {
+            const { startDate, endDate } = req.query;
+
+            await Visit.find({
+              timeIn: { $gte: startDate },
+              timeOut: { $lte: endDate },
+            })
+              .populate("visitorId")
+              .then((e) => {
+                res.json({ status: 200, data: e });
+                resolve();
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
+          case "visitor-has-items": {
+            const { id } = req.query;
+            return await Item.find({
+              ownerId: id,
+              claimed: false,
+              status: { $nin: ["DISPOSED"] },
+            })
+              .then((e) => {
+                res.json({ status: 200, data: e });
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
         }
       });
     case "POST": {
@@ -86,10 +157,15 @@ export default async function handler(req, res) {
 
         switch (mode) {
           case "new-visit": {
+            let { items } = req.body.payload.data;
             let newVisit = Visit(req.body.payload.data);
+            items = items.map((e) => {
+              return { ...e, visitId: newVisit._id };
+            });
             return await newVisit
               .save()
-              .then(() => {
+              .then(async (e) => {
+                await Item.insertMany(items);
                 res.json({ status: 200, message: "Successfully Added" });
                 resolve();
               })

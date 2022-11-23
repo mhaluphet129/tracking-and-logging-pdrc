@@ -19,6 +19,8 @@ import {
   LoginOutlined,
   LogoutOutlined,
   QuestionCircleOutlined,
+  CheckOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import QRCode from "qrcode";
@@ -27,8 +29,9 @@ import axios from "axios";
 
 import { SettingsContext } from "../../context";
 import { VisitForm } from "../../components/Visitor/components";
+import CheckLister from "./item_checklist_verifier";
 
-const Profiler = ({ openModal, setOpenModal, data }) => {
+const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
   const [qr, setQr] = useState("");
   const [loader, setLoader] = useState("");
   const [visitData, setVisitData] = useState([]);
@@ -39,6 +42,10 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
   const [refViolation, setRefViolation] = useState(false);
   const [trigger, setTrigger] = useState(0);
   const [isTimeOut, setIsTimeOut] = useState(true);
+  const [openItemModal, setOpenItemModal] = useState({
+    show: false,
+    data: null,
+  });
 
   const { setVisitHour, visitHour } = useContext(SettingsContext);
 
@@ -57,7 +64,23 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
       setOpenAddRemarks(false);
       message.success(res.data.message);
       setTrigger(trigger + 1);
+      setTrigger2((trig) => trig + 1);
     }
+  };
+
+  const checkOut = async () => {
+    setLoader("registering");
+    let res = await axios.get("/api/visit", {
+      params: {
+        mode: "visit-out",
+        id: visitData[0]._id,
+      },
+    });
+    if (res.data.status == 200) {
+      setTrigger(trigger + 1);
+      message.success("Timed OUT.");
+    }
+    setLoader("");
   };
 
   const columns = [
@@ -127,7 +150,7 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
     });
 
     if (res.data.status == 200) setIsTimeOut(res.data.data.timeOut);
-  }, [data?._id]);
+  }, [data?._id, trigger]);
 
   useEffect(async () => {
     QRCode.toString(data?._id?.toString(), function (err, url) {
@@ -145,7 +168,7 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
     if (res.data.status == 200) {
       setVisitData(res.data.data);
       if (res.data.data != null) {
-        res.data.data.forEach((e) => {
+        res.data.data?.forEach((e) => {
           e.remarks.forEach((e2) => {
             if (e2.hasViolation) setRefViolation(true);
           });
@@ -159,9 +182,15 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
     <>
       <VisitForm
         open={visitIn}
-        setOpen={setVisitIn}
+        close={() => setVisitIn(false)}
         data={data}
         setTrigger={setTrigger}
+      />
+      <CheckLister
+        open={openItemModal.show}
+        close={() => setOpenItemModal({ show: false, data: null })}
+        data={openItemModal.data}
+        update={checkOut}
       />
       <Modal
         open={openModal}
@@ -237,15 +266,21 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
                         icon={<LogoutOutlined />}
                         disabled={moment().isAfter(moment(visitHour))}
                         onClick={async () => {
-                          setLoader("registering");
                           let res = await axios.get("/api/visit", {
-                            params: { mode: "visit-out", id: visitData[0]._id },
+                            params: {
+                              mode: "visitor-has-items",
+                              id: data?._id,
+                            },
                           });
-                          if (res.data.status == 200) {
-                            setTrigger(trigger + 1);
-                            message.success("Timed OUT.");
+
+                          if (res.status == 200) {
+                            if (res.data?.data?.length > 0) {
+                              setOpenItemModal({
+                                show: true,
+                                data: res?.data?.data,
+                              });
+                            } else checkOut();
                           }
-                          setLoader("");
                         }}
                         ghost
                         danger
@@ -284,9 +319,48 @@ const Profiler = ({ openModal, setOpenModal, data }) => {
                     <p>
                       Visit Prisoner: {row?.prisonerName} <br />
                       Relationship to Prisoner: {row?.relationship} <br />
-                      Deposited Items:{" "}
+                      Deposited Items{" "}
+                      <Tooltip title='You can click into the items to view its description and status. "✓" means the item is claimed by user'>
+                        <QuestionCircleOutlined />
+                      </Tooltip>
+                      :{" "}
                       {row?.depositItems.length > 0 ? (
-                        row?.depositItems.map((e, i) => <Tag key={i}>{e}</Tag>)
+                        row?.depositItems.map((e, i) => (
+                          <Tooltip
+                            key={e?.name + i}
+                            title={
+                              e?.claimed
+                                ? "CLAIMED"
+                                : e?.status &&
+                                  e?.status[e?.status?.length - 1] == "DISPOSED"
+                                ? "DISPOSED"
+                                : "UNCLAIMED"
+                            }
+                          >
+                            <Tag
+                              color={
+                                e?.claimed
+                                  ? "success"
+                                  : e?.status &&
+                                    e?.status[e?.status?.length - 1] ==
+                                      "DISPOSED"
+                                  ? "error"
+                                  : null
+                              }
+                            >
+                              {e?.claimed ? (
+                                <CheckOutlined />
+                              ) : e?.status &&
+                                e?.status[e?.status?.length - 1] ==
+                                  "DISPOSED" ? (
+                                <DeleteOutlined />
+                              ) : (
+                                ""
+                              )}{" "}
+                              {e?.name}
+                            </Tag>
+                          </Tooltip>
+                        ))
                       ) : (
                         <Typography.Text type="secondary" italic>
                           NONE
