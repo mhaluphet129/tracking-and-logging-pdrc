@@ -1,12 +1,13 @@
 import React from "react";
 import "antd/dist/antd.css";
 import "../styles/main.styles.css";
+import SettingsContextProvider from "./context";
 
 import Head from "next/head";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <>
+    <SettingsContextProvider>
       <Head>
         {/* <link rel='shortcut icon' href='/logo-icon.svg' /> */}
         <title>PDRC - Visitour Tracking and Logging System</title>
@@ -16,7 +17,7 @@ function MyApp({ Component, pageProps }) {
         />
       </Head>
       <Component {...pageProps} />
-    </>
+    </SettingsContextProvider>
   );
 }
 
