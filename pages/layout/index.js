@@ -28,6 +28,7 @@ import VisitorPage from "../components/Visitor";
 import DashboardPage from "../components/Dashboard";
 import Profiler from "../assets/utilities/profiler";
 import VisitorLog from "../components/VisitorLog";
+import InventoryPage from "../components/Inventory";
 import io from "socket.io-client";
 let socket;
 
@@ -183,7 +184,7 @@ const Content = ({ selectedKey }) => {
       {selectedKey == "dashboard" ? <DashboardPage /> : null}
       {selectedKey == "visitor" ? <VisitorPage /> : null}
       {selectedKey == "visitor-log" ? <VisitorLog /> : null}
-      {selectedKey == "report" ? "report" : null}
+      {selectedKey == "inventory" ? <InventoryPage /> : null}
     </div>
   );
 };

@@ -62,7 +62,7 @@ export default async function handler(req, res) {
               {
                 $set: {
                   timeOutDone: true,
-                  timeOut: moment(),
+                  timeOutTimeAfterDone: moment(),
                 },
               }
             )
@@ -164,7 +164,7 @@ export default async function handler(req, res) {
             });
             return await newVisit
               .save()
-              .then(async (e) => {
+              .then(async () => {
                 await Item.insertMany(items);
                 res.json({ status: 200, message: "Successfully Added" });
                 resolve();

@@ -90,9 +90,9 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
       render: (_, row) => (
         <Space direction="vertical">
           {!row?.timeOutDone ? (
-            <Tag color="success">TIME IN</Tag>
+            <Tag color="success">CHECK IN</Tag>
           ) : (
-            <Tag color="warning">TIME OUT</Tag>
+            <Tag color="warning">CHECK OUT</Tag>
           )}
           {row?.remarks.filter((e) => e.hasViolation)?.length > 0 ? (
             <Tag color="error">Violation</Tag>
@@ -320,7 +320,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                       Visit Prisoner: {row?.prisonerName} <br />
                       Relationship to Prisoner: {row?.relationship} <br />
                       Deposited Items{" "}
-                      <Tooltip title='You can click into the items to view its description and status. "✓" means the item is claimed by user'>
+                      <Tooltip title='You can click into the items to view its description and status. "✓" means the item is claimed by owner'>
                         <QuestionCircleOutlined />
                       </Tooltip>
                       :{" "}

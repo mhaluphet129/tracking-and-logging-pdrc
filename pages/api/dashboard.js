@@ -39,7 +39,7 @@ export default async function handler(req, res) {
             status: 200,
             data: { graphValue, totalVisitor, totalVisit, totalVisitMonth },
           });
-        } catch (e) {
+        } catch (err) {
           res.status(500).json({ success: false, message: "Error: " + err });
         }
         resolve();

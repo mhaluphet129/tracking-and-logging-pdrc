@@ -49,6 +49,9 @@ let VisitSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    timeOutTimeAfterDone: {
+      type: Date,
+    },
     date: {
       type: Date,
       required: true,

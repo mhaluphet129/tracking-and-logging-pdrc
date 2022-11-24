@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Table, Typography, Space, AutoComplete, DatePicker } from "antd";
+import {
+  Table,
+  Typography,
+  Space,
+  AutoComplete,
+  DatePicker,
+  Modal,
+  Tag,
+} from "antd";
 import axios from "axios";
 import moment from "moment";
 
@@ -8,9 +16,12 @@ const VisitorLog = () => {
   const [trigger, setTrigger] = useState(0);
   const [loader, setLoader] = useState(false);
   const timerRef = useRef(null);
+  const [viewLog, setViewLog] = useState({ show: false, data: null });
+  const [openLogItems, setOpenedLogItems] = useState([]);
+
   const column2 = [
     {
-      title: "Name",
+      title: "Visitor Name",
       render: (_, row) => (
         <Typography>
           {row?.visitorId?.name}
@@ -22,27 +33,34 @@ const VisitorLog = () => {
       ),
     },
     {
+      title: "Visitee Name",
+      render: (_, row) => row?.prisonerName,
+    },
+    {
       title: "Date",
       render: (_, row) => moment(row?.date).format("MMM DD, YYYY"),
     },
     {
-      title: "Time In/Check In",
+      title: "Check In",
       render: (_, row) => moment(row?.timeIn).format("hh:mm a"),
     },
     {
-      title: "Time Out/Check Out",
+      title: "Expected Check Out",
+      align: "center",
       render: (_, row) => moment(row?.timeOut).format("hh:mm a"),
     },
+    {
+      title: "Checked out",
+      render: (_, row) =>
+        row?.timeOutTimeAfterDone ? (
+          moment(row?.timeOutTimeAfterDone).format("hh:mm a")
+        ) : (
+          <Typography.Text type="secondary" italic>
+            Not yet
+          </Typography.Text>
+        ),
+    },
   ];
-
-  useEffect(() => {
-    (async () => {
-      let res = await axios.get("/api/visit", {
-        params: { mode: "fetch-recent" },
-      });
-      if (res.data.status == 200) setRecentVisit(res.data.data);
-    })();
-  }, [trigger]);
 
   const searchName = async (keyword) => {
     if (keyword != "" && keyword != null) {
@@ -84,8 +102,126 @@ const VisitorLog = () => {
     if (data.status == 200) setRecentVisit(data.data);
   };
 
+  const checkItemStatus = (item) => {
+    if (item.status?.length > 0) {
+      item.status.forEach((e) => {
+        if (e == "DISPOSED") return "DISPOSED";
+      });
+    } else return item.claimed ? "CLAIMED" : "UNCLAIMED";
+  };
+
+  useEffect(() => {
+    (async () => {
+      let res = await axios.get("/api/visit", {
+        params: { mode: "fetch-recent" },
+      });
+      if (res.data.status == 200) setRecentVisit(res.data.data);
+    })();
+  }, [trigger]);
+
+  useEffect(() => {
+    (async () => {
+      if (viewLog.data?.visitorId._id != null) {
+        let { data } = await axios.get("/api/items", {
+          params: {
+            mode: "get-items",
+            id: viewLog.data?.visitorId._id,
+          },
+        });
+        console.log(data.data);
+
+        if (data.status == 200) setOpenedLogItems(data.data);
+      }
+    })();
+  }, [viewLog?.data]);
+
   return (
-    <Space direction="vertical">
+    <>
+      <Modal
+        footer={null}
+        closable={false}
+        open={viewLog.show}
+        onCancel={() => setViewLog({ show: false, data: null })}
+      >
+        <Space direction="vertical">
+          <Space>
+            Visitor name:{" "}
+            <strong>
+              {viewLog.data?.visitorId.name}
+              {viewLog.data?.visitorId.middlename
+                ? " " + viewLog.data?.visitorId.middlename
+                : ""}{" "}
+              {viewLog.data?.visitorId.lastname}
+            </strong>
+          </Space>
+          <Space>
+            Visitee name: <strong>{viewLog.data?.prisonerName}</strong>
+          </Space>
+          <Space>
+            Date visited:{" "}
+            <strong>
+              {moment(viewLog.data?.timeIn).format("MMMM DD, YYYY")}
+            </strong>
+          </Space>
+          <Space>
+            Time Checked In:{" "}
+            <strong> {moment(viewLog.data?.timeIn).format("hh:mm a")}</strong>
+          </Space>
+          <Space>
+            Expected Checkout:{" "}
+            <>
+              <strong>{moment(viewLog.data?.timeOut).format("hh:mm a")}</strong>
+              {moment
+                .duration(
+                  moment(viewLog.data?.timeOutTimeAfterDone).diff(
+                    moment(viewLog.data?.timeOut)
+                  )
+                )
+                .asSeconds() < 0 ? (
+                <Tag>
+                  check-out early @{" "}
+                  {moment(viewLog.data?.timeOutTimeAfterDone).format("hh:mm a")}
+                </Tag>
+              ) : (
+                ""
+              )}
+            </>
+          </Space>
+          Items:
+          <Table
+            locale={{ emptyText: "No desposited items" }}
+            pagination={false}
+            columns={[
+              {
+                title: "Name",
+                render: (_, row) => row?.name,
+              },
+              {
+                title: "Description",
+                render: (_, row) => row?.description,
+              },
+              {
+                title: "Status",
+                render: (row) => (
+                  <Tag
+                    color={
+                      checkItemStatus(row) == "DISPOSED"
+                        ? "blue"
+                        : checkItemStatus(row) == "CLAIMED"
+                        ? "success"
+                        : "default"
+                    }
+                  >
+                    {checkItemStatus(row)}
+                  </Tag>
+                ),
+              },
+            ]}
+            tableLayout="auto"
+            dataSource={openLogItems}
+          />
+        </Space>
+      </Modal>
       <Space>
         <AutoComplete
           style={{
@@ -113,8 +249,15 @@ const VisitorLog = () => {
           onCalendarChange={handleCalendarChange}
         />
       </Space>
-      <Table columns={column2} dataSource={recentVisit} />
-    </Space>
+      <Table
+        columns={column2}
+        dataSource={recentVisit}
+        onRow={(row) => {
+          return { onClick: () => setViewLog({ show: true, data: row }) };
+        }}
+        style={{ marginTop: 10 }}
+      />
+    </>
   );
 };
 
