@@ -15,11 +15,13 @@ export default async function handler(req, res) {
             let { ids } = req.query;
             ids = JSON.parse(ids);
             return await Item.updateMany(
-              { _id: { $in: [...ids] } },
-              { $set: { claimed: true } }
+              { _id: { $in: ids } },
+              { $set: { claimed: true } },
+              { new: true }
             )
-              .then(() => {
-                res.json({ status: 200, message: "Check out done." });
+              .then(async () => {
+                let data = await Item.find();
+                res.json({ status: 200, message: "Check out done.", data });
                 resolve();
               })
               .catch((err) => {

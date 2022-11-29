@@ -11,6 +11,8 @@ import {
   notification,
   Popconfirm,
   message,
+  PageHeader,
+  Card,
 } from "antd";
 import {
   UserAddOutlined,
@@ -54,6 +56,7 @@ const VisitorPage = () => {
     {
       title: "ID",
       align: "center",
+      width: 50,
       render: (_, row) => (
         <Typography.Link>{IDGen(row?._id, 6)}</Typography.Link>
       ),
@@ -71,6 +74,7 @@ const VisitorPage = () => {
     {
       title: "Age",
       width: 1,
+      align: "center",
       render: (_, row) => <Typography>{row.age}</Typography>,
     },
     {
@@ -88,6 +92,7 @@ const VisitorPage = () => {
     {
       title: "Actions",
       align: "center",
+      width: 50,
       render: (_, row) => (
         <>
           <Row style={{ display: "flex", justifyContent: "space-around" }}>
@@ -271,65 +276,60 @@ const VisitorPage = () => {
   }, [trigger]);
 
   return (
-    <div>
+    <PageHeader title="Visitors Profile">
       {contextHolder}
-      <Row>
-        <Col span={14}>
-          <Space style={{ marginBottom: 5 }}>
-            <Button
-              onClick={() => setShowAddVisitor(true)}
-              icon={<UserAddOutlined />}
-            >
-              New Visitor
-            </Button>
-            <AutoComplete
-              style={{
-                width: 200,
-              }}
-              loading={loading}
-              placeholder="Search by Name"
-              filterOption={(inputValue, option) =>
-                option.value
-                  ?.toUpperCase()
-                  .indexOf(inputValue.toUpperCase()) !== -1
+      <Card>
+        <Space style={{ marginBottom: 5 }}>
+          <Button
+            onClick={() => setShowAddVisitor(true)}
+            icon={<UserAddOutlined />}
+          >
+            New Visitor
+          </Button>
+          <AutoComplete
+            style={{
+              width: 200,
+            }}
+            loading={loading}
+            placeholder="Search by Name"
+            filterOption={(inputValue, option) =>
+              option.value?.toUpperCase().indexOf(inputValue.toUpperCase()) !==
+              -1
+            }
+            onChange={(_) => {
+              runTimer(_);
+              if (_?.length <= 0) {
+                setSearchName("");
+                setLoading(false);
+                setTrigger(trigger + 1);
               }
-              onChange={(_) => {
-                runTimer(_);
-                if (_?.length <= 0) {
-                  setSearchName("");
-                  setLoading(false);
-                  setTrigger(trigger + 1);
-                }
-              }}
-              autoFocus
-              allowClear
-            />
-          </Space>
-          <Table
-            dataSource={visitors}
-            columns={column}
-            onRow={(data) => {
-              return { onClick: () => setOpenProfile({ show: true, data }) };
             }}
-            rowKey={(row) => row._id}
-            loading={load == "fetch"}
+            autoFocus
+            allowClear
           />
-        </Col>
-        <Col span={9} offset={1}>
-          <Space style={{ marginBottom: 5, padding: 6 }}>
-            <Typography.Text strong>Visit limit Timers</Typography.Text>
-          </Space>
-          <Table
-            dataSource={visitorWithTimer}
-            columns={column2}
-            rowKey={(row) => row._id}
-            pagination={{
-              pageSize: 8,
-            }}
-            loading={load == "fetch"}
-          />
-        </Col>
-      </Row>
+        </Space>
+        <Table
+          dataSource={visitors}
+          columns={column}
+          onRow={(data) => {
+            return { onClick: () => setOpenProfile({ show: true, data }) };
+          }}
+          rowKey={(row) => row._id}
+          loading={load == "fetch"}
+        />
+        {/* <Space style={{ marginBottom: 5, padding: 6 }}>
+          <Typography.Text strong>Visit limit Timers</Typography.Text>
+        </Space> */}
+        {/* <Table
+          dataSource={visitorWithTimer}
+          columns={column2}
+          rowKey={(row) => row._id}
+          pagination={false}
+          loading={load == "fetch"}
+          style={{ width: 400 }}
+        /> */}
+      </Card>
+
       <AddVisitor
         open={showAddVisitor}
         close={() => setShowAddVisitor(false)}
@@ -357,7 +357,7 @@ const VisitorPage = () => {
         data={openVisitForm.data}
         setTrigger={setTrigger}
       />
-    </div>
+    </PageHeader>
   );
 };
 

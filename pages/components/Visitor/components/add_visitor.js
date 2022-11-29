@@ -264,12 +264,19 @@ const AddVisitor = ({ open, close, refresh }) => {
               title={
                 <>
                   {name.name}{" "}
+                  {name.middlename != null || name.middlename != ""
+                    ? name.middlename
+                    : ""}{" "}
+                  {name.lastname}{" "}
                   <Typography.Text type="secondary">
                     (
-                    {(
-                      (showResults.data?.countName / showResults.data?.total) *
-                      100
-                    ).toFixed(2)}
+                    {showResults.data?.total != 0
+                      ? (
+                          (showResults.data?.countName /
+                            showResults.data?.total) *
+                          100
+                        ).toFixed(2)
+                      : 0}
                     %)
                   </Typography.Text>
                 </>
@@ -289,11 +296,13 @@ const AddVisitor = ({ open, close, refresh }) => {
                     {name.name}{" "}
                     <Typography.Text type="secondary">
                       (
-                      {(
-                        (showResults.data?.countName /
-                          showResults.data?.total) *
-                        100
-                      ).toFixed(2)}
+                      {showResults.data?.total != 0
+                        ? (
+                            (showResults.data?.countName /
+                              showResults.data?.total) *
+                            100
+                          ).toFixed(2)
+                        : 0}
                       %)
                     </Typography.Text>
                   </>
@@ -310,14 +319,16 @@ const AddVisitor = ({ open, close, refresh }) => {
                 title={
                   name.middlename != "" ? (
                     <>
-                      {name.name}{" "}
+                      {name.middlename}{" "}
                       <Typography.Text type="secondary">
                         (
-                        {(
-                          (showResults.data?.countMiddleName /
-                            showResults.data?.total) *
-                          100
-                        ).toFixed(2)}
+                        {showResults.data?.total != 0
+                          ? (
+                              (showResults.data?.countMiddleName /
+                                showResults.data?.total) *
+                              100
+                            ).toFixed(2)
+                          : 0}
                         %)
                       </Typography.Text>
                     </>
@@ -327,7 +338,7 @@ const AddVisitor = ({ open, close, refresh }) => {
                     </Typography.Text>
                   )
                 }
-                style={{ width: 150, height: 150 }}
+                style={{ height: 150, width: 300 }}
               >
                 {name.middlename != "" ? (
                   `${showResults.data?.countMiddleName ?? 0} out of ${
@@ -346,7 +357,7 @@ const AddVisitor = ({ open, close, refresh }) => {
               <Card
                 title={
                   <>
-                    {name.name}{" "}
+                    {name.lastname}{" "}
                     <Typography.Text type="secondary">
                       (
                       {(

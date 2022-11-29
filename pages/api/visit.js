@@ -57,6 +57,8 @@ export default async function handler(req, res) {
           }
 
           case "visit-out": {
+            const { id } = req.query;
+
             return await Visit.findOneAndUpdate(
               { _id: req.query.id },
               {

@@ -33,6 +33,11 @@ const VisitForm = ({ open, close, data, setTrigger }) => {
       return;
     }
 
+    if (itemsInfo.name != "") {
+      message.warning("Please add the items to query before proceeding.");
+      return;
+    }
+
     let obj = {
       visitorId: data._id,
       timeIn: moment(),
@@ -65,6 +70,7 @@ const VisitForm = ({ open, close, data, setTrigger }) => {
         onCancel={() => {
           close();
           setItems([]);
+          setOpenAddItems(false);
         }}
         closable={false}
         footer={null}
@@ -121,13 +127,16 @@ const VisitForm = ({ open, close, data, setTrigger }) => {
               {items?.length > 0 && (
                 <div style={{ marginLeft: 150 }}>
                   {items?.map((e, i) => (
-                    <Tooltip key={e + i} title={e?.description}>
+                    <Tooltip
+                      key={e + i}
+                      title={e?.description ? e?.description : "No description"}
+                    >
                       <Tag
-                        style={{ marginTop: 5 }}
                         onClose={(___) => {
                           ___.preventDefault();
                           setItems((_) => _.filter((__) => __.name != e.name));
                         }}
+                        style={{ marginBottom: 5 }}
                         closable
                       >
                         {e.name}
@@ -144,7 +153,6 @@ const VisitForm = ({ open, close, data, setTrigger }) => {
                       width: "100%",
                       display: "flex",
                       justifyContent: "end",
-                      marginTop: 10,
                     }}
                   >
                     Name:{" "}

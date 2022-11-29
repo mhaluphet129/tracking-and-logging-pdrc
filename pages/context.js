@@ -3,7 +3,7 @@ import React, { createContext, useState } from "react";
 export const SettingsContext = createContext();
 
 function SettingsContextProvider(props) {
-  let [visitHour, setVisitHour] = useState({ hour: 10, minute: 0 });
+  let [visitHour, setVisitHour] = useState({ hour: 16, minute: 0 });
   return (
     <SettingsContext.Provider
       value={{

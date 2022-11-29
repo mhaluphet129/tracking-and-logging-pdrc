@@ -1,5 +1,6 @@
 import Visitor from "../../database/model/Visitor";
 import Visit from "../../database/model/Visit";
+import Item from "../../database/model/Item";
 import dbConnect from "../../database/dbConnect";
 
 export default async function handler(req, res) {
@@ -13,26 +14,23 @@ export default async function handler(req, res) {
 
         switch (mode) {
           case "fetch-all": {
-            if (req.query.search != "") {
-              const { search } = req.query;
-              return await Visitor.find({ _id: search }).then((e) => {
-                res.json({
-                  status: 200,
-                  message: "Successfully fetched the data",
-                  visitor: e,
-                });
-                resolve();
+            return await Visitor.aggregate([
+              {
+                $lookup: {
+                  from: "items",
+                  localField: "_id",
+                  foreignField: "ownerId",
+                  as: "items",
+                },
+              },
+            ]).then((e) => {
+              res.json({
+                status: 200,
+                message: "Successfully fetched the data",
+                visitor: e,
               });
-            } else {
-              return await Visitor.find().then((e) => {
-                res.json({
-                  status: 200,
-                  message: "Successfully fetched the data",
-                  visitor: e,
-                });
-                resolve();
-              });
-            }
+              resolve();
+            });
           }
           case "search-visitor": {
             const { searchKeyword } = req.query;

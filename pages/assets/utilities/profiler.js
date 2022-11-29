@@ -14,6 +14,8 @@ import {
   Checkbox,
   Tooltip,
   Badge,
+  Card,
+  Radio,
 } from "antd";
 import {
   LoginOutlined,
@@ -46,6 +48,11 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
     show: false,
     data: null,
   });
+  const [unclaimTotal, setUnclaimTotal] = useState(0);
+  const [items, setItems] = useState([]);
+  const [unclaimData, setUnclaimData] = useState({ show: false, data: null });
+  const [listItemType, setListItemType] = useState("unclaimed");
+  const [itemChecklist, setItemChecklist] = useState([]);
 
   const { setVisitHour, visitHour } = useContext(SettingsContext);
 
@@ -80,6 +87,48 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
       setTrigger(trigger + 1);
       message.success("Timed OUT.");
     }
+    setLoader("");
+  };
+
+  const reload = () => {
+    setUnclaimData(() => {
+      let _items = [];
+      if (listItemType == "all") _items = items;
+      if (listItemType == "claimed") _items = items.filter((e) => e.claimed);
+      if (listItemType == "unclaimed") _items = items.filter((e) => !e.claimed);
+
+      return { show: true, data: _items };
+    });
+  };
+
+  const handleClaim = async () => {
+    let ids = [];
+    itemChecklist.forEach((e, i) => {
+      if (e) ids.push(items[i]?._id);
+    });
+
+    setLoader("updating-items");
+    let res = await axios.get("/api/items", {
+      params: {
+        mode: "claim-true",
+        ids: JSON.stringify(ids),
+      },
+    });
+
+    if (res.data.status == 200) {
+      setItems(res?.data?.data);
+      setUnclaimData(() => {
+        let _items = [];
+        if (listItemType == "all") _items = res?.data?.data;
+        if (listItemType == "claimed")
+          _items = res?.data?.data.filter((e) => e.claimed);
+        if (listItemType == "unclaimed")
+          _items = res?.data?.data.filter((e) => !e.claimed);
+
+        return { show: true, data: _items };
+      });
+    }
+    setItemChecklist(itemChecklist.map(() => false));
     setLoader("");
   };
 
@@ -153,29 +202,39 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
   }, [data?._id, trigger]);
 
   useEffect(async () => {
-    QRCode.toString(data?._id?.toString(), function (err, url) {
-      setQr(parse(url || ""));
-    });
+    if (data != null || data != "") {
+      QRCode.toString(data?._id?.toString(), function (err, url) {
+        setQr(parse(url || ""));
+      });
 
-    setLoader("fetch-visit");
-    let res = await axios.get("/api/visit", {
-      params: {
-        mode: "get-visit-data",
-        id: data?._id,
-      },
-    });
+      setLoader("fetch-visit");
+      let res = await axios.get("/api/visit", {
+        params: {
+          mode: "get-visit-data",
+          id: data?._id,
+        },
+      });
 
-    if (res.data.status == 200) {
-      setVisitData(res.data.data);
-      if (res.data.data != null) {
-        res.data.data?.forEach((e) => {
-          e.remarks.forEach((e2) => {
-            if (e2.hasViolation) setRefViolation(true);
+      if (res.data.status == 200) {
+        setVisitData(res.data.data);
+        if (res.data.data != null) {
+          res.data.data?.forEach((e) => {
+            e.remarks.forEach((e2) => {
+              if (e2.hasViolation) setRefViolation(true);
+            });
           });
-        });
+        }
       }
+
+      setUnclaimTotal(
+        data?.items?.reduce((p, n) => {
+          if (!n.claimed) return p + 1;
+          return p;
+        }, 0)
+      );
+
+      setLoader("");
     }
-    setLoader("");
   }, [data, trigger]);
 
   return (
@@ -202,7 +261,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
         <Row>
           <Col span={8}>
             <Space direction="vertical">
-              <span>ID: {data?._id}</span>
+              <span style={{ fontSize: 10, margin: 0 }}>ID: {data?._id}</span>
               <Badge.Ribbon
                 text={refViolation ? "Has Violation" : "No Violation"}
                 color={refViolation ? "red" : "blue"}
@@ -229,7 +288,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
           </Col>
           <Col span={16}>
             <Space direction="vertical">
-              <>
+              <Space direction="horizontal">
                 {isTimeOut ? (
                   <Tooltip
                     title={
@@ -252,67 +311,71 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                   </Tooltip>
                 ) : (
                   <Space>
-                    <Tooltip
-                      title={
-                        moment().isAfter(moment(visitHour))
-                          ? "Visiting hour is close"
-                          : null
-                      }
-                    >
-                      <Button
-                        type="primary"
-                        style={{ width: 200 }}
-                        size="large"
-                        icon={<LogoutOutlined />}
-                        disabled={moment().isAfter(moment(visitHour))}
-                        onClick={async () => {
-                          let res = await axios.get("/api/visit", {
-                            params: {
-                              mode: "visitor-has-items",
-                              id: data?._id,
-                            },
-                          });
+                    <Button
+                      type="primary"
+                      style={{ width: 200 }}
+                      size="large"
+                      icon={<LogoutOutlined />}
+                      onClick={async () => {
+                        let res = await axios.get("/api/visit", {
+                          params: {
+                            mode: "visitor-has-items",
+                            id: data?._id,
+                          },
+                        });
 
-                          if (res.status == 200) {
-                            if (res.data?.data?.length > 0) {
-                              setOpenItemModal({
-                                show: true,
-                                data: res?.data?.data,
-                              });
-                            } else checkOut();
-                          }
-                        }}
-                        ghost
-                        danger
-                      >
-                        Check Out
-                      </Button>
-                    </Tooltip>
-
-                    <Tooltip
-                      title={
-                        moment().isAfter(moment(visitHour))
-                          ? "Visiting hour is close"
-                          : null
-                      }
+                        if (res.status == 200) {
+                          if (res.data?.data?.length > 0) {
+                            setOpenItemModal({
+                              show: true,
+                              data: res?.data?.data,
+                            });
+                          } else checkOut();
+                        }
+                      }}
+                      ghost
+                      danger
                     >
-                      <Button
-                        size="large"
-                        icon={<LogoutOutlined />}
-                        style={{ width: 200 }}
-                        disabled={moment().isAfter(moment(visitHour))}
-                      >
-                        Quick Check-Out
-                      </Button>
-                    </Tooltip>
+                      Check Out
+                    </Button>
+
+                    <Button
+                      size="large"
+                      icon={<LogoutOutlined />}
+                      style={{ width: 200 }}
+                      onClick={checkOut}
+                    >
+                      Quick Check-Out
+                    </Button>
                   </Space>
                 )}
-              </>
+                {unclaimTotal > 0 ? (
+                  <Badge.Ribbon text={unclaimTotal}>
+                    <Button
+                      size="large"
+                      onClick={() => {
+                        setItems(data?.items);
+                        setItemChecklist(Array(data?.items.length).fill(false));
+                        setUnclaimData({
+                          show: true,
+                          data: data?.items,
+                        });
+                      }}
+                      style={{ width: 200 }}
+                    >
+                      Unclaimed Items
+                    </Button>
+                  </Badge.Ribbon>
+                ) : (
+                  <Button size="large">Unclaimed Items</Button>
+                )}
+              </Space>
               <strong>Recent Visit</strong>
               <Table
                 columns={columns}
                 dataSource={visitData}
                 rowKey={(row) => row._id}
+                style={{ width: 700 }}
                 loading={loader == "fetch-visit"}
                 expandable={{
                   expandedRowRender: (row) => (
@@ -320,7 +383,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                       Visit Prisoner: {row?.prisonerName} <br />
                       Relationship to Prisoner: {row?.relationship} <br />
                       Deposited Items{" "}
-                      <Tooltip title='You can click into the items to view its description and status. "✓" means the item is claimed by owner'>
+                      <Tooltip title='"✓" means the item is claimed by owner'>
                         <QuestionCircleOutlined />
                       </Tooltip>
                       :{" "}
@@ -382,7 +445,112 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
           </Col>
         </Row>
       </Modal>
+      <Modal
+        open={unclaimData.show}
+        closable={false}
+        footer={null}
+        width={800}
+        title="Item List"
+        style={{
+          top: 50,
+        }}
+        onCancel={() => {
+          setUnclaimData({ show: false, data: null });
+          setListItemType("unclaimed");
+        }}
+      >
+        <Space
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: 10,
+          }}
+        >
+          <Radio.Group
+            value={listItemType}
+            onChange={(e) => {
+              setListItemType(e.target.value);
+              setUnclaimData(() => {
+                let _items = [];
+                if (e.target.value == "all") _items = items;
+                if (e.target.value == "claimed")
+                  _items = items.filter((e) => e.claimed);
+                if (e.target.value == "unclaimed")
+                  _items = items.filter((e) => !e.claimed);
 
+                return { show: true, data: _items };
+              });
+            }}
+          >
+            <Radio value="all">All</Radio>
+            <Radio value="claimed">Claimed</Radio>
+            <Radio value="unclaimed">Unclaimed</Radio>
+          </Radio.Group>
+          <Space>
+            <Button
+              onClick={() => {
+                if (
+                  itemChecklist.filter((e) => e).length == itemChecklist?.length
+                )
+                  setItemChecklist(itemChecklist.map(() => false));
+                else setItemChecklist(itemChecklist.map(() => true));
+              }}
+            >
+              {itemChecklist.filter((e) => e).length == itemChecklist?.length
+                ? `Unselect All (${itemChecklist.length})`
+                : "Select All"}
+            </Button>
+            {itemChecklist.filter((e) => e).length > 0 && (
+              <Button
+                type="primary"
+                onClick={handleClaim}
+                loading={loader == "updating-items"}
+                disabled={loader == "updating-items"}
+              >
+                Claim{" "}
+                {itemChecklist.filter((e) => e).length == itemChecklist?.length
+                  ? "All"
+                  : ""}
+              </Button>
+            )}
+          </Space>
+        </Space>
+        <Row
+          gutter={[16, 16]}
+          style={{ overflowY: "auto", maxHeight: "calc(100vh - 200px)" }}
+        >
+          {unclaimData?.data?.map((e, i) => (
+            <Col span={8} key={i + e?.name}>
+              <Card
+                title={e?.name}
+                onClick={() => {
+                  let _items = itemChecklist;
+                  _items[i] = !_items[i];
+                  setItemChecklist(_items);
+                  reload();
+                }}
+                extra={[
+                  <Checkbox
+                    checked={itemChecklist[i]}
+                    onChange={(e) => {
+                      let _items = itemChecklist;
+                      _items[i] = e.target.checked;
+                      setItemChecklist(_items);
+                      reload();
+                    }}
+                  />,
+                ]}
+                hoverable
+              >
+                Description: <br />
+                <Typography.Text type="secondary">
+                  {e?.description}
+                </Typography.Text>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Modal>
       <Modal
         open={openRemarks.show}
         onCancel={() => setOpenRemarks({ show: false, data: null })}

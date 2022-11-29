@@ -17,6 +17,7 @@ import {
   Typography,
   Table,
   notification,
+  PageHeader,
 } from "antd";
 import { Bar } from "react-chartjs-2";
 import { Timer, Profiler } from "../../assets/utilities";
@@ -157,7 +158,7 @@ export default () => {
   }, []);
 
   return (
-    <>
+    <PageHeader title="Dashboard">
       <Profiler
         openModal={openProfile.show}
         setOpenModal={() => setOpenProfile({ show: false, data: null })}
@@ -217,6 +218,6 @@ export default () => {
           }}
         />
       </div>
-    </>
+    </PageHeader>
   );
 };

@@ -12,16 +12,19 @@ export default async function handler(req, res) {
         switch (mode) {
           case "verify-name": {
             const { name, middlename, lastname } = req.query;
-            let countMiddleName = 0;
+            let countName = 0,
+              countMiddleName = 0,
+              countLastname = 0,
+              total = 0;
             try {
-              let countName = await Visitor.countDocuments({ name });
+              countName = await Visitor.countDocuments({ name });
               if (middlename != "")
                 countMiddleName = await Visitor.countDocuments({
                   middlename,
                 });
 
-              let countLastname = await Visitor.countDocuments({ lastname });
-              let total = await Visitor.countDocuments();
+              countLastname = await Visitor.countDocuments({ lastname });
+              total = await Visitor.countDocuments();
 
               res.json({
                 status: 200,

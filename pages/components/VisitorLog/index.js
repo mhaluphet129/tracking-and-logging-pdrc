@@ -7,6 +7,8 @@ import {
   DatePicker,
   Modal,
   Tag,
+  PageHeader,
+  Card,
 } from "antd";
 import axios from "axios";
 import moment from "moment";
@@ -136,7 +138,7 @@ const VisitorLog = () => {
   }, [viewLog?.data]);
 
   return (
-    <>
+    <PageHeader title="Visit Logs">
       <Modal
         footer={null}
         closable={false}
@@ -177,7 +179,10 @@ const VisitorLog = () => {
                     moment(viewLog.data?.timeOut)
                   )
                 )
-                .asSeconds() < 0 ? (
+                .asSeconds() > 0 ? (
+                ""
+              ) : viewLog.data?.timeOutTimeAfterDone != null ||
+                viewLog.data?.timeOutTimeAfterDone != undefined ? (
                 <Tag>
                   check-out early @{" "}
                   {moment(viewLog.data?.timeOutTimeAfterDone).format("hh:mm a")}
@@ -222,42 +227,45 @@ const VisitorLog = () => {
           />
         </Space>
       </Modal>
-      <Space>
-        <AutoComplete
-          style={{
-            width: 200,
-          }}
-          loading={loader}
-          placeholder="Search by Name/ID"
-          filterOption={(inputValue, option) =>
-            option.value?.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-          }
-          onChange={(_) => {
-            runTimer(_);
-            if (_?.length <= 0) {
-              setLoader(false);
-              setTrigger(trigger + 1);
+      <Card>
+        <Space>
+          <AutoComplete
+            style={{
+              width: 200,
+            }}
+            loading={loader}
+            placeholder="Search by Name/ID"
+            filterOption={(inputValue, option) =>
+              option.value?.toUpperCase().indexOf(inputValue.toUpperCase()) !==
+              -1
             }
+            onChange={(_) => {
+              runTimer(_);
+              if (_?.length <= 0) {
+                setLoader(false);
+                setTrigger(trigger + 1);
+              }
+            }}
+            autoFocus
+            allowClear
+          />
+          Date:
+          <DatePicker.RangePicker
+            format="MMM DD, YYYY"
+            defaultValue={[moment("01/01/1990"), moment()]}
+            onCalendarChange={handleCalendarChange}
+          />
+        </Space>
+        <Table
+          columns={column2}
+          dataSource={recentVisit}
+          onRow={(row) => {
+            return { onClick: () => setViewLog({ show: true, data: row }) };
           }}
-          autoFocus
-          allowClear
+          style={{ marginTop: 10 }}
         />
-        Date:
-        <DatePicker.RangePicker
-          format="MMM DD, YYYY"
-          defaultValue={[moment("01/01/1990"), moment()]}
-          onCalendarChange={handleCalendarChange}
-        />
-      </Space>
-      <Table
-        columns={column2}
-        dataSource={recentVisit}
-        onRow={(row) => {
-          return { onClick: () => setViewLog({ show: true, data: row }) };
-        }}
-        style={{ marginTop: 10 }}
-      />
-    </>
+      </Card>
+    </PageHeader>
   );
 };
 

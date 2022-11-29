@@ -28,7 +28,6 @@ import VisitorPage from "../components/Visitor";
 import DashboardPage from "../components/Dashboard";
 import Profiler from "../assets/utilities/profiler";
 import VisitorLog from "../components/VisitorLog";
-import InventoryPage from "../components/Inventory";
 import io from "socket.io-client";
 let socket;
 
@@ -37,30 +36,17 @@ const Sider = ({ selectedIndex }) => {
     {
       label: "Dashboard",
       key: "dashboard",
-      icon: <BarChartOutlined />,
+      icon: <BarChartOutlined style={{ fontSize: 20 }} />,
     },
     {
       label: "Visitors Profile",
       key: "visitor",
-      icon: <TeamOutlined />,
+      icon: <TeamOutlined style={{ fontSize: 20 }} />,
     },
     {
       label: "Visit Logs",
       key: "visitor-log",
-      icon: <SnippetsOutlined />,
-    },
-    // {
-    //   label: "Report",
-    //   key: "report",
-    //   icon: <SnippetsOutlined />,
-    //   style: {
-    //     paddingRight: "40px",
-    //   },
-    // },
-    {
-      label: "Inventory Page",
-      key: "inventory",
-      icon: <BlockOutlined />,
+      icon: <SnippetsOutlined style={{ fontSize: 20 }} />,
     },
   ]);
 
@@ -80,6 +66,8 @@ const Sider = ({ selectedIndex }) => {
         defaultSelectedKeys="dashboard"
         style={{
           minHeight: "70vh",
+          fontSize: 15,
+          fontWeight: 700,
         }}
       />
     </Layout.Sider>
@@ -184,7 +172,6 @@ const Content = ({ selectedKey }) => {
       {selectedKey == "dashboard" ? <DashboardPage /> : null}
       {selectedKey == "visitor" ? <VisitorPage /> : null}
       {selectedKey == "visitor-log" ? <VisitorLog /> : null}
-      {selectedKey == "inventory" ? <InventoryPage /> : null}
     </div>
   );
 };
