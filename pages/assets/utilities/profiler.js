@@ -361,14 +361,22 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                           data: data?.items,
                         });
                       }}
+                      type="primary"
                       style={{ width: 200 }}
                     >
                       Unclaimed Items
                     </Button>
                   </Badge.Ribbon>
                 ) : (
-                  <Button size="large">Unclaimed Items</Button>
+                  <Button size="large" type="primary">
+                    Unclaimed Items
+                  </Button>
                 )}
+                <Tooltip title="Open Print Viewer">
+                  <Button size="large" style={{ width: 200 }}>
+                    Print Visitor Data
+                  </Button>
+                </Tooltip>
               </Space>
               <strong>Recent Visit</strong>
               <Table

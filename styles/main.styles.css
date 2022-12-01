@@ -10,3 +10,18 @@
 .red td article {
   color: red;
 }
+
+thead {
+  display: table-row-group;
+}
+
+footer {
+  font-size: 9px;
+  color: #f00;
+  text-align: center;
+}
+
+@page {
+  size: legal;
+  margin: 0.5in;
+}

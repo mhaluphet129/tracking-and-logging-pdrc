@@ -21,7 +21,13 @@ import {
 } from "antd";
 import { Bar } from "react-chartjs-2";
 import { Timer, Profiler } from "../../assets/utilities";
-import { WarningOutlined } from "@ant-design/icons";
+import {
+  WarningOutlined,
+  UserOutlined,
+  ImportOutlined,
+  CalendarOutlined,
+} from "@ant-design/icons";
+import Cards from "./components/cards";
 import jayson from "../../assets/json/index.json";
 import axios from "axios";
 
@@ -158,7 +164,7 @@ export default () => {
   }, []);
 
   return (
-    <PageHeader title="Dashboard">
+    <PageHeader title="Dashboard" extra={[<Button>PRINT</Button>]}>
       <Profiler
         openModal={openProfile.show}
         setOpenModal={() => setOpenProfile({ show: false, data: null })}
@@ -166,27 +172,30 @@ export default () => {
       />
       <Card>
         {contextHolder}
-        <Row>
-          <Col span={4}>
-            <Space direction="vertical">
-              <Card
-                title="Total Visitor"
-                style={{ textAlign: "center", width: "100%" }}
-              >
-                {cardData.totalVisitor}
-              </Card>
-              <Card title="Total Visits" style={{ textAlign: "center" }}>
-                {cardData.totalVisit}
-              </Card>
-              <Card
-                title="Total Visits this Month"
-                style={{ textAlign: "center" }}
-              >
-                {cardData.totalVisitMonth}
-              </Card>
+        <Row gutter={[16, 16]}>
+          <Col span={6}>
+            <Space direction="vertical" style={{ width: "100%" }}>
+              <Cards
+                color="cyan"
+                icon={<UserOutlined />}
+                name="Total Visitor"
+                value={cardData.totalVisitor}
+              />
+              <Cards
+                color="orange"
+                icon={<ImportOutlined />}
+                name="Total Visits"
+                value={cardData.totalVisit}
+              />
+              <Cards
+                color="green"
+                icon={<CalendarOutlined />}
+                name="Visit This Month"
+                value={cardData.totalVisitMonth}
+              />
             </Space>
           </Col>
-          <Col span={19} offset={1} style={{ marginTop: 15 }}>
+          <Col span={17} offset={1} style={{ marginTop: 15 }}>
             <Space align="end">
               <Button disabled>DAILY</Button>
               <Button disabled>MONTHLY</Button>
