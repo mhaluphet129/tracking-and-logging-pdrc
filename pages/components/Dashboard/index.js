@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -20,6 +20,7 @@ import {
   PageHeader,
 } from "antd";
 import { Bar } from "react-chartjs-2";
+import { useReactToPrint } from "react-to-print";
 import { Timer, Profiler } from "../../assets/utilities";
 import {
   WarningOutlined,
@@ -40,6 +41,12 @@ ChartJS.register(
   Legend
 );
 
+class PDF extends React.Component {
+  render() {
+    return { ...this.props.children };
+  }
+}
+
 export default () => {
   let [dashbardNumericalData, setDashbardNumericalData] = useState(
     Array(12).fill(0)
@@ -52,6 +59,11 @@ export default () => {
     totalVisitor: 0,
     totalVisit: 0,
     totalVisitMonth: 0,
+  });
+  let ref = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => ref.current,
   });
 
   const options = {
@@ -164,7 +176,10 @@ export default () => {
   }, []);
 
   return (
-    <PageHeader title="Dashboard" extra={[<Button>PRINT</Button>]}>
+    <PageHeader
+      title="Dashboard"
+      // extra={[<Button onClick={handlePrint}>PRINT</Button>]}
+    >
       <Profiler
         openModal={openProfile.show}
         setOpenModal={() => setOpenProfile({ show: false, data: null })}
@@ -196,23 +211,24 @@ export default () => {
             </Space>
           </Col>
           <Col span={17} offset={1} style={{ marginTop: 15 }}>
-            <Space align="end">
-              <Button disabled>DAILY</Button>
-              <Button disabled>MONTHLY</Button>
-            </Space>
-            <Bar
-              options={options}
-              data={{
-                labels: jayson.months,
-                datasets: [
-                  {
-                    label: "Total visit",
-                    backgroundColor: "rgb(255, 99, 132)",
-                    borderColor: "rgb(255, 99, 132)",
-                    data: dashbardNumericalData,
-                  },
-                ],
-              }}
+            <PDF
+              ref={ref}
+              children={
+                <Bar
+                  options={options}
+                  data={{
+                    labels: jayson.months,
+                    datasets: [
+                      {
+                        label: "Total visit",
+                        backgroundColor: "rgb(255, 99, 132)",
+                        borderColor: "rgb(255, 99, 132)",
+                        data: dashbardNumericalData,
+                      },
+                    ],
+                  }}
+                />
+              }
             />
           </Col>
         </Row>

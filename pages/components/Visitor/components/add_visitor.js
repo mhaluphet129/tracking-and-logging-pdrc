@@ -360,11 +360,13 @@ const AddVisitor = ({ open, close, refresh }) => {
                     {name.lastname}{" "}
                     <Typography.Text type="secondary">
                       (
-                      {(
-                        (showResults.data?.countLastname /
-                          showResults.data?.total) *
-                        100
-                      ).toFixed(2)}
+                      {showResults.data?.total != 0
+                        ? (
+                            (showResults.data?.countLastname /
+                              showResults.data?.total) *
+                            100
+                          ).toFixed(2)
+                        : 0}
                       %)
                     </Typography.Text>
                   </>

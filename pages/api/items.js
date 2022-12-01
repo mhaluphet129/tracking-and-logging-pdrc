@@ -33,6 +33,7 @@ export default async function handler(req, res) {
 
           case "get-items": {
             let { id } = req.query;
+            console.log(id);
 
             return await Item.find({ ownerId: ObjectId(id) })
               .then((e) => {

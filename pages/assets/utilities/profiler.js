@@ -23,6 +23,7 @@ import {
   QuestionCircleOutlined,
   CheckOutlined,
   DeleteOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import QRCode from "qrcode";
@@ -349,34 +350,37 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                     </Button>
                   </Space>
                 )}
-                {unclaimTotal > 0 ? (
-                  <Badge.Ribbon text={unclaimTotal}>
-                    <Button
-                      size="large"
-                      onClick={() => {
-                        setItems(data?.items);
-                        setItemChecklist(Array(data?.items.length).fill(false));
-                        setUnclaimData({
-                          show: true,
-                          data: data?.items,
-                        });
-                      }}
-                      type="primary"
-                      style={{ width: 200 }}
-                    >
-                      Unclaimed Items
-                    </Button>
-                  </Badge.Ribbon>
-                ) : (
-                  <Button size="large" type="primary">
-                    Unclaimed Items
+
+                <Badge.Ribbon text={unclaimTotal}>
+                  <Button
+                    size="large"
+                    onClick={() => {
+                      setItems(data?.items);
+                      setItemChecklist(Array(data?.items.length).fill(false));
+
+                      let _items = [];
+                      if (listItemType == "all") _items = data?.item;
+                      if (listItemType == "claimed")
+                        _items = data?.item?.filter((e) => e.claimed);
+                      if (listItemType == "unclaimed")
+                        _items = data?.item?.filter((e) => !e.claimed);
+
+                      setUnclaimData({
+                        show: true,
+                        data: _items,
+                      });
+                    }}
+                    style={{ width: 200 }}
+                  >
+                    Check Items
                   </Button>
-                )}
-                <Tooltip title="Open Print Viewer">
+                </Badge.Ribbon>
+
+                {/* <Tooltip title="Open Print Viewer">
                   <Button size="large" style={{ width: 200 }}>
                     Print Visitor Data
                   </Button>
-                </Tooltip>
+                </Tooltip> */}
               </Space>
               <strong>Recent Visit</strong>
               <Table
@@ -495,19 +499,22 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
             <Radio value="unclaimed">Unclaimed</Radio>
           </Radio.Group>
           <Space>
-            <Button
-              onClick={() => {
-                if (
-                  itemChecklist.filter((e) => e).length == itemChecklist?.length
-                )
-                  setItemChecklist(itemChecklist.map(() => false));
-                else setItemChecklist(itemChecklist.map(() => true));
-              }}
-            >
-              {itemChecklist.filter((e) => e).length == itemChecklist?.length
-                ? `Unselect All (${itemChecklist.length})`
-                : "Select All"}
-            </Button>
+            {listItemType != "claimed" && (
+              <Button
+                onClick={() => {
+                  if (
+                    itemChecklist.filter((e) => e).length ==
+                    itemChecklist?.length
+                  )
+                    setItemChecklist(itemChecklist.map(() => false));
+                  else setItemChecklist(itemChecklist.map(() => true));
+                }}
+              >
+                {itemChecklist.filter((e) => e).length == itemChecklist?.length
+                  ? `Unselect All (${itemChecklist.length})`
+                  : "Select All"}
+              </Button>
+            )}
             {itemChecklist.filter((e) => e).length > 0 && (
               <Button
                 type="primary"
@@ -528,25 +535,37 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
           style={{ overflowY: "auto", maxHeight: "calc(100vh - 200px)" }}
         >
           {unclaimData?.data?.map((e, i) => (
-            <Col span={8} key={i + e?.name}>
+            <Col
+              span={8}
+              key={i + e?.name}
+              style={{ marginTop: 8, marginBottom: 8 }}
+            >
               <Card
                 title={e?.name}
                 onClick={() => {
-                  let _items = itemChecklist;
-                  _items[i] = !_items[i];
-                  setItemChecklist(_items);
-                  reload();
+                  if (listItemType != "claimed") {
+                    let _items = itemChecklist;
+                    _items[i] = !_items[i];
+                    setItemChecklist(_items);
+                    reload();
+                  }
                 }}
                 extra={[
-                  <Checkbox
-                    checked={itemChecklist[i]}
-                    onChange={(e) => {
-                      let _items = itemChecklist;
-                      _items[i] = e.target.checked;
-                      setItemChecklist(_items);
-                      reload();
-                    }}
-                  />,
+                  listItemType != "claimed" ? (
+                    <Checkbox
+                      checked={itemChecklist[i]}
+                      onChange={(e) => {
+                        let _items = itemChecklist;
+                        _items[i] = e.target.checked;
+                        setItemChecklist(_items);
+                        reload();
+                      }}
+                    />
+                  ) : (
+                    <CheckCircleOutlined
+                      style={{ color: "green", fontSize: 20 }}
+                    />
+                  ),
                 ]}
                 hoverable
               >

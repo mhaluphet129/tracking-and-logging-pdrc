@@ -279,8 +279,8 @@ const VisitorLog = () => {
         title="Print Preview"
         placement="bottom"
         height="100%"
+        extra={[<Button onClick={handlePrint}>PRINT</Button>]}
       >
-        <Button onClick={handlePrint}>PRINT</Button>
         <PDF ref={ref} children={<CustomTable />} />
       </Drawer>
       <PageHeader
@@ -296,6 +296,7 @@ const VisitorLog = () => {
           closable={false}
           open={viewLog.show}
           onCancel={() => setViewLog({ show: false, data: null })}
+          style={{ top: 30 }}
         >
           <Space direction="vertical">
             <Space>
@@ -352,6 +353,11 @@ const VisitorLog = () => {
             <Table
               locale={{ emptyText: "No desposited items" }}
               pagination={false}
+              style={{
+                overflowY: "auto",
+                maxHeight: "calc(100vh - 200px)",
+                height: 500,
+              }}
               columns={[
                 {
                   title: "Name",

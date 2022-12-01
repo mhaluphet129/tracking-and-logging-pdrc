@@ -451,8 +451,8 @@ const VisitorPage = () => {
         height="100%"
         title="Print Preview"
         width="200"
+        extra={[<Button onClick={handlePrint}>PRINT</Button>]}
       >
-        <Button onClick={handlePrint}>PRINT</Button>
         <PDF ref={ref} children={<CustomTable />} />
       </Drawer>
       <PageHeader
