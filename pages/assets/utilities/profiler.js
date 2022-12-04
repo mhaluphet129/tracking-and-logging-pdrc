@@ -86,6 +86,8 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
     });
     if (res.data.status == 200) {
       setTrigger(trigger + 1);
+      setTrigger2((t) => t + 1);
+      setOpenModal(false);
       message.success("Timed OUT.");
     }
     setLoader("");
@@ -245,6 +247,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
         close={() => setVisitIn(false)}
         data={data}
         setTrigger={setTrigger}
+        parentClose={() => setOpenModal(false)}
       />
       <CheckLister
         open={openItemModal.show}
@@ -351,30 +354,28 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                   </Space>
                 )}
 
-                <Badge.Ribbon text={unclaimTotal}>
-                  <Button
-                    size="large"
-                    onClick={() => {
-                      setItems(data?.items);
-                      setItemChecklist(Array(data?.items.length).fill(false));
+                <Button
+                  size="large"
+                  onClick={() => {
+                    setItems(data?.items);
+                    setItemChecklist(Array(data?.items.length).fill(false));
 
-                      let _items = [];
-                      if (listItemType == "all") _items = data?.item;
-                      if (listItemType == "claimed")
-                        _items = data?.item?.filter((e) => e.claimed);
-                      if (listItemType == "unclaimed")
-                        _items = data?.item?.filter((e) => !e.claimed);
+                    let _items = [];
+                    if (listItemType == "all") _items = data?.item;
+                    if (listItemType == "claimed")
+                      _items = data?.item?.filter((e) => e.claimed);
+                    if (listItemType == "unclaimed")
+                      _items = data?.item?.filter((e) => !e.claimed);
 
-                      setUnclaimData({
-                        show: true,
-                        data: _items,
-                      });
-                    }}
-                    style={{ width: 200 }}
-                  >
-                    Check Items
-                  </Button>
-                </Badge.Ribbon>
+                    setUnclaimData({
+                      show: true,
+                      data: _items,
+                    });
+                  }}
+                  style={{ width: 250 }}
+                >
+                  {`Check Items (${unclaimTotal} unclaimed)`}
+                </Button>
 
                 {/* <Tooltip title="Open Print Viewer">
                   <Button size="large" style={{ width: 200 }}>
@@ -462,7 +463,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
         closable={false}
         footer={null}
         width={800}
-        title="Item List"
+        title={`Item List (${items?.length} total items)`}
         style={{
           top: 50,
         }}
@@ -510,7 +511,8 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                   else setItemChecklist(itemChecklist.map(() => true));
                 }}
               >
-                {itemChecklist.filter((e) => e).length == itemChecklist?.length
+                {itemChecklist.filter((e) => e).length ==
+                  itemChecklist?.length && itemChecklist?.length != 0
                   ? `Unselect All (${itemChecklist.length})`
                   : "Select All"}
               </Button>
@@ -551,7 +553,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                   }
                 }}
                 extra={[
-                  listItemType != "claimed" ? (
+                  listItemType != "claimed" && !items[i].claimed ? (
                     <Checkbox
                       checked={itemChecklist[i]}
                       onChange={(e) => {

@@ -42,11 +42,12 @@ const VisitorLog = () => {
   const column2 = [
     {
       title: "Visitor Name",
+      width: 300,
       render: (_, row) => (
         <Typography>
           {row?.visitorId?.name}
           {row?.visitorId?.middlename
-            ? " " + row?.visitorId.middlename
+            ? ` ${row?.visitorId.middlename[0].toUpperCase()}.`
             : ""}{" "}
           {row?.visitorId?.lastname}
         </Typography>
@@ -54,23 +55,28 @@ const VisitorLog = () => {
     },
     {
       title: "Visitee Name",
+      width: 200,
       render: (_, row) => row?.prisonerName,
     },
     {
       title: "Date",
+      width: 200,
       render: (_, row) => moment(row?.date).format("MMM DD, YYYY"),
     },
     {
       title: "Check In",
+      width: 200,
       render: (_, row) => moment(row?.timeIn).format("hh:mm a"),
     },
     {
       title: "Expected Check Out",
+      width: 200,
       align: "center",
       render: (_, row) => moment(row?.timeOut).format("hh:mm a"),
     },
     {
       title: "Checked out",
+      width: 200,
       render: (_, row) =>
         row?.timeOutTimeAfterDone ? (
           moment(row?.timeOutTimeAfterDone).format("hh:mm a")
@@ -138,7 +144,7 @@ const VisitorLog = () => {
           </Col>
         </Row>
       </Col>
-      <Col span={18} offset={3}>
+      <Col span={22} offset={1}>
         <Table columns={column2} dataSource={recentVisit} pagination={false} />
       </Col>
       <Col span={8} offset={3}>
@@ -264,7 +270,6 @@ const VisitorLog = () => {
             id: viewLog.data?.visitorId._id,
           },
         });
-        console.log(data.data);
 
         if (data.status == 200) setOpenedLogItems(data.data);
       }

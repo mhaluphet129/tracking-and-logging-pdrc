@@ -16,7 +16,7 @@ import moment from "moment";
 import axios from "axios";
 import { PlusOutlined } from "@ant-design/icons";
 
-const VisitForm = ({ open, close, data, setTrigger }) => {
+const VisitForm = ({ open, close, data, setTrigger, parentClose }) => {
   const [durationType, setDurationType] = useState("hours");
   const [loader, setLoader] = useState("");
   const [items, setItems] = useState([]);
@@ -58,6 +58,7 @@ const VisitForm = ({ open, close, data, setTrigger }) => {
     setLoader("");
 
     if (res.data.status == 200) {
+      parentClose();
       close();
       message.success(res.data.message);
       setTrigger((trigger) => trigger + 1);

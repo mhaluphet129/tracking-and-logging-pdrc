@@ -256,7 +256,10 @@ const VisitorPage = () => {
       render: (_, row) => (
         <Typography>
           {row.name}
-          {row?.middlename ? " " + row?.middlename : ""} {row.lastname}
+          {row?.middlename
+            ? " " + `${row?.middlename[0].toUpperCase()}.`
+            : ""}{" "}
+          {row.lastname}
         </Typography>
       ),
     },
@@ -287,7 +290,7 @@ const VisitorPage = () => {
           <Col>
             <Image
               preview={false}
-              src="/pdrc-logo.webp"
+              src="/pdrc-logo2.png"
               alt="logo"
               width={150}
             />
@@ -332,7 +335,7 @@ const VisitorPage = () => {
       <Col span={7}>
         <Row justify="space-around">
           <Col>
-            <Image preview={false} src="/pdrc-logo.webp" width={150} />
+            <Image preview={false} src="/pdrc-logo.png" width={150} />
           </Col>
         </Row>
       </Col>
