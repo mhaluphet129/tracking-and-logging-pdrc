@@ -8,7 +8,7 @@ const DashboardCards = (props) => {
           <div
             style={{
               background: props.color,
-              height: 100,
+              height: "100%",
               width: 65,
               display: "flex",
               justifyContent: "center",

@@ -95,7 +95,7 @@ const VisitorLog = () => {
           <Col>
             <Image
               preview={false}
-              src="/pdrc-logo.webp"
+              src="/pdrc-logo2.png"
               alt="logo"
               width={150}
             />
@@ -140,7 +140,7 @@ const VisitorLog = () => {
       <Col span={7}>
         <Row justify="space-around">
           <Col>
-            <Image preview={false} src="/pdrc-logo.webp" width={150} />
+            <Image preview={false} src="/pdrc-logo.png" width={150} />
           </Col>
         </Row>
       </Col>
@@ -159,42 +159,15 @@ const VisitorLog = () => {
         </Typography.Text>
       </Col>
       <Col span={13}>{recentVisit?.length}</Col>
-      {/* <Col span={8} offset={3}>
-        <Typography.Text
-          style={{
-            marginTop: 10,
-            fontWeight: 900,
-            color: "#757575",
-          }}
-        >
-          MALE
-        </Typography.Text>
-      </Col>
-      <Col span={13}>
-        {visitors?.filter((el) => el?.gender == "male").length}
-      </Col>
-      <Col span={8} offset={3}>
-        <Typography.Text
-          style={{
-            marginTop: 10,
-            fontWeight: 900,
-            color: "#757575",
-          }}
-        >
-          FEMALE
-        </Typography.Text>
-      </Col>
-      <Col span={13}>
-        {visitors?.filter((el) => el?.gender == "female").length}
-      </Col> */}
-      {/* <Col span={12} offset={3} style={{ marginTop: 100 }}>
-        <Typography.Text>Leyn</Typography.Text>
+
+      <Col span={12} offset={3} style={{ marginTop: 100 }}>
+        <Typography.Text>Allan Balaba</Typography.Text>
         <br />
         <Typography.Text style={{ borderTop: "1px solid #000" }}>
-          Agriculture Technician
+          PDRC Warden
         </Typography.Text>
       </Col>
-      <Col span={9} style={{ marginTop: 100 }}>
+      {/* <Col span={9} style={{ marginTop: 100 }}>
         <Typography.Text>Coleen C. Ambos</Typography.Text>
         <br />
         <Typography.Text style={{ borderTop: "1px solid #000" }}>
@@ -235,7 +208,8 @@ const VisitorLog = () => {
 
     if (e?.length > 0) {
       if (e[0] != null) startDate = moment(e[0]).format("MM/DD/YYYY");
-      if (e[1] != null) endDate = moment(e[1]).format("MM/DD/YYYY");
+      if (e[1] != null)
+        endDate = moment(e[1]).add(1, "days").format("MM/DD/YYYY");
     }
 
     let { data } = await axios.get("/api/visit", {

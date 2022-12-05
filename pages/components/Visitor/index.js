@@ -387,14 +387,14 @@ const VisitorPage = () => {
       <Col span={13}>
         {visitors?.filter((el) => el?.gender == "female").length}
       </Col>
-      {/* <Col span={12} offset={3} style={{ marginTop: 100 }}>
-        <Typography.Text>Leyn</Typography.Text>
+      <Col span={12} offset={3} style={{ marginTop: 100 }}>
+        <Typography.Text>Allan Balaba</Typography.Text>
         <br />
         <Typography.Text style={{ borderTop: "1px solid #000" }}>
-          Agriculture Technician
+          PDRC Warden
         </Typography.Text>
       </Col>
-      <Col span={9} style={{ marginTop: 100 }}>
+      {/* <Col span={9} style={{ marginTop: 100 }}>
         <Typography.Text>Coleen C. Ambos</Typography.Text>
         <br />
         <Typography.Text style={{ borderTop: "1px solid #000" }}>
@@ -499,7 +499,6 @@ const VisitorPage = () => {
                 }
               }}
               autoFocus
-              allowClear
             />
           </Space>
           <Table
@@ -511,19 +510,18 @@ const VisitorPage = () => {
             rowKey={(row) => row._id}
             loading={load == "fetch"}
           />
-
-          {/* <Space style={{ marginBottom: 5, padding: 6 }}>
+        </Card>
+        <Space style={{ marginBottom: 5, padding: 6 }}>
           <Typography.Text strong>Visit limit Timers</Typography.Text>
-        </Space> */}
-          {/* <Table
+        </Space>
+        <Table
           dataSource={visitorWithTimer}
           columns={column2}
           rowKey={(row) => row._id}
           pagination={false}
           loading={load == "fetch"}
           style={{ width: 400 }}
-        /> */}
-        </Card>
+        />
 
         <AddVisitor
           open={showAddVisitor}

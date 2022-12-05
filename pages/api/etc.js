@@ -1,5 +1,7 @@
 import Visitor from "../../database/model/Visitor";
+import Admin from "../../database/model/Admin";
 import dbConnect from "../../database/dbConnect";
+import moment from "moment";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -38,12 +40,49 @@ export default async function handler(req, res) {
             }
             resolve();
           }
+
+          case "check-admin-exist": {
+            return await Admin.find({ role: "superadmin" })
+              .then((data) => {
+                res.json({ status: 200, message: "Fetch done.", data });
+                resolve();
+              })
+              .catch(() => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
         }
       });
     case "POST": {
       return new Promise(async (resolve, reject) => {
         const { mode } = req.body.payload;
         switch (mode) {
+          case "init": {
+            let initAdmin = Admin({
+              name: "PDRC",
+              lastname: "ADMIN",
+              email: "admin",
+              role: "superadmin",
+              password: "1234",
+            });
+
+            initAdmin
+              .save()
+              .then(() => {
+                res.json({
+                  status: 200,
+                  message: "Init admin creation success",
+                });
+                resolve();
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
         }
       });
     }

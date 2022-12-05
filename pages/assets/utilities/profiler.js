@@ -553,7 +553,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                   }
                 }}
                 extra={[
-                  listItemType != "claimed" && !items[i].claimed ? (
+                  listItemType != "claimed" ? (
                     <Checkbox
                       checked={itemChecklist[i]}
                       onChange={(e) => {
