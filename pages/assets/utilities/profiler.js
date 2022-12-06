@@ -33,6 +33,7 @@ import axios from "axios";
 import { SettingsContext } from "../../context";
 import { VisitForm } from "../../components/Visitor/components";
 import CheckLister from "./item_checklist_verifier";
+import ItemChecklist from "./items-checklist";
 
 const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
   const [qr, setQr] = useState("");
@@ -51,9 +52,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
   });
   const [unclaimTotal, setUnclaimTotal] = useState(0);
   const [items, setItems] = useState([]);
-  const [unclaimData, setUnclaimData] = useState({ show: false, data: null });
-  const [listItemType, setListItemType] = useState("unclaimed");
-  const [itemChecklist, setItemChecklist] = useState([]);
+  const [show, setShow] = useState(false);
 
   const { setVisitHour, visitHour } = useContext(SettingsContext);
 
@@ -86,29 +85,15 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
     });
     if (res.data.status == 200) {
       setTrigger(trigger + 1);
-      setTrigger2((t) => t + 1);
+      setTrigger2((trig) => trig + 1);
       setOpenModal(false);
       message.success("Timed OUT.");
     }
     setLoader("");
   };
 
-  const reload = () => {
-    setUnclaimData(() => {
-      let _items = [];
-      if (listItemType == "all") _items = items;
-      if (listItemType == "claimed") _items = items.filter((e) => e.claimed);
-      if (listItemType == "unclaimed") _items = items.filter((e) => !e.claimed);
-
-      return { show: true, data: _items };
-    });
-  };
-
   const handleClaim = async () => {
     let ids = [];
-    itemChecklist.forEach((e, i) => {
-      if (e) ids.push(items[i]?._id);
-    });
 
     setLoader("updating-items");
     let res = await axios.get("/api/items", {
@@ -120,18 +105,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
 
     if (res.data.status == 200) {
       setItems(res?.data?.data);
-      setUnclaimData(() => {
-        let _items = [];
-        if (listItemType == "all") _items = res?.data?.data;
-        if (listItemType == "claimed")
-          _items = res?.data?.data.filter((e) => e.claimed);
-        if (listItemType == "unclaimed")
-          _items = res?.data?.data.filter((e) => !e.claimed);
-
-        return { show: true, data: _items };
-      });
     }
-    setItemChecklist(itemChecklist.map(() => false));
     setLoader("");
   };
 
@@ -247,6 +221,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
         close={() => setVisitIn(false)}
         data={data}
         setTrigger={setTrigger}
+        setTrigger2={setTrigger2}
         parentClose={() => setOpenModal(false)}
       />
       <CheckLister
@@ -254,6 +229,13 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
         close={() => setOpenItemModal({ show: false, data: null })}
         data={openItemModal.data}
         update={checkOut}
+      />
+      <ItemChecklist
+        open={show}
+        close={() => setShow(false)}
+        items={items}
+        setItems={setItems}
+        setUnclaimTotal={setUnclaimTotal}
       />
       <Modal
         open={openModal}
@@ -357,20 +339,8 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                 <Button
                   size="large"
                   onClick={() => {
-                    setItems(data?.items);
-                    setItemChecklist(Array(data?.items.length).fill(false));
-
-                    let _items = [];
-                    if (listItemType == "all") _items = data?.item;
-                    if (listItemType == "claimed")
-                      _items = data?.item?.filter((e) => e.claimed);
-                    if (listItemType == "unclaimed")
-                      _items = data?.item?.filter((e) => !e.claimed);
-
-                    setUnclaimData({
-                      show: true,
-                      data: _items,
-                    });
+                    if (items?.length == 0) setItems(data?.items);
+                    setShow(true);
                   }}
                   style={{ width: 250 }}
                 >
@@ -456,128 +426,6 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
               />
             </Space>
           </Col>
-        </Row>
-      </Modal>
-      <Modal
-        open={unclaimData.show}
-        closable={false}
-        footer={null}
-        width={800}
-        title={`Item List (${items?.length} total items)`}
-        style={{
-          top: 50,
-        }}
-        onCancel={() => {
-          setUnclaimData({ show: false, data: null });
-          setListItemType("unclaimed");
-        }}
-      >
-        <Space
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: 10,
-          }}
-        >
-          <Radio.Group
-            value={listItemType}
-            onChange={(e) => {
-              setListItemType(e.target.value);
-              setUnclaimData(() => {
-                let _items = [];
-                if (e.target.value == "all") _items = items;
-                if (e.target.value == "claimed")
-                  _items = items.filter((e) => e.claimed);
-                if (e.target.value == "unclaimed")
-                  _items = items.filter((e) => !e.claimed);
-
-                return { show: true, data: _items };
-              });
-            }}
-          >
-            <Radio value="all">All</Radio>
-            <Radio value="claimed">Claimed</Radio>
-            <Radio value="unclaimed">Unclaimed</Radio>
-          </Radio.Group>
-          <Space>
-            {listItemType != "claimed" && (
-              <Button
-                onClick={() => {
-                  if (
-                    itemChecklist.filter((e) => e).length ==
-                    itemChecklist?.length
-                  )
-                    setItemChecklist(itemChecklist.map(() => false));
-                  else setItemChecklist(itemChecklist.map(() => true));
-                }}
-              >
-                {itemChecklist.filter((e) => e).length ==
-                  itemChecklist?.length && itemChecklist?.length != 0
-                  ? `Unselect All (${itemChecklist.length})`
-                  : "Select All"}
-              </Button>
-            )}
-            {itemChecklist.filter((e) => e).length > 0 && (
-              <Button
-                type="primary"
-                onClick={handleClaim}
-                loading={loader == "updating-items"}
-                disabled={loader == "updating-items"}
-              >
-                Claim{" "}
-                {itemChecklist.filter((e) => e).length == itemChecklist?.length
-                  ? "All"
-                  : ""}
-              </Button>
-            )}
-          </Space>
-        </Space>
-        <Row
-          gutter={[16, 16]}
-          style={{ overflowY: "auto", maxHeight: "calc(100vh - 200px)" }}
-        >
-          {unclaimData?.data?.map((e, i) => (
-            <Col
-              span={8}
-              key={i + e?.name}
-              style={{ marginTop: 8, marginBottom: 8 }}
-            >
-              <Card
-                title={e?.name}
-                onClick={() => {
-                  if (listItemType != "claimed") {
-                    let _items = itemChecklist;
-                    _items[i] = !_items[i];
-                    setItemChecklist(_items);
-                    reload();
-                  }
-                }}
-                extra={[
-                  listItemType != "claimed" ? (
-                    <Checkbox
-                      checked={itemChecklist[i]}
-                      onChange={(e) => {
-                        let _items = itemChecklist;
-                        _items[i] = e.target.checked;
-                        setItemChecklist(_items);
-                        reload();
-                      }}
-                    />
-                  ) : (
-                    <CheckCircleOutlined
-                      style={{ color: "green", fontSize: 20 }}
-                    />
-                  ),
-                ]}
-                hoverable
-              >
-                Description: <br />
-                <Typography.Text type="secondary">
-                  {e?.description}
-                </Typography.Text>
-              </Card>
-            </Col>
-          ))}
         </Row>
       </Modal>
       <Modal

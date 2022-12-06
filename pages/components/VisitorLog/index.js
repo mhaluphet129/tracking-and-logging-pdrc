@@ -340,10 +340,12 @@ const VisitorLog = () => {
               columns={[
                 {
                   title: "Name",
+                  width: 200,
                   render: (_, row) => row?.name,
                 },
                 {
                   title: "Description",
+                  width: 200,
                   render: (_, row) => row?.description,
                 },
                 {

@@ -83,6 +83,48 @@ export default async function handler(req, res) {
                   .json({ success: false, message: "Error: " + err });
               });
           }
+          case "change-password-admin": {
+            const { password } = req.body.payload;
+
+            return await Admin.findOneAndUpdate(
+              {},
+              {
+                $set: {
+                  password,
+                },
+              }
+            )
+              .then(() => {
+                res.json({
+                  status: 200,
+                  message: "Successfully changed the password",
+                });
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
+          case "update-admin": {
+            return await Admin.findOneAndUpdate(
+              {},
+              { $set: { ...req.body.payload } },
+              { new: true }
+            )
+              .then((e) => {
+                res.json({
+                  status: 200,
+                  data: e,
+                  message: "Successfully update your credentials",
+                });
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
         }
       });
     }

@@ -2,6 +2,6 @@ import IDGen from "./id_generator";
 import QRCamera from "./qr";
 import Profiler from "./profiler";
 import Timer from "./timer";
-import ItemCheckilist from "./item_checklist_verifier";
+import ItemChecklist from "./items-checklist";
 
-export { IDGen, QRCamera, Profiler, Timer, ItemCheckilist };
+export { IDGen, QRCamera, Profiler, Timer, ItemChecklist };
