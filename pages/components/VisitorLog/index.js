@@ -258,14 +258,20 @@ const VisitorLog = () => {
         title="Print Preview"
         placement="bottom"
         height="100%"
-        extra={[<Button onClick={handlePrint}>PRINT</Button>]}
+        extra={[
+          <Button onClick={handlePrint} key="log1">
+            PRINT
+          </Button>,
+        ]}
       >
-        <PDF ref={ref} children={<CustomTable />} />
+        <PDF ref={ref}>
+          <CustomTable />
+        </PDF>
       </Drawer>
       <PageHeader
         title="Visit Logs"
         extra={[
-          <Button onClick={() => setOpenPrintDrawer(true)}>
+          <Button onClick={() => setOpenPrintDrawer(true)} key="log2">
             Print Visit Logs
           </Button>,
         ]}

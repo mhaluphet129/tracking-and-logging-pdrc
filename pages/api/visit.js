@@ -57,8 +57,6 @@ export default async function handler(req, res) {
           }
 
           case "visit-out": {
-            const { id } = req.query;
-
             return await Visit.findOneAndUpdate(
               { _id: req.query.id },
               {
@@ -162,7 +160,7 @@ export default async function handler(req, res) {
             let { items } = req.body.payload.data;
             let newVisit = Visit(req.body.payload.data);
             items = items.map((e) => {
-              return { ...e, visitId: newVisit._id };
+              return { ...e, visitId: newVisit._id, depositDate: moment() };
             });
             return await newVisit
               .save()

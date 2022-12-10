@@ -23,6 +23,7 @@ import {
   WarningOutlined,
   CheckCircleOutlined,
   ReloadOutlined,
+  BlockOutlined,
 } from "@ant-design/icons";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -31,6 +32,7 @@ import VisitorPage from "../components/Visitor";
 import DashboardPage from "../components/Dashboard";
 import Profiler from "../assets/utilities/profiler";
 import VisitorLog from "../components/VisitorLog";
+import ItemPage from "../components/Items";
 import io from "socket.io-client";
 let socket;
 
@@ -50,6 +52,11 @@ const Sider = ({ selectedIndex }) => {
       label: "Visit Logs",
       key: "visitor-log",
       icon: <SnippetsOutlined style={{ fontSize: 20 }} />,
+    },
+    {
+      label: "Items Page",
+      key: "item",
+      icon: <BlockOutlined style={{ fontSize: 20 }} />,
     },
   ]);
 
@@ -164,7 +171,10 @@ const Header = () => {
         onCancel={() => setShowSettings(false)}
         closable={false}
         footer={[
-          <Space style={{ display: "flex", justifyContent: "space-between" }}>
+          <Space
+            style={{ display: "flex", justifyContent: "space-between" }}
+            key={1}
+          >
             <Typography.Text
               style={{ fontSize: 10, fontStyle: "italic" }}
               type="secondary"
@@ -335,6 +345,7 @@ const Content = ({ selectedKey }) => {
       {selectedKey == "dashboard" ? <DashboardPage /> : null}
       {selectedKey == "visitor" ? <VisitorPage /> : null}
       {selectedKey == "visitor-log" ? <VisitorLog /> : null}
+      {selectedKey == "item" ? <ItemPage /> : null}
     </div>
   );
 };
@@ -358,7 +369,7 @@ const Footer = () => {
   );
 };
 
-export default () => {
+const Main = () => {
   const [openModal, setOpenModal] = useState(false);
   const [data, setData] = useState({});
 
@@ -382,5 +393,5 @@ export default () => {
     <Profiler openModal={openModal} setOpenModal={setOpenModal} data={data} />
   );
 };
-
+export default Main;
 export { Sider, Header, Content, Footer };

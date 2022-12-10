@@ -335,7 +335,12 @@ const VisitorPage = () => {
       <Col span={7}>
         <Row justify="space-around">
           <Col>
-            <Image preview={false} src="/pdrc-logo.png" width={150} />
+            <Image
+              preview={false}
+              src="/pdrc-logo.png"
+              width={150}
+              alt="pdrc logo"
+            />
           </Col>
         </Row>
       </Col>
@@ -454,14 +459,20 @@ const VisitorPage = () => {
         height="100%"
         title="Print Preview"
         width="200"
-        extra={[<Button onClick={handlePrint}>PRINT</Button>]}
+        extra={[
+          <Button onClick={handlePrint} key="visit1">
+            PRINT
+          </Button>,
+        ]}
       >
-        <PDF ref={ref} children={<CustomTable />} />
+        <PDF ref={ref}>
+          <CustomTable />
+        </PDF>
       </Drawer>
       <PageHeader
         title="Visitors Profile"
         extra={[
-          <Button onClick={() => setOpenPrintDrawer(true)}>
+          <Button key="visit2" onClick={() => setOpenPrintDrawer(true)}>
             PRINT VISITOR LIST
           </Button>,
         ]}

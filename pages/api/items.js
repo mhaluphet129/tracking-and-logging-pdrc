@@ -118,12 +118,42 @@ export default async function handler(req, res) {
                   .json({ success: false, message: "Error: " + err });
               });
           }
+          case "delete-item": {
+            console.log(req.query);
+            return await Item.findOneAndDelete({ _id: req.query.id })
+              .then(() => {
+                res.json({ status: 200, message: "Deleted successsfully" });
+                resolve();
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
         }
       });
     case "POST": {
       return new Promise(async (resolve, reject) => {
         const { mode } = req.body.payload;
         switch (mode) {
+          case "edit-items": {
+            console.log(req.body.payload);
+            const { id } = req.body.payload;
+            return Item.findOneAndUpdate(
+              { _id: id },
+              { $set: { ...req.body.payload } }
+            )
+              .then((e) => {
+                res.json({ status: 200, message: "Successfully Updated" });
+                resolve();
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
         }
       });
     }

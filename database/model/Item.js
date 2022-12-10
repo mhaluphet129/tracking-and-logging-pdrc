@@ -19,7 +19,7 @@ let ItemsSchema = new mongoose.Schema(
       required: true,
       ref: "Item",
     },
-    category: {
+    depositDate: {
       type: String,
     },
     claimed: {

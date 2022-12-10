@@ -80,7 +80,7 @@ const ItemChecklist = ({ open, close, items, setItems, setUnclaimTotal }) => {
                     );
                   } else {
                     setFilteredRenderedItems((e) =>
-                      e.map((_) => {
+                      e?.map((_) => {
                         return { ..._, claimed: true };
                       })
                     );
