@@ -7,6 +7,15 @@
   min-height: 100vh;
 }
 
+.ant-progress-inner {
+  width: 50px !important;
+  height: 50px !important;
+}
+
+.ant-progress-text {
+  font-size: 0.6em !important;
+}
+
 .red td article {
   color: red;
 }

@@ -33,7 +33,6 @@ export default async function handler(req, res) {
 
           case "get-items": {
             let { id } = req.query;
-            console.log(id);
 
             return await Item.find({ ownerId: ObjectId(id) })
               .then((e) => {
@@ -119,7 +118,6 @@ export default async function handler(req, res) {
               });
           }
           case "delete-item": {
-            console.log(req.query);
             return await Item.findOneAndDelete({ _id: req.query.id })
               .then(() => {
                 res.json({ status: 200, message: "Deleted successsfully" });
@@ -138,7 +136,6 @@ export default async function handler(req, res) {
         const { mode } = req.body.payload;
         switch (mode) {
           case "edit-items": {
-            console.log(req.body.payload);
             const { id } = req.body.payload;
             return Item.findOneAndUpdate(
               { _id: id },

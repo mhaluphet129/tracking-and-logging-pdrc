@@ -25,9 +25,8 @@ import {
 } from "@ant-design/icons";
 
 import { AddVisitor, UpdateVisitor, VisitForm } from "./components";
-import { IDGen, Timer, Profiler } from "../../assets/utilities";
+import { IDGen, Profiler } from "../../assets/utilities";
 import axios from "axios";
-import moment from "moment";
 import { useReactToPrint } from "react-to-print";
 
 class PDF extends React.Component {
@@ -45,12 +44,7 @@ const VisitorPage = () => {
   const timerRef = useRef(null);
   const ref = useRef();
   const [load, setLoad] = useState("");
-  const [visitorWithTimer, setVisitorWithTimer] = useState();
   const [openProfile, setOpenProfile] = useState({ show: false, data: null });
-  const [dismissClick, setDismmissClick] = useState({
-    show: false,
-    index: null,
-  });
   const [updateVisitor, setUpdateVisitor] = useState({
     open: false,
     data: null,
@@ -182,70 +176,6 @@ const VisitorPage = () => {
           </Row>
         </>
       ),
-    },
-  ];
-
-  const column2 = [
-    {
-      title: "Visitor Name",
-      render: (_, row) => (
-        <Typography>
-          {row?.visitorId.name}
-          {row?.visitorId.middlename
-            ? " " + row?.visitorId.middlename
-            : ""}{" "}
-          {row.visitorId.lastname}
-        </Typography>
-      ),
-    },
-    {
-      title: "Time left",
-      align: "center",
-      width: 200,
-      render: (_, row, i) =>
-        moment(row?.timeOut).diff(moment()) > 0 ? (
-          <Timer
-            endDate={row?.timeOut}
-            reload={() => setTrigger(trigger + 1)}
-            end={() => {
-              setTrigger(trigger + 1);
-              api["warning"]({
-                message: "Time Visit",
-                description: "Some visitor exceed visit duration.",
-                duration: 0,
-              });
-            }}
-          />
-        ) : dismissClick.show && dismissClick.index == i ? (
-          <Space>
-            <Button
-              onClick={async () => {
-                let res = await axios.get("/api/visit", {
-                  params: { mode: "visit-out", id: row._id },
-                });
-                if (res.data.status == 200) {
-                  setTrigger(trigger + 1);
-                  setDismmissClick({ show: false, index: null });
-                }
-              }}
-              type="primary"
-            >
-              Confirm
-            </Button>
-            <Button
-              onClick={() => setDismmissClick({ show: false, index: null })}
-            >
-              Cancel
-            </Button>
-          </Space>
-        ) : (
-          <Button
-            onClick={() => setDismmissClick({ show: true, index: i })}
-            danger
-          >
-            DISMISS
-          </Button>
-        ),
     },
   ];
 
@@ -441,10 +371,6 @@ const VisitorPage = () => {
         params: { mode: "fetch-all", search: _searchName },
       });
       if (data.status == 200) setVisitors(data.visitor);
-      let res = await axios.get("/api/visit", {
-        params: { mode: "visit-with-timers" },
-      });
-      if (res.data.status == 200) setVisitorWithTimer(res.data.data);
       setLoad("");
     };
     fetchVisitor();
@@ -522,17 +448,6 @@ const VisitorPage = () => {
             loading={load == "fetch"}
           />
         </Card>
-        <Space style={{ marginBottom: 5, padding: 6 }}>
-          <Typography.Text strong>Visit limit Timers</Typography.Text>
-        </Space>
-        <Table
-          dataSource={visitorWithTimer}
-          columns={column2}
-          rowKey={(row) => row._id}
-          pagination={false}
-          loading={load == "fetch"}
-          style={{ width: 400 }}
-        />
 
         <AddVisitor
           open={showAddVisitor}

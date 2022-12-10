@@ -24,6 +24,7 @@ import {
   CheckCircleOutlined,
   ReloadOutlined,
   BlockOutlined,
+  FieldTimeOutlined,
 } from "@ant-design/icons";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -33,6 +34,7 @@ import DashboardPage from "../components/Dashboard";
 import Profiler from "../assets/utilities/profiler";
 import VisitorLog from "../components/VisitorLog";
 import ItemPage from "../components/Items";
+import VisitTime from "../components/VisitTime";
 import io from "socket.io-client";
 let socket;
 
@@ -52,6 +54,11 @@ const Sider = ({ selectedIndex }) => {
       label: "Visit Logs",
       key: "visitor-log",
       icon: <SnippetsOutlined style={{ fontSize: 20 }} />,
+    },
+    {
+      label: "Visit Time",
+      key: "visit-time",
+      icon: <FieldTimeOutlined style={{ fontSize: 20 }} />,
     },
     {
       label: "Items Page",
@@ -346,6 +353,7 @@ const Content = ({ selectedKey }) => {
       {selectedKey == "visitor" ? <VisitorPage /> : null}
       {selectedKey == "visitor-log" ? <VisitorLog /> : null}
       {selectedKey == "item" ? <ItemPage /> : null}
+      {selectedKey == "visit-time" ? <VisitTime /> : null}
     </div>
   );
 };
