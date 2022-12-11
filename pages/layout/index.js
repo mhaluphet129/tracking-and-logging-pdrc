@@ -320,32 +320,14 @@ const Header = () => {
           alignItems: "center",
         }}
       >
-        <Space style={{ marginRight: "auto" }}>
-          <Tooltip
-            title={isConnected ? "Connected" : "Not Connected to any device"}
-          >
-            <Tag color={isConnected ? "success" : "red"}>
-              <Typography.Text strong>{keyPair.toUpperCase()}</Typography.Text>
-              {isConnected ? <CheckCircleOutlined /> : <WarningOutlined />}
-            </Tag>
-          </Tooltip>
-        </Space>
         <Dropdown
           placement="bottom"
+          overlayStyle={{ width: 150 }}
           menu={{
             items: [
               {
-                key: 0,
-                label: (
-                  <Tooltip title="Click to Generate New Key">
-                    Key: {Cookies.get("key")?.toUpperCase()}
-                  </Tooltip>
-                ),
-                onClick: () => socket.emit("new-key"),
-              },
-              {
                 key: 1,
-                label: "Settings",
+                label: "Profile Settings",
                 icon: <SettingFilled />,
                 onClick: () => setShowSettings(true),
               },

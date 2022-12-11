@@ -58,9 +58,9 @@ const UpdateSenior = ({ open, close, data, refresh }) => {
         open={open}
         onClose={close}
         width={500}
-        title=" "
+        title="Edit Visitor Profile"
         extra={[
-          <Space>
+          <Space key={1}>
             <Button type="primary" disabled={!edited} onClick={handleSave}>
               SAVE
             </Button>
@@ -138,23 +138,17 @@ const UpdateSenior = ({ open, close, data, refresh }) => {
                 </Space>
               </Radio.Group>
             </Form.Item>
-            <Form.Item label="Date of Birth">
+            <Form.Item
+              label="Date of Birth"
+              initialValue={moment(inputData?.dateOfBirth)}
+            >
               <DatePicker
                 defaultValue={moment(inputData?.dateOfBirth)}
-                format="MMM DD YYYY"
+                format="MMMM DD, YYYY"
+                style={{ width: 200 }}
                 onChange={(e) => {
                   setInputData((_) => {
                     return { ..._, dateOfBirth: e };
-                  });
-                }}
-              />
-            </Form.Item>
-            <Form.Item label="Age">
-              <InputNumber
-                value={inputData?.age || ""}
-                onChange={(e) => {
-                  setInputData((_) => {
-                    return { ..._, age: e };
                   });
                 }}
               />

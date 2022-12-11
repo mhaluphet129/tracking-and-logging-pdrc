@@ -284,7 +284,12 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                 {isTimeOut ? (
                   <Tooltip
                     title={
-                      moment().isAfter(moment(visitHour))
+                      moment().isAfter(
+                        moment({
+                          hour: moment(visitHour).format("HH"),
+                          minute: moment(visitHour).format("M"),
+                        })
+                      )
                         ? "Visiting hour is close"
                         : null
                     }
@@ -295,7 +300,12 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                       style={{ width: 200 }}
                       icon={<LoginOutlined />}
                       onClick={() => setVisitIn(true)}
-                      disabled={moment().isAfter(moment(visitHour))}
+                      disabled={moment().isAfter(
+                        moment({
+                          hour: moment(visitHour).format("HH"),
+                          minute: moment(visitHour).format("M"),
+                        })
+                      )}
                       ghost
                     >
                       VISIT IN
