@@ -12,6 +12,7 @@ import {
   Tag,
   Popconfirm,
   message,
+  Tooltip,
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import EditItems from "./components/EditItems";
@@ -154,7 +155,14 @@ const Inventory = () => {
                 {
                   title: "Description",
                   width: 200,
-                  render: (_, row) => row?.description,
+                  render: (_, row) =>
+                    row?.description != "" ? (
+                      row?.description
+                    ) : (
+                      <Typography.Text type="secondary" italic>
+                        No description
+                      </Typography.Text>
+                    ),
                 },
                 {
                   title: "Status",
@@ -196,7 +204,9 @@ const Inventory = () => {
                           setOpenEditModal({ show: true, data: row });
                         }}
                       >
-                        <EditOutlined />
+                        <Tooltip title="edit">
+                          <EditOutlined />
+                        </Tooltip>
                       </Typography.Link>
                       <Typography.Link onClick={(e) => {}}>
                         <Popconfirm
@@ -217,7 +227,9 @@ const Inventory = () => {
                             } else message.error(res.data.message);
                           }}
                         >
-                          <DeleteOutlined />
+                          <Tooltip title="delete">
+                            <DeleteOutlined style={{ color: "#f00" }} />
+                          </Tooltip>
                         </Popconfirm>
                       </Typography.Link>
                     </Space>

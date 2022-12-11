@@ -168,48 +168,52 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
     },
   ];
 
-  useEffect(async () => {
-    let res = await axios.get("/api/visitor", {
-      params: { mode: "check-isTimeIn", id: data?._id },
-    });
+  useEffect(() => {
+    (async () => {
+      let res = await axios.get("/api/visitor", {
+        params: { mode: "check-isTimeIn", id: data?._id },
+      });
 
-    if (res.data.status == 200) setIsTimeOut(res.data.data.timeOut);
+      if (res.data.status == 200) setIsTimeOut(res.data.data.timeOut);
+    })();
   }, [data?._id, trigger]);
 
-  useEffect(async () => {
-    if (data != null || data != "") {
-      QRCode.toString(data?._id?.toString(), function (err, url) {
-        setQr(parse(url || ""));
-      });
+  useEffect(() => {
+    (async () => {
+      if (data != null || data != "") {
+        QRCode.toString(data?._id?.toString(), function (err, url) {
+          setQr(parse(url || ""));
+        });
 
-      setLoader("fetch-visit");
-      let res = await axios.get("/api/visit", {
-        params: {
-          mode: "get-visit-data",
-          id: data?._id,
-        },
-      });
+        setLoader("fetch-visit");
+        let res = await axios.get("/api/visit", {
+          params: {
+            mode: "get-visit-data",
+            id: data?._id,
+          },
+        });
 
-      if (res.data.status == 200) {
-        setVisitData(res.data.data);
-        if (res.data.data != null) {
-          res.data.data?.forEach((e) => {
-            e.remarks.forEach((e2) => {
-              if (e2.hasViolation) setRefViolation(true);
+        if (res.data.status == 200) {
+          setVisitData(res.data.data);
+          if (res.data.data != null) {
+            res.data.data?.forEach((e) => {
+              e.remarks.forEach((e2) => {
+                if (e2.hasViolation) setRefViolation(true);
+              });
             });
-          });
+          }
         }
+
+        setUnclaimTotal(
+          data?.items?.reduce((p, n) => {
+            if (!n.claimed) return p + 1;
+            return p;
+          }, 0)
+        );
+
+        setLoader("");
       }
-
-      setUnclaimTotal(
-        data?.items?.reduce((p, n) => {
-          if (!n.claimed) return p + 1;
-          return p;
-        }, 0)
-      );
-
-      setLoader("");
-    }
+    })();
   }, [data, trigger]);
 
   return (

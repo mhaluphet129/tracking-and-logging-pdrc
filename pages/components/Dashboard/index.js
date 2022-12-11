@@ -3,13 +3,14 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
   Title,
+  PointElement,
+  LineElement,
   Tooltip,
   Legend,
+  Filler,
 } from "chart.js";
 import {
-  Button,
   Card,
   Col,
   Row,
@@ -19,7 +20,7 @@ import {
   notification,
   PageHeader,
 } from "antd";
-import { Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import { useReactToPrint } from "react-to-print";
 import { Timer, Profiler } from "../../assets/utilities";
 import {
@@ -35,19 +36,15 @@ import axios from "axios";
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
+  Filler,
   Legend
 );
 
-class PDF extends React.Component {
-  render() {
-    return { ...this.props.children };
-  }
-}
-
-export default () => {
+const Dashboard = () => {
   let [dashbardNumericalData, setDashbardNumericalData] = useState(
     Array(12).fill(0)
   );
@@ -74,7 +71,7 @@ export default () => {
         text: "Visitor Analytical Display/Dashboard - 2022",
       },
       legend: {
-        position: "top",
+        position: "bottom",
       },
     },
     scales: {
@@ -168,11 +165,13 @@ export default () => {
 
   //suck it
 
-  useEffect(async () => {
-    let res = await axios.get("/api/visit", {
-      params: { mode: "visit-with-timers" },
-    });
-    if (res.data.status == 200) setVisitorWithTimer(res.data.data);
+  useEffect(() => {
+    (async () => {
+      let res = await axios.get("/api/visit", {
+        params: { mode: "visit-with-timers" },
+      });
+      if (res.data.status == 200) setVisitorWithTimer(res.data.data);
+    })();
   }, []);
 
   return (
@@ -211,24 +210,19 @@ export default () => {
             </Space>
           </Col>
           <Col span={17} offset={1} style={{ marginTop: 15 }}>
-            <PDF
-              ref={ref}
-              children={
-                <Bar
-                  options={options}
-                  data={{
-                    labels: jayson.months,
-                    datasets: [
-                      {
-                        label: "Total visit",
-                        backgroundColor: "rgb(255, 99, 132)",
-                        borderColor: "rgb(255, 99, 132)",
-                        data: dashbardNumericalData,
-                      },
-                    ],
-                  }}
-                />
-              }
+            <Line
+              options={options}
+              data={{
+                labels: jayson.months,
+                datasets: [
+                  {
+                    label: "Total visit",
+                    borderColor: "rgb(53, 162, 235)",
+                    backgroundColor: "rgba(53, 162, 235, 0.5)",
+                    data: dashbardNumericalData,
+                  },
+                ],
+              }}
             />
           </Col>
         </Row>
@@ -246,3 +240,5 @@ export default () => {
     </PageHeader>
   );
 };
+
+export default Dashboard;

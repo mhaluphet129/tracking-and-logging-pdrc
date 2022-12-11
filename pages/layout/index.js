@@ -25,6 +25,7 @@ import {
   ReloadOutlined,
   BlockOutlined,
   FieldTimeOutlined,
+  LoginOutlined,
 } from "@ant-design/icons";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -35,6 +36,8 @@ import Profiler from "../assets/utilities/profiler";
 import VisitorLog from "../components/VisitorLog";
 import ItemPage from "../components/Items";
 import VisitTime from "../components/VisitTime";
+import Violation from "../components/Violation";
+import CheckIn from "../components/CheckIn";
 import io from "socket.io-client";
 let socket;
 
@@ -64,6 +67,16 @@ const Sider = ({ selectedIndex }) => {
       label: "Items Page",
       key: "item",
       icon: <BlockOutlined style={{ fontSize: 20 }} />,
+    },
+    {
+      label: "Check In",
+      key: "checkin",
+      icon: <LoginOutlined style={{ fontSize: 20 }} />,
+    },
+    {
+      label: "Violations",
+      key: "violations",
+      icon: <WarningOutlined style={{ fontSize: 20 }} />,
     },
   ]);
 
@@ -354,25 +367,8 @@ const Content = ({ selectedKey }) => {
       {selectedKey == "visitor-log" ? <VisitorLog /> : null}
       {selectedKey == "item" ? <ItemPage /> : null}
       {selectedKey == "visit-time" ? <VisitTime /> : null}
-    </div>
-  );
-};
-
-const Footer = () => {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        width: "100%",
-        backgroundColor: "#aaa",
-        minHeight: "5vh",
-      }}
-    >
-      <Typography.Title level={5}>
-        E-Sitizen: A WEB-BASED INFORMATION AND HEALTH MONITORING SYSTEM FOR THE
-        SENIOR CITIZEN
-      </Typography.Title>
+      {selectedKey == "checkin" ? <CheckIn /> : null}
+      {selectedKey == "violations" ? <Violation /> : null}
     </div>
   );
 };
@@ -402,4 +398,4 @@ const Main = () => {
   );
 };
 export default Main;
-export { Sider, Header, Content, Footer };
+export { Sider, Header, Content };

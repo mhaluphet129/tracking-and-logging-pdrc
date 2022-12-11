@@ -32,7 +32,6 @@ const VisitorLog = () => {
   const timerRef = useRef(null);
   const ref = useState();
   const [viewLog, setViewLog] = useState({ show: false, data: null });
-  const [openLogItems, setOpenedLogItems] = useState([]);
   const [openPrintDrawer, setOpenPrintDrawer] = useState(false);
 
   const handlePrint = useReactToPrint({
@@ -45,11 +44,11 @@ const VisitorLog = () => {
       width: 300,
       render: (_, row) => (
         <Typography>
-          {row?.visitorId?.name}
-          {row?.visitorId?.middlename
-            ? ` ${row?.visitorId.middlename[0].toUpperCase()}.`
+          {row?.user?.name}
+          {row?.user?.middlename
+            ? ` ${row?.user.middlename[0].toUpperCase()}.`
             : ""}{" "}
-          {row?.visitorId?.lastname}
+          {row?.user?.lastname}
         </Typography>
       ),
     },
@@ -235,21 +234,6 @@ const VisitorLog = () => {
     })();
   }, [trigger]);
 
-  useEffect(() => {
-    (async () => {
-      if (viewLog.data?.visitorId._id != null) {
-        let { data } = await axios.get("/api/items", {
-          params: {
-            mode: "get-items",
-            id: viewLog.data?.visitorId._id,
-          },
-        });
-
-        if (data.status == 200) setOpenedLogItems(data.data);
-      }
-    })();
-  }, [viewLog?.data]);
-
   return (
     <>
       <Drawer
@@ -287,11 +271,11 @@ const VisitorLog = () => {
             <Space>
               Visitor name:{" "}
               <strong>
-                {viewLog.data?.visitorId.name}
-                {viewLog.data?.visitorId.middlename
-                  ? " " + viewLog.data?.visitorId.middlename
+                {viewLog.data?.user.name}
+                {viewLog.data?.user.middlename
+                  ? " " + viewLog.data?.user.middlename
                   : ""}{" "}
-                {viewLog.data?.visitorId.lastname}
+                {viewLog.data?.user.lastname}
               </strong>
             </Space>
             <Space>
@@ -372,7 +356,7 @@ const VisitorLog = () => {
                 },
               ]}
               tableLayout="auto"
-              dataSource={openLogItems}
+              dataSource={viewLog.data?.depositItems}
             />
           </Space>
         </Modal>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { PageHeader, Table, Typography, Space, Button } from "antd";
+import { PageHeader, Table, Typography, Space, Button, Card } from "antd";
 import { Timer } from "../../assets/utilities";
 import axios from "axios";
 import moment from "moment";
@@ -81,14 +81,16 @@ const VisitTime = () => {
 
   return (
     <PageHeader title="Visit Time">
-      <Table
-        dataSource={visitorWithTimer}
-        columns={column2}
-        rowKey={(row) => row._id}
-        pagination={false}
-        loading={load == "fetch"}
-        style={{ width: 400 }}
-      />
+      <Card>
+        <Table
+          dataSource={visitorWithTimer}
+          columns={column2}
+          rowKey={(row) => row._id}
+          pagination={false}
+          loading={load == "fetch"}
+          style={{ width: 400 }}
+        />
+      </Card>
     </PageHeader>
   );
 };

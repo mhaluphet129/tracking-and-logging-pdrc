@@ -42,8 +42,27 @@ export default async function handler(req, res) {
               });
           }
           case "fetch-recent": {
-            return await Visit.find({})
-              .populate("visitorId")
+            return await Visit.aggregate([
+              {
+                $lookup: {
+                  from: "items",
+                  localField: "_id",
+                  foreignField: "visitId",
+                  as: "depositItems",
+                },
+              },
+              {
+                $lookup: {
+                  from: "visitors",
+                  localField: "visitorId",
+                  foreignField: "_id",
+                  as: "user",
+                },
+              },
+              {
+                $unwind: "$user",
+              },
+            ])
               .sort({ createdAt: -1 })
               .then((e) => {
                 res.json({ status: 200, data: e });

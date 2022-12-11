@@ -1,4 +1,5 @@
 import Item from "../../database/model/Item";
+import Visit from "../../database/model/Visit";
 import dbConnect from "../../database/dbConnect";
 var ObjectId = require("mongodb").ObjectId;
 
@@ -31,20 +32,20 @@ export default async function handler(req, res) {
               });
           }
 
-          case "get-items": {
-            let { id } = req.query;
+          // case "get-items": {
+          //   let { id } = req.query;
 
-            return await Item.find({ ownerId: ObjectId(id) })
-              .then((e) => {
-                res.json({ status: 200, data: e });
-                resolve();
-              })
-              .catch((err) => {
-                res
-                  .status(500)
-                  .json({ success: false, message: "Error: " + err });
-              });
-          }
+          //   return await Item.find({ ownerId: ObjectId(id) })
+          //     .then((e) => {
+          //       res.json({ status: 200, data: e });
+          //       resolve();
+          //     })
+          //     .catch((err) => {
+          //       res
+          //         .status(500)
+          //         .json({ success: false, message: "Error: " + err });
+          //     });
+          // }
 
           case "get-items-all": {
             try {
