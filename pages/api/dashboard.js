@@ -1,5 +1,6 @@
 import Visit from "../../database/model/Visit";
 import Visitor from "../../database/model/Visitor";
+import Item from "../../database/model/Item";
 import dbConnect from "../../database/dbConnect";
 import moment from "moment";
 
@@ -34,10 +35,17 @@ export default async function handler(req, res) {
           let totalVisitMonth = await Visit.countDocuments({
             createdAt: { $gte: startOfMonth, $lte: endOfMonth },
           });
+          let items = await Item.find();
 
           res.json({
             status: 200,
-            data: { graphValue, totalVisitor, totalVisit, totalVisitMonth },
+            data: {
+              graphValue,
+              totalVisitor,
+              totalVisit,
+              totalVisitMonth,
+              items,
+            },
           });
         } catch (err) {
           res.status(500).json({ success: false, message: "Error: " + err });

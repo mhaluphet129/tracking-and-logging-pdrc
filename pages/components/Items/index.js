@@ -43,6 +43,7 @@ const Inventory = () => {
   let _tabs = ["total", "totalClaimed", "totalUnclaimed", "totalDisposed"];
 
   const searchName = async (keyword) => {
+    setLoader("searching");
     if (keyword != "" && keyword != null) {
       let { data } = await axios.get("/api/items", {
         params: {
@@ -52,9 +53,21 @@ const Inventory = () => {
       });
       if (data.status == 200) {
         setTableData(data.searchData);
-        // setLoading(false);
+        setTabList(() =>
+          _tabs.map((e) => {
+            return {
+              key: e,
+              tab: (
+                <Typography.Text>
+                  {formalTabName[e]} <Badge count={data?.analytics[e]} />
+                </Typography.Text>
+              ),
+            };
+          })
+        );
       }
     }
+    setLoader("");
   };
 
   const runTimer = (key) => {
@@ -113,7 +126,7 @@ const Inventory = () => {
                 style={{
                   width: 400,
                 }}
-                // loading={loading}
+                loading={loader == "searching"}
                 placeholder="Search Name, Items or Description"
                 onChange={(_) => {
                   runTimer(_);
@@ -123,7 +136,6 @@ const Inventory = () => {
                   }
                 }}
                 autoFocus
-                allowClear
               />
             }
             style={{ width: "100%" }}
@@ -146,7 +158,8 @@ const Inventory = () => {
             <Table
               dataSource={tableData}
               loading={loader == "fetch"}
-              pagination={{ pageSize: 6 }}
+              pagination={{ pageSize: 10 }}
+              scroll={{ y: 400 }}
               columns={[
                 {
                   title: "Name",

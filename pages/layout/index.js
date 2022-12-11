@@ -22,10 +22,11 @@ import {
   SnippetsOutlined,
   WarningOutlined,
   CheckCircleOutlined,
-  ReloadOutlined,
+  SettingOutlined,
   BlockOutlined,
   FieldTimeOutlined,
   LoginOutlined,
+  DiffOutlined,
 } from "@ant-design/icons";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -38,6 +39,7 @@ import ItemPage from "../components/Items";
 import VisitTime from "../components/VisitTime";
 import Violation from "../components/Violation";
 import CheckIn from "../components/CheckIn";
+import Settings from "../components/Settings";
 import io from "socket.io-client";
 let socket;
 
@@ -78,6 +80,16 @@ const Sider = ({ selectedIndex }) => {
       key: "violations",
       icon: <WarningOutlined style={{ fontSize: 20 }} />,
     },
+    {
+      label: "Reports",
+      key: "reports",
+      icon: <DiffOutlined style={{ fontSize: 20 }} />,
+    },
+    {
+      label: "Settings",
+      key: "settings",
+      icon: <SettingOutlined style={{ fontSize: 20 }} />,
+    },
   ]);
 
   useEffect(() => {
@@ -89,13 +101,13 @@ const Sider = ({ selectedIndex }) => {
 
   return (
     <Layout.Sider collapsible theme="light">
-      <div style={{ height: "25vh", backgroundColor: "#fff" }} />
+      <div style={{ height: "10vh", backgroundColor: "#fff" }} />
       <Menu
         onClick={selectedIndex}
         items={items}
         defaultSelectedKeys="dashboard"
         style={{
-          minHeight: "70vh",
+          minHeight: "85vh",
           fontSize: 15,
           fontWeight: 700,
         }}
@@ -309,11 +321,6 @@ const Header = () => {
         }}
       >
         <Space style={{ marginRight: "auto" }}>
-          <Tooltip title="Generate a new key and disconnect current device.">
-            <Button size="small" onClick={() => socket.emit("new-key")}>
-              <ReloadOutlined />
-            </Button>
-          </Tooltip>
           <Tooltip
             title={isConnected ? "Connected" : "Not Connected to any device"}
           >
@@ -327,6 +334,15 @@ const Header = () => {
           placement="bottom"
           menu={{
             items: [
+              {
+                key: 0,
+                label: (
+                  <Tooltip title="Click to Generate New Key">
+                    Key: {Cookies.get("key")?.toUpperCase()}
+                  </Tooltip>
+                ),
+                onClick: () => socket.emit("new-key"),
+              },
               {
                 key: 1,
                 label: "Settings",
@@ -369,6 +385,7 @@ const Content = ({ selectedKey }) => {
       {selectedKey == "visit-time" ? <VisitTime /> : null}
       {selectedKey == "checkin" ? <CheckIn /> : null}
       {selectedKey == "violations" ? <Violation /> : null}
+      {selectedKey == "settings" ? <Settings /> : null}
     </div>
   );
 };

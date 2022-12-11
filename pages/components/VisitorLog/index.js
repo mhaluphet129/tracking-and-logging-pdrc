@@ -397,6 +397,7 @@ const VisitorLog = () => {
               return { onClick: () => setViewLog({ show: true, data: row }) };
             }}
             style={{ marginTop: 10 }}
+            scroll={{ y: 450 }}
           />
         </Card>
       </PageHeader>

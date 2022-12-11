@@ -19,19 +19,17 @@ const Timer = ({ startDate, endDate, end }) => {
   }, [seconds, countTimer]);
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column" }}>
       <Progress
         type="dashboard"
-        percent={
+        percent={(
           100 -
-          Math.floor(
-            (seconds /
-              moment
-                .duration(moment(endDate).diff(moment(startDate)))
-                .asSeconds()) *
-              100
-          )
-        }
+          (seconds /
+            moment
+              .duration(moment(endDate).diff(moment(startDate)))
+              .asSeconds()) *
+            100
+        ).toFixed(1)}
         status="active"
         strokeColor={{
           "0%": "#108ee9",
@@ -40,7 +38,7 @@ const Timer = ({ startDate, endDate, end }) => {
         strokeWidth={10}
       />
       {new Date(seconds * 1000).toISOString().slice(11, 19)}
-    </>
+    </div>
   );
 };
 

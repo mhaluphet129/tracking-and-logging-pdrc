@@ -13,11 +13,19 @@
 }
 
 .ant-progress-text {
-  font-size: 0.6em !important;
+  font-size: 0.5em !important;
 }
 
 .red td article {
   color: red;
+}
+
+.red-status {
+  background: rgba(255, 0, 0, 0.2);
+}
+
+.green-status {
+  background: rgba(0, 255, 0, 0.2);
 }
 
 thead {

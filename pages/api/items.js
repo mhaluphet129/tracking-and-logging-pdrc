@@ -88,11 +88,11 @@ export default async function handler(req, res) {
                   from: "visitors",
                   localField: "ownerId",
                   foreignField: "_id",
-                  as: "owner",
+                  as: "ownerId",
                 },
               },
               {
-                $unwind: "$owner",
+                $unwind: "$ownerId",
               },
               {
                 $match: {
@@ -109,7 +109,18 @@ export default async function handler(req, res) {
               .collation({ locale: "en" })
               .sort({ name: 1 })
               .then((e) => {
-                res.json({ status: 200, searchData: e });
+                res.json({
+                  status: 200,
+                  searchData: e,
+                  analytics: {
+                    total: e?.length,
+                    totalClaimed: e?.filter((_) => _?.claimed)?.length,
+                    totalUnclaimed: e?.filter((_) => !_?.claimed)?.length,
+                    totalDisposed: e?.filter((_) =>
+                      _?.status?.includes("DISPOSED")
+                    )?.length,
+                  },
+                });
                 resolve();
               })
               .catch((err) => {

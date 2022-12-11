@@ -69,16 +69,6 @@ const Violation = () => {
       <Card>
         <Row gutter={[16, 16]}>
           <Col span={6}>
-            <Radio.Group
-              defaultValue="pie"
-              buttonStyle="solid"
-              onChange={(e) => setType(e.target.value)}
-              style={{ marginBottom: 10 }}
-              size="small"
-            >
-              <Radio.Button value="pie">Pie</Radio.Button>
-              <Radio.Button value="card">Card</Radio.Button>
-            </Radio.Group>
             {type == "pie" ? (
               <Pie
                 style={{ marginTop: 10 }}
@@ -128,6 +118,16 @@ const Violation = () => {
                 />
               </Space>
             )}
+            <Radio.Group
+              defaultValue="pie"
+              buttonStyle="solid"
+              onChange={(e) => setType(e.target.value)}
+              style={{ marginBottom: 10 }}
+              size="small"
+            >
+              <Radio.Button value="pie">Pie</Radio.Button>
+              <Radio.Button value="card">Card</Radio.Button>
+            </Radio.Group>
           </Col>
           <Col span={18}>
             <Typography.Title level={5}>List of Violators</Typography.Title>

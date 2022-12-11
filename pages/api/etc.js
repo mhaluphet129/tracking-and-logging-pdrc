@@ -125,6 +125,24 @@ export default async function handler(req, res) {
                   .json({ success: false, message: "Error: " + err });
               });
           }
+          case "update-visit-time": {
+            return await Admin.findOneAndUpdate(
+              {},
+              { $set: { visitLimit: req.body.payload.visitLimit } }
+            )
+              .then((e) => {
+                res.json({
+                  status: 200,
+                  data: e,
+                  message: "Successfully update the visit time limit",
+                });
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
         }
       });
     }

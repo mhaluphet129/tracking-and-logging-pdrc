@@ -95,6 +95,26 @@ export default async function handler(req, res) {
                   .json({ success: false, message: "Error: " + err });
               });
           }
+          case "visit-out-many": {
+            return await Visit.updateMany(
+              { _id: { $in: JSON.parse(req.query.ids) } },
+              {
+                $set: {
+                  timeOutDone: true,
+                  timeOutTimeAfterDone: moment(),
+                },
+              }
+            )
+              .then((e) => {
+                res.json({ status: 200, message: "Checkout Succesfully" });
+                resolve();
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
           case "visit-with-timers": {
             return await Visit.find({
               timeOutDone: false,

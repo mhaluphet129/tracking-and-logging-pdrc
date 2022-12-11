@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
   Filler,
+  ArcElement,
 } from "chart.js";
 import {
   Card,
@@ -20,13 +21,13 @@ import {
   notification,
   PageHeader,
 } from "antd";
-import { Line } from "react-chartjs-2";
-import { useReactToPrint } from "react-to-print";
+import { Line, Pie } from "react-chartjs-2";
 import { Timer, Profiler } from "../../assets/utilities";
 import {
   WarningOutlined,
   UserOutlined,
   ImportOutlined,
+  BlockOutlined,
   CalendarOutlined,
 } from "@ant-design/icons";
 import Cards from "./components/cards";
@@ -41,7 +42,8 @@ ChartJS.register(
   Title,
   Tooltip,
   Filler,
-  Legend
+  Legend,
+  ArcElement
 );
 
 const Dashboard = () => {
@@ -57,10 +59,10 @@ const Dashboard = () => {
     totalVisit: 0,
     totalVisitMonth: 0,
   });
-  let ref = useRef();
-
-  const handlePrint = useReactToPrint({
-    content: () => ref.current,
+  const [pieData, setPieData] = useState({
+    total: "-",
+    unclaimed: 0,
+    claimed: 0,
   });
 
   const options = {
@@ -159,6 +161,11 @@ const Dashboard = () => {
           totalVisit: data.data?.totalVisit,
           totalVisitMonth: data.data?.totalVisitMonth,
         });
+        setPieData({
+          total: data?.data?.items?.length,
+          claimed: data?.data?.items?.filter((e) => e?.claimed)?.length,
+          unclaimed: data?.data?.items?.filter((e) => !e?.claimed)?.length,
+        });
       }
     })();
   }, []);
@@ -186,43 +193,84 @@ const Dashboard = () => {
       />
       <Card>
         {contextHolder}
-        <Row gutter={[16, 16]}>
-          <Col span={6}>
-            <Space direction="vertical" style={{ width: "100%" }}>
-              <Cards
-                color="cyan"
-                icon={<UserOutlined />}
-                name="Total Visitor"
-                value={cardData.totalVisitor}
+        <Row>
+          <Col span={14}>
+            <Row gutter={[16, 16]}>
+              <Space style={{ width: "100%" }}>
+                <Cards
+                  color="cyan"
+                  icon={<UserOutlined />}
+                  name="Total Visitor"
+                  value={cardData.totalVisitor}
+                />
+                <Cards
+                  color="orange"
+                  icon={<ImportOutlined />}
+                  name="Total Visits"
+                  value={cardData.totalVisit}
+                />
+                <Cards
+                  color="green"
+                  icon={<CalendarOutlined />}
+                  name="Visit This Month"
+                  value={cardData.totalVisitMonth}
+                />
+              </Space>
+
+              <Line
+                options={options}
+                data={{
+                  labels: jayson.months,
+                  datasets: [
+                    {
+                      label: "Total visit",
+                      borderColor: "rgb(53, 162, 235)",
+                      backgroundColor: "rgba(53, 162, 235, 0.5)",
+                      data: dashbardNumericalData,
+                    },
+                  ],
+                }}
               />
-              <Cards
-                color="orange"
-                icon={<ImportOutlined />}
-                name="Total Visits"
-                value={cardData.totalVisit}
-              />
-              <Cards
-                color="green"
-                icon={<CalendarOutlined />}
-                name="Visit This Month"
-                value={cardData.totalVisitMonth}
-              />
-            </Space>
+            </Row>
           </Col>
-          <Col span={17} offset={1} style={{ marginTop: 15 }}>
-            <Line
-              options={options}
+          <Col span={8} offset={2}>
+            <Pie
+              options={{
+                responsive: true,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: `Pie graph of Claimed and Unclaimed Items`,
+                  },
+                  legend: {
+                    position: "bottom",
+                  },
+                },
+              }}
               data={{
-                labels: jayson.months,
+                labels: ["Total Claimed", "Total Unclaimed"],
                 datasets: [
                   {
-                    label: "Total visit",
-                    borderColor: "rgb(53, 162, 235)",
-                    backgroundColor: "rgba(53, 162, 235, 0.5)",
-                    data: dashbardNumericalData,
+                    data: [pieData.claimed, pieData.unclaimed],
+                    backgroundColor: [
+                      "rgba(54, 162, 235, 1)",
+                      "rgba(54, 162, 235, 0.2)",
+                    ],
+                    borderColor: [
+                      "rgba(54, 162, 235, 1)",
+                      "rgba(54, 162, 235, 1)",
+                    ],
+                    borderWidth: 1,
                   },
                 ],
               }}
+            />
+            <Cards
+              name="Total Deposit Items"
+              color="blue"
+              icon={<BlockOutlined />}
+              value={pieData.total}
+              hoverable
             />
           </Col>
         </Row>

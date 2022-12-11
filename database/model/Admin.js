@@ -19,6 +19,10 @@ let AdminSchema = new mongoose.Schema(
       type: String,
       default: "admin",
     },
+    visitLimit: {
+      type: String,
+      default: "15-20",
+    },
   },
   { timestamps: true }
 );

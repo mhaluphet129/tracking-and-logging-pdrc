@@ -21,7 +21,6 @@ import {
   QuestionCircleOutlined,
   CheckOutlined,
   DeleteOutlined,
-  CheckCircleOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import QRCode from "qrcode";
@@ -51,15 +50,17 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
   const [unclaimTotal, setUnclaimTotal] = useState(0);
   const [items, setItems] = useState([]);
   const [show, setShow] = useState(false);
+  const [openRemarksIndex, setOpenRemarksIndex] = useState(-1);
 
   const { setVisitHour, visitHour } = useContext(SettingsContext);
 
   const handleFinishRemarks = async (val) => {
+    console.log(openRemarksIndex);
     val = { ...val, hasViolation };
     let res = await axios.post("/api/visit", {
       payload: {
         ...val,
-        id: visitData[0]?._id,
+        id: visitData[openRemarksIndex]?._id,
         mode: "new-remarks",
       },
     });
@@ -139,9 +140,12 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
     {
       align: "center",
       title: "Function",
-      render: (_, row) => (
+      render: (_, row, i) => (
         <Button
-          onClick={() => setOpenRemarks({ show: true, data: row?.remarks })}
+          onClick={() => {
+            setOpenRemarks({ show: true, data: row?.remarks });
+            setOpenRemarksIndex(i);
+          }}
         >
           REMARKS
         </Button>
@@ -417,9 +421,8 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                     </p>
                   ),
                 }}
-                pagination={{
-                  pageSize: 6,
-                }}
+                pagination={false}
+                scroll={{ y: 500 }}
                 rowClassName={(row) =>
                   row?.remarks.filter((e) => e.hasViolation)?.length > 0
                     ? "red"
