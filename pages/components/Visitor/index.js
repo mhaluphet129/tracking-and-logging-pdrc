@@ -13,7 +13,6 @@ import {
   message,
   PageHeader,
   Card,
-  Drawer,
   Image,
 } from "antd";
 import {
@@ -27,13 +26,6 @@ import {
 import { AddVisitor, UpdateVisitor, VisitForm } from "./components";
 import { IDGen, Profiler } from "../../assets/utilities";
 import axios from "axios";
-import { useReactToPrint } from "react-to-print";
-
-class PDF extends React.Component {
-  render() {
-    return { ...this.props.children };
-  }
-}
 
 const VisitorPage = () => {
   const [showAddVisitor, setShowAddVisitor] = useState(false);
@@ -42,7 +34,6 @@ const VisitorPage = () => {
   const [trigger, setTrigger] = useState(0);
   const [_searchName, setSearchName] = useState("");
   const timerRef = useRef(null);
-  const ref = useRef();
   const [load, setLoad] = useState("");
   const [openProfile, setOpenProfile] = useState({ show: false, data: null });
   const [updateVisitor, setUpdateVisitor] = useState({
@@ -55,11 +46,6 @@ const VisitorPage = () => {
   });
 
   const [api, contextHolder] = notification.useNotification();
-  const [openPrintDrawer, setOpenPrintDrawer] = useState(false);
-
-  const handlePrint = useReactToPrint({
-    content: () => ref.current,
-  });
 
   const column = [
     {
@@ -378,31 +364,7 @@ const VisitorPage = () => {
 
   return (
     <>
-      <Drawer
-        open={openPrintDrawer}
-        onClose={() => setOpenPrintDrawer(false)}
-        placement="bottom"
-        height="100%"
-        title="Print Preview"
-        width="200"
-        extra={[
-          <Button onClick={handlePrint} key="visit1">
-            PRINT
-          </Button>,
-        ]}
-      >
-        <PDF ref={ref}>
-          <CustomTable />
-        </PDF>
-      </Drawer>
-      <PageHeader
-        title="Visitors Profile"
-        extra={[
-          <Button key="visit2" onClick={() => setOpenPrintDrawer(true)}>
-            PRINT VISITOR LIST
-          </Button>,
-        ]}
-      >
+      <PageHeader title="Visitors Profile">
         {contextHolder}
         <Card>
           <Space

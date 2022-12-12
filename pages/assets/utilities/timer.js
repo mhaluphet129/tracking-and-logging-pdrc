@@ -32,8 +32,9 @@ const Timer = ({ startDate, endDate, end }) => {
         ).toFixed(1)}
         status="active"
         strokeColor={{
-          "0%": "#108ee9",
-          "100%": "#87d068",
+          "0%": "#0f0",
+          "50%": "#ff0",
+          "100%": "#f00",
         }}
         strokeWidth={10}
       />

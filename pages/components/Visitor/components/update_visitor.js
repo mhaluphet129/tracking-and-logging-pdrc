@@ -96,6 +96,7 @@ const UpdateSenior = ({ open, close, data, refresh }) => {
             <Form.Item label="First Name">
               <Input
                 value={inputData?.name || ""}
+                style={{ width: "60%" }}
                 onChange={(e) => {
                   setInputData((_) => {
                     return { ..._, name: e.target.value };
@@ -106,6 +107,7 @@ const UpdateSenior = ({ open, close, data, refresh }) => {
             <Form.Item label="Middle Name (Optional)">
               <Input
                 value={inputData?.middlename || ""}
+                style={{ width: "60%" }}
                 onChange={(e) => {
                   setInputData((_) => {
                     return { ..._, middlename: e.target.value };
@@ -116,6 +118,7 @@ const UpdateSenior = ({ open, close, data, refresh }) => {
             <Form.Item label="Last Name">
               <Input
                 value={inputData?.lastname || ""}
+                style={{ width: "60%" }}
                 onChange={(e) => {
                   setInputData((_) => {
                     return { ..._, lastname: e.target.value };
@@ -145,7 +148,7 @@ const UpdateSenior = ({ open, close, data, refresh }) => {
               <DatePicker
                 defaultValue={moment(inputData?.dateOfBirth)}
                 format="MMMM DD, YYYY"
-                style={{ width: 200 }}
+                style={{ width: 180 }}
                 onChange={(e) => {
                   setInputData((_) => {
                     return { ..._, dateOfBirth: e };
@@ -156,6 +159,7 @@ const UpdateSenior = ({ open, close, data, refresh }) => {
             <Form.Item label="Address">
               <Input
                 value={inputData?.address || ""}
+                style={{ width: "60%" }}
                 onChange={(e) => {
                   setInputData((_) => {
                     return { ..._, address: e.target.value };
@@ -164,11 +168,13 @@ const UpdateSenior = ({ open, close, data, refresh }) => {
               />
             </Form.Item>
             <Form.Item label="Contact Number">
-              <Input
+              <InputNumber
+                maxLength={11}
+                style={{ width: "60%" }}
                 value={inputData?.contactNumber || ""}
                 onChange={(e) => {
                   setInputData((_) => {
-                    return { ..._, contactNumber: e.target.value };
+                    return { ..._, contactNumber: e };
                   });
                 }}
               />

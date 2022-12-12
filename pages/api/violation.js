@@ -17,6 +17,7 @@ export default async function handler(req, res) {
               let violators = await Visit.find({
                 "remarks.hasViolation": true,
               }).populate("visitorId");
+
               let totalVisitor = await Visitor.countDocuments();
 
               return res.json({

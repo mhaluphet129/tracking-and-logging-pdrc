@@ -36,10 +36,10 @@ import DashboardPage from "../components/Dashboard";
 import Profiler from "../assets/utilities/profiler";
 import VisitorLog from "../components/VisitorLog";
 import ItemPage from "../components/Items";
-import VisitTime from "../components/VisitTime";
 import Violation from "../components/Violation";
 import CheckIn from "../components/CheckIn";
 import Settings from "../components/Settings";
+import Report from "../components/Reports";
 import io from "socket.io-client";
 let socket;
 
@@ -60,11 +60,7 @@ const Sider = ({ selectedIndex }) => {
       key: "visitor-log",
       icon: <SnippetsOutlined style={{ fontSize: 20 }} />,
     },
-    {
-      label: "Visit Time",
-      key: "visit-time",
-      icon: <FieldTimeOutlined style={{ fontSize: 20 }} />,
-    },
+
     {
       label: "Items Page",
       key: "item",
@@ -364,10 +360,10 @@ const Content = ({ selectedKey }) => {
       {selectedKey == "visitor" ? <VisitorPage /> : null}
       {selectedKey == "visitor-log" ? <VisitorLog /> : null}
       {selectedKey == "item" ? <ItemPage /> : null}
-      {selectedKey == "visit-time" ? <VisitTime /> : null}
       {selectedKey == "checkin" ? <CheckIn /> : null}
       {selectedKey == "violations" ? <Violation /> : null}
       {selectedKey == "settings" ? <Settings /> : null}
+      {selectedKey == "reports" ? <Report /> : null}
     </div>
   );
 };

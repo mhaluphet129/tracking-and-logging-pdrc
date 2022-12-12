@@ -9,34 +9,19 @@ import {
   Tag,
   PageHeader,
   Card,
-  Button,
   Row,
   Col,
-  Drawer,
   Image,
 } from "antd";
 import axios from "axios";
 import moment from "moment";
-import { useReactToPrint } from "react-to-print";
-
-class PDF extends React.Component {
-  render() {
-    return { ...this.props.children };
-  }
-}
 
 const VisitorLog = () => {
   const [recentVisit, setRecentVisit] = useState([]);
   const [trigger, setTrigger] = useState(0);
   const [loader, setLoader] = useState(false);
   const timerRef = useRef(null);
-  const ref = useState();
   const [viewLog, setViewLog] = useState({ show: false, data: null });
-  const [openPrintDrawer, setOpenPrintDrawer] = useState(false);
-
-  const handlePrint = useReactToPrint({
-    content: () => ref.current,
-  });
 
   const column2 = [
     {
@@ -139,7 +124,12 @@ const VisitorLog = () => {
       <Col span={7}>
         <Row justify="space-around">
           <Col>
-            <Image preview={false} src="/pdrc-logo.png" width={150} />
+            <Image
+              preview={false}
+              src="/pdrc-logo.png"
+              width={150}
+              alt="image 1"
+            />
           </Col>
         </Row>
       </Col>
@@ -236,30 +226,7 @@ const VisitorLog = () => {
 
   return (
     <>
-      <Drawer
-        open={openPrintDrawer}
-        onClose={() => setOpenPrintDrawer(false)}
-        title="Print Preview"
-        placement="bottom"
-        height="100%"
-        extra={[
-          <Button onClick={handlePrint} key="log1">
-            PRINT
-          </Button>,
-        ]}
-      >
-        <PDF ref={ref}>
-          <CustomTable />
-        </PDF>
-      </Drawer>
-      <PageHeader
-        title="Visit Logs"
-        extra={[
-          <Button onClick={() => setOpenPrintDrawer(true)} key="log2">
-            Print Visit Logs
-          </Button>,
-        ]}
-      >
+      <PageHeader title="Visit Logs">
         <Modal
           footer={null}
           closable={false}

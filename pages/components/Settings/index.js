@@ -8,6 +8,7 @@ import {
   Typography,
   Tooltip,
   Tag,
+  message,
 } from "antd";
 import {
   CheckCircleOutlined,
@@ -16,7 +17,9 @@ import {
 } from "@ant-design/icons";
 import { SettingsContext } from "../../context";
 import Cookies from "js-cookie";
+import axios from "axios";
 import io from "socket.io-client";
+import moment from "moment";
 let socket;
 
 const Settings = () => {
@@ -24,6 +27,7 @@ const Settings = () => {
   const [isChanged, setIsChanged] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [keyPair, setKeypair] = useState("");
+  const [date, setDate] = useState();
 
   useEffect(() => {
     fetch("/api/socket").finally(() => {
@@ -70,12 +74,15 @@ const Settings = () => {
               </Button>
             </Tooltip>
           </Form.Item>
-          <Form.Item label="Visit Time" initialValue={visitHour}>
+          <Form.Item label="Visit Time" initialValue={moment(visitHour)}>
             <DatePicker.TimePicker
               style={{ width: 200 }}
               format="hh:mm a"
-              defaultValue={visitHour}
-              onChange={() => setIsChanged(true)}
+              defaultValue={moment(visitHour)}
+              onChange={(e) => {
+                setIsChanged(true);
+                setDate(e);
+              }}
             />
           </Form.Item>
           <Button
@@ -83,6 +90,22 @@ const Settings = () => {
             type="primary"
             disabled={!isChanged}
             style={{ float: "right", width: 200 }}
+            onClick={async () => {
+              let payload = {};
+              if (date) payload["visitLimit"] = date;
+              const { data } = await axios.get("/api/etc", {
+                params: {
+                  mode: "update",
+                  ...payload,
+                },
+              });
+
+              if (data.status == 200) {
+                message.success(data?.message);
+                Cookies.set("currentUser", JSON.stringify(data?.data));
+                setVisitHour(data?.data?.visitLimit);
+              }
+            }}
           >
             SAVE
           </Button>

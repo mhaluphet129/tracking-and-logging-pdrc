@@ -53,6 +53,27 @@ export default async function handler(req, res) {
                   .json({ success: false, message: "Error: " + err });
               });
           }
+
+          case "update": {
+            return await Admin.findOneAndUpdate(
+              {},
+              { $set: { ...req.query } },
+              { returnOriginal: false }
+            )
+              .then((e) => {
+                res.json({
+                  status: 200,
+                  data: e,
+                  message: "System Settings Updated Successfully",
+                });
+                resolve();
+              })
+              .catch(() => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
         }
       });
     case "POST": {

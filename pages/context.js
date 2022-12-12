@@ -6,10 +6,12 @@ export const SettingsContext = createContext();
 
 function SettingsContextProvider(props) {
   let [visitHour, setVisitHour] = useState();
+
   useEffect(() => {
     if (Cookies.get("currentUser") != undefined)
       setVisitHour(moment(JSON.parse(Cookies.get("currentUser"))?.visitLimit));
   }, []);
+
   return (
     <SettingsContext.Provider
       value={{
