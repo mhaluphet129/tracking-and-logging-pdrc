@@ -190,6 +190,7 @@ const Header = () => {
   });
   useEffect(() => {
     setCurrentUser(JSON.parse(Cookies.get("currentUser")));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [Cookies.get("currentUser")]);
 
   return (

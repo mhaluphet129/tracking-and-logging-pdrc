@@ -16,6 +16,7 @@ const Timer = ({ startDate, endDate, end }) => {
       setSeconds(0);
       end();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seconds, countTimer]);
 
   return (

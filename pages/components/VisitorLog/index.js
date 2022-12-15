@@ -353,7 +353,7 @@ const VisitorLog = () => {
             Date:
             <DatePicker.RangePicker
               format="MMM DD, YYYY"
-              defaultValue={[moment("01/01/1990"), moment()]}
+              defaultValue={[moment("01/01/1990", "MM/DD/YYYY"), moment()]}
               onCalendarChange={handleCalendarChange}
             />
           </Space>

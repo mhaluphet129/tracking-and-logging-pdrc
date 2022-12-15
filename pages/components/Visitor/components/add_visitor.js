@@ -232,6 +232,7 @@ const AddVisitor = ({ open, close, refresh }) => {
         closable={false}
         footer={[
           <Button
+            key="key 1"
             onClick={() => {
               setShowResults({ show: false, data: null });
               setDoneVerify(false);
@@ -240,6 +241,7 @@ const AddVisitor = ({ open, close, refresh }) => {
             Cancel
           </Button>,
           <Button
+            key="key 2"
             type="primary"
             onClick={() => {
               setVerifyContinue(true);
