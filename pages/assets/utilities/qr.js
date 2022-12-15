@@ -59,54 +59,54 @@ const QRCamera = () => {
 
   return (
     <>
-      {moment().isBefore(visitHour) ? (
-        <>
-          <div>
-            <div id="reader" style={{ alignSelf: "flex-start" }} />
-          </div>
-          <div>
-            {connected ? (
-              <Space
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  marginTop: 10,
+      {/* {moment().isBefore(visitHour) ? ( */}
+      <>
+        <div>
+          <div id="reader" style={{ alignSelf: "flex-start" }} />
+        </div>
+        <div>
+          {connected ? (
+            <Space
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 10,
+              }}
+            >
+              <CheckCircleOutlined /> Connected <br />
+              <Button
+                onClick={() => {
+                  setConnected(false);
+                  socket.emit("disconnected");
                 }}
               >
-                <CheckCircleOutlined /> Connected <br />
-                <Button
-                  onClick={() => {
-                    setConnected(false);
-                    socket.emit("disconnected");
-                  }}
-                >
-                  DISCONNECT
-                </Button>
-              </Space>
-            ) : (
-              <Space
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  marginTop: 10,
-                }}
-              >
-                <Input
-                  onChange={(e) => setInputKey(e.target.value)}
-                  value={inputKey}
-                />
-                <Button onClick={handleConnect} loading={load == "connecting"}>
-                  CONNECT
-                </Button>
-              </Space>
-            )}
-          </div>
-        </>
-      ) : (
+                DISCONNECT
+              </Button>
+            </Space>
+          ) : (
+            <Space
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 10,
+              }}
+            >
+              <Input
+                onChange={(e) => setInputKey(e.target.value)}
+                value={inputKey}
+              />
+              <Button onClick={handleConnect} loading={load == "connecting"}>
+                CONNECT
+              </Button>
+            </Space>
+          )}
+        </div>
+      </>
+      {/* ) : (
         <Typography.Text>
           Visiting hours is limited to 2:00PM only.
         </Typography.Text>
-      )}
+      )} */}
     </>
   );
 };
