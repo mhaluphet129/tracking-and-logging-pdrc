@@ -229,7 +229,7 @@ const VisitorLog = () => {
       <PageHeader title="Visit Logs">
         <Modal
           footer={null}
-          closable={false}
+          maskClosable={false}
           open={viewLog.show}
           onCancel={() => setViewLog({ show: false, data: null })}
           style={{ top: 30 }}

@@ -198,7 +198,7 @@ const Header = () => {
       <Modal
         open={showSettings}
         onCancel={() => setShowSettings(false)}
-        closable={false}
+        maskClosable={false}
         footer={[
           <Space
             style={{ display: "flex", justifyContent: "space-between" }}
@@ -285,7 +285,7 @@ const Header = () => {
       <Modal
         open={openPasswordModal}
         onCancel={() => setOpenPasswordModal(false)}
-        closable={false}
+        maskClosable={false}
         footer={null}
       >
         <Form layout="vertical" form={form2} onFinish={handleChangePassword}>

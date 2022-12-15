@@ -44,7 +44,7 @@ const ItemChecklistVerifier = ({ open, close, data, update }) => {
       okText="Verify"
       onOk={handleProceed}
       okButtonProps={{ disabled: !changed }} //loading: loader == "proceed",
-      closable={false}
+      maskClosable={false}
     >
       <Table
         columns={column}

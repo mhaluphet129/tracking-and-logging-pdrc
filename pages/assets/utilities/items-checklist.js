@@ -27,7 +27,7 @@ const ItemChecklist = ({ open, close, items, setItems, setUnclaimTotal }) => {
   return (
     <Modal
       open={open}
-      closable={false}
+      maskClosable={false}
       footer={null}
       width={800}
       title={`Item List (${items?.length} total items)`}

@@ -245,10 +245,10 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
       />
       <Modal
         open={openModal}
-        closable={false}
         footer={null}
         width={1100}
         onCancel={() => setOpenModal({ show: false, data: null })}
+        maskClosable={false}
       >
         <Row>
           <Col span={8}>
@@ -467,7 +467,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
             <Button onClick={() => setOpenAddRemarks(true)}>Add Remarks</Button>
           </Space>
         }
-        closable={false}
+        maskClosable={false}
         footer={null}
         width={600}
       >
@@ -481,7 +481,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
         open={openAddRemarks}
         onCancel={() => setOpenAddRemarks(false)}
         title="Add Remarks"
-        closable={false}
+        maskClosable={false}
         footer={null}
         destroyOnClose
       >

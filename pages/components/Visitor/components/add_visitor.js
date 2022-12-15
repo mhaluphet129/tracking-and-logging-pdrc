@@ -73,7 +73,7 @@ const AddVisitor = ({ open, close, refresh }) => {
         title={"PDRC VISITOR INFORMATION REGISTRATION FORM"}
         open={open}
         onCancel={close}
-        closable={false}
+        maskClosable={false}
         width={450}
         footer={
           verifyContinue && (
@@ -229,7 +229,7 @@ const AddVisitor = ({ open, close, refresh }) => {
           setShowResults({ show: false, data: null });
           setDoneVerify(false);
         }}
-        closable={false}
+        maskClosable={false}
         footer={[
           <Button
             key="key 1"

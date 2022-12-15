@@ -60,23 +60,9 @@ const UpdateSenior = ({ open, close, data, refresh }) => {
         width={500}
         title="Edit Visitor Profile"
         extra={[
-          <Space key={1}>
-            <Button type="primary" disabled={!edited} onClick={handleSave}>
-              SAVE
-            </Button>
-            <Button
-              type="danger"
-              onClick={() => {
-                Modal.confirm({
-                  title: "are you sure ?",
-                  okText: "Confirm",
-                  onOk: () => alert("sanaol"),
-                });
-              }}
-            >
-              DELETE
-            </Button>
-          </Space>,
+          <Button type="primary" disabled={!edited} onClick={handleSave}>
+            SAVE
+          </Button>,
         ]}
         closable={false}
       >

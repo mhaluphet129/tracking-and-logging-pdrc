@@ -32,7 +32,7 @@ const EditItems = ({ open, close, data, refresh }) => {
         setStatus([]);
         setIsChanged(false);
       }}
-      closable={false}
+      maskClosable={false}
       title="Edit Item Info"
       okText="Save"
       okButtonProps={{

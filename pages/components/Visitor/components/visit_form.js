@@ -72,7 +72,7 @@ const VisitForm = ({ open, close, data, setTrigger }) => {
           setItems([]);
           setOpenAddItems(false);
         }}
-        closable={false}
+        maskClosable={false}
         footer={null}
         title="Visitation Form"
         destroyOnClose

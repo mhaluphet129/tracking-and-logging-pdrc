@@ -45,6 +45,7 @@ const Login = () => {
                 Update
               </Button>,
             ]}
+            maskClosable={false}
           >
             <Form
               form={form}
