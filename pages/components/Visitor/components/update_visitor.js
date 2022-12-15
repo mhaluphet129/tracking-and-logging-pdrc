@@ -60,7 +60,12 @@ const UpdateSenior = ({ open, close, data, refresh }) => {
         width={500}
         title="Edit Visitor Profile"
         extra={[
-          <Button type="primary" disabled={!edited} onClick={handleSave}>
+          <Button
+            key="key 1"
+            type="primary"
+            disabled={!edited}
+            onClick={handleSave}
+          >
             SAVE
           </Button>,
         ]}

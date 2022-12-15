@@ -34,13 +34,11 @@ const QRCamera = () => {
   };
 
   useEffect(() => {
-    console.log(visitHour);
     if (visitHour != undefined && moment().isBefore(visitHour)) {
       let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
         fps: 10,
         qrbox: 300,
       });
-
       html5QrcodeScanner.render(handleSuccessScan);
     }
   }, [visitHour]);

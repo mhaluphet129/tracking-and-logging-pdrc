@@ -360,7 +360,9 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                   }}
                   style={{ width: 250 }}
                 >
-                  {`Check Items (${unclaimTotal} unclaimed)`}
+                  {`Check Items (${
+                    unclaimTotal == undefined ? 0 : unclaimTotal
+                  } unclaimed)`}
                 </Button>
 
                 {/* <Tooltip title="Open Print Viewer">
