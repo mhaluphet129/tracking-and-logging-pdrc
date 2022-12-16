@@ -247,7 +247,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
         open={openModal}
         footer={null}
         width={1100}
-        onCancel={() => setOpenModal({ show: false, data: null })}
+        onCancel={() => setOpenModal(false)}
         maskClosable={false}
       >
         <Row>
