@@ -10,10 +10,15 @@ import {
   Typography,
   Card,
   message,
+  Upload,
 } from "antd";
 import axios from "axios";
 import moment from "moment";
-import { ArrowRightOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import {
+  ArrowRightOutlined,
+  CheckCircleOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 
 const AddVisitor = ({ open, close, refresh }) => {
   let [form] = Form.useForm();
@@ -21,6 +26,7 @@ const AddVisitor = ({ open, close, refresh }) => {
   let [showResults, setShowResults] = useState({ show: false, data: null });
   let [loader, setLoader] = useState("");
   let [doneVerify, setDoneVerify] = useState(false);
+  let [image, setImage] = useState();
   let [name, setName] = useState({
     name: "",
     middlename: "",
@@ -36,11 +42,12 @@ const AddVisitor = ({ open, close, refresh }) => {
     let { data } = await axios.post("/api/visitor", {
       payload: {
         mode: "add-visitor",
-        visitor: { ...val, age },
+        visitor: { ...val, age, photo: image },
       },
     });
 
     if (data.status == 200) {
+      localStorage.setItem(`${image}`, image);
       close();
       refresh();
       message.success(data.message);
@@ -219,6 +226,33 @@ const AddVisitor = ({ open, close, refresh }) => {
               ]}
             >
               <Input prefix="+63" maxLength={11} />
+            </Form.Item>
+          )}
+
+          {verifyContinue && (
+            <Form.Item label="Picture" name="pic">
+              <Upload
+                listType="picture-card"
+                onChange={(e) => {
+                  let objImage = URL.createObjectURL(
+                    e.fileList[0].originFileObj
+                  );
+                  setImage(objImage);
+                }}
+              >
+                {image == null || image == "" ? (
+                  <div>
+                    <PlusOutlined />
+                    <div
+                      style={{
+                        marginTop: 8,
+                      }}
+                    >
+                      Upload
+                    </div>
+                  </div>
+                ) : null}
+              </Upload>
             </Form.Item>
           )}
         </Form>

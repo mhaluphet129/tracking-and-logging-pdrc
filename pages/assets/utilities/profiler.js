@@ -14,6 +14,7 @@ import {
   Tooltip,
   Badge,
   message,
+  Image,
 } from "antd";
 import {
   LoginOutlined,
@@ -51,6 +52,8 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
   const [items, setItems] = useState([]);
   const [show, setShow] = useState(false);
   const [openRemarksIndex, setOpenRemarksIndex] = useState(-1);
+  const [image, setImage] = useState("");
+  const [openQr, setOpenQr] = useState(false);
 
   const { setVisitHour, visitHour } = useContext(SettingsContext);
 
@@ -183,6 +186,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
   }, [data?._id, trigger]);
 
   useEffect(() => {
+    setImage(localStorage.getItem(data?.photo));
     (async () => {
       if (data != null || data != "") {
         QRCode.toString(data?._id?.toString(), function (err, url) {
@@ -244,6 +248,20 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
         setUnclaimTotal={setUnclaimTotal}
       />
       <Modal
+        open={openQr}
+        footer={null}
+        onCancel={() => setOpenQr(false)}
+        maskClosable={false}
+      >
+        <span style={{ fontSize: 10, margin: 0 }}>ID: {data?._id}</span>
+        <Badge.Ribbon
+          text={refViolation ? "Has Violation" : "No Violation"}
+          color={refViolation ? "red" : "blue"}
+        >
+          <div>{qr}</div>
+        </Badge.Ribbon>
+      </Modal>
+      <Modal
         open={openModal}
         footer={null}
         width={1100}
@@ -253,13 +271,28 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
         <Row>
           <Col span={8}>
             <Space direction="vertical">
-              <span style={{ fontSize: 10, margin: 0 }}>ID: {data?._id}</span>
-              <Badge.Ribbon
-                text={refViolation ? "Has Violation" : "No Violation"}
-                color={refViolation ? "red" : "blue"}
-              >
-                <div style={{ width: 200 }}>{qr}</div>
-              </Badge.Ribbon>
+              <div style={{ width: 200 }}>
+                {image != null ? (
+                  <Image src={image} />
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: 180,
+                      width: 180,
+                    }}
+                  >
+                    <Typography.Title type="secondary" italic>
+                      No Image
+                    </Typography.Title>
+                  </div>
+                )}
+              </div>
+              <Button onClick={() => setOpenQr(true)} style={{ width: 200 }}>
+                View QR
+              </Button>
               <strong>Fullname</strong>
               <span style={{ marginLeft: 10 }}>
                 {data?.name} {data?.middlename ?? ""} {data?.lastname}

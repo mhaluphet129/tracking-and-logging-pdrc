@@ -6,8 +6,6 @@ import {
   Modal,
   Button,
   Typography,
-  Tag,
-  Tooltip,
   Space,
   Form,
   Input,
@@ -21,10 +19,9 @@ import {
   TeamOutlined,
   SnippetsOutlined,
   WarningOutlined,
-  CheckCircleOutlined,
+  UserAddOutlined,
   SettingOutlined,
   BlockOutlined,
-  FieldTimeOutlined,
   LoginOutlined,
   DiffOutlined,
 } from "@ant-design/icons";
@@ -40,6 +37,7 @@ import Violation from "../components/Violation";
 import CheckIn from "../components/CheckIn";
 import Settings from "../components/Settings";
 import Report from "../components/Reports";
+import Admin from "../components/Admin";
 import io from "socket.io-client";
 let socket;
 
@@ -54,6 +52,11 @@ const Sider = ({ selectedIndex }) => {
       label: "Visitors Profile",
       key: "visitor",
       icon: <TeamOutlined style={{ fontSize: 20 }} />,
+    },
+    {
+      label: "Admin Page",
+      key: "admin",
+      icon: <UserAddOutlined style={{ fontSize: 20 }} />,
     },
     {
       label: "Visit Logs",
@@ -365,6 +368,7 @@ const Content = ({ selectedKey }) => {
       {selectedKey == "violations" ? <Violation /> : null}
       {selectedKey == "settings" ? <Settings /> : null}
       {selectedKey == "reports" ? <Report /> : null}
+      {selectedKey == "admin" ? <Admin /> : null}
     </div>
   );
 };
