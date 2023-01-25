@@ -239,10 +239,6 @@ const Dashboard = () => {
               options={{
                 responsive: true,
                 plugins: {
-                  title: {
-                    display: true,
-                    text: `Pie graph of Claimed and Unclaimed Items`,
-                  },
                   legend: {
                     position: "bottom",
                   },

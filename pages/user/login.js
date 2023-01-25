@@ -1,8 +1,21 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import { Form, Input, Button, Alert, Modal, message } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Alert,
+  Modal,
+  Image,
+  message,
+  Row,
+  Col,
+  Typography,
+} from "antd";
 import { MobileView, BrowserView } from "react-device-detect";
+import { UserOutlined } from "@ant-design/icons";
 import { QRCamera } from "../assets/utilities";
+import Jason from "../assets/json/index.json";
 import axios from "axios";
 
 const Login = () => {
@@ -36,6 +49,148 @@ const Login = () => {
     <>
       <div className="main-body-login">
         <BrowserView>
+          <Row>
+            <Col
+              span={15}
+              style={{
+                backgroundColor: "#eee",
+                width: 1000,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "column",
+                padding: 10,
+              }}
+            >
+              <Image
+                preview={false}
+                src="/pdrc-logo.png"
+                alt="logo"
+                height={300}
+                width={400}
+                style={{ paddingBottom: 20 }}
+              />
+
+              <Typography.Title
+                level={5}
+                style={{
+                  fontWeight: 900,
+                  textAlign: "center",
+                  paddingBottom: 50,
+                }}
+                italic
+              >
+                {Jason.loginLabel.toLocaleUpperCase()}
+              </Typography.Title>
+              <Typography.Text>
+                {Jason.school.toLocaleUpperCase()}
+              </Typography.Text>
+            </Col>
+            <Col
+              span={9}
+              style={{
+                backgroundColor: "#a0a0a0",
+                width: 100,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "column",
+                padding: 10,
+              }}
+            >
+              <Typography.Title
+                level={4}
+                style={{ color: "#fff", textAlign: "center" }}
+              >
+                Login
+              </Typography.Title>
+              <Form
+                labelCol={{
+                  span: 24,
+                }}
+                wrapperCol={{
+                  span: 24,
+                }}
+                labelAlign="right"
+                style={{
+                  width: 400,
+                  padding: 30,
+                }}
+                onFinish={handleLogin}
+              >
+                <Form.Item
+                  label={
+                    <Typography style={{ color: "#fff" }}>
+                      Email / Username
+                    </Typography>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your email!",
+                    },
+                  ]}
+                  name="email"
+                >
+                  <Input
+                    className="customInput"
+                    size="large"
+                    style={{
+                      backgroundColor: "#a0a0a0",
+                      border: "none",
+                      borderBottom: "1px solid #fff",
+                    }}
+                    suffix={<UserOutlined style={{ color: "#fff" }} />}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  label={
+                    <Typography style={{ color: "#fff" }}>Password</Typography>
+                  }
+                  name="password"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your password!",
+                    },
+                  ]}
+                >
+                  <Input.Password
+                    className="customInput"
+                    style={{
+                      backgroundColor: "#a0a0a0",
+                      border: "none",
+                      borderBottom: "1px solid #fff",
+                    }}
+                  />
+                </Form.Item>
+                <Form.Item>
+                  <Button
+                    style={{
+                      width: "100%",
+                      boxShadow: "1px 1px 3px #000",
+                      fontWeight: 900,
+                    }}
+                    htmlType="submit"
+                    onClick={() => setIsError({ show: false, description: "" })}
+                  >
+                    LOGIN
+                  </Button>
+                </Form.Item>
+                {isError.show && (
+                  <Alert
+                    description={isError.description}
+                    onClose={() => setIsError({ show: false, description: "" })}
+                    type="error"
+                    closable
+                  />
+                )}
+              </Form>
+            </Col>
+          </Row>
+
           <Modal
             open={openModal}
             title={`Setup account for email '${email}'`}
@@ -123,66 +278,6 @@ const Login = () => {
               </Form.Item>
             </Form>
           </Modal>
-          <Form
-            labelCol={{
-              span: 24,
-            }}
-            wrapperCol={{
-              span: 24,
-            }}
-            labelAlign="right"
-            style={{
-              width: 400,
-              padding: 30,
-              background: "#fff",
-            }}
-            onFinish={handleLogin}
-          >
-            {isError.show && (
-              <Alert
-                description={isError.description}
-                onClose={() => setIsError({ show: false, description: "" })}
-                type="error"
-                closable
-              />
-            )}
-            <Form.Item
-              label="Email"
-              name="email"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your email!",
-                },
-              ]}
-            >
-              <Input size="large" onChange={(e) => setEmail(e.target.value)} />
-            </Form.Item>
-
-            <Form.Item
-              label="Password"
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your password!",
-                },
-              ]}
-            >
-              <Input.Password />
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                type="primary"
-                style={{ width: "100%" }}
-                htmlType="submit"
-                onClick={() => setIsError({ show: false, description: "" })}
-              >
-                Log In
-              </Button>
-            </Form.Item>
-          </Form>
         </BrowserView>
         <MobileView>
           <QRCamera />
