@@ -110,6 +110,9 @@ const AdminPage = () => {
       <Button onClick={() => setShowAddAdmin(true)}>Add Admin</Button>
       <Table
         dataSource={admins}
+        footer={() => (
+          <Typography.Text>Total: {admins?.length ?? 0}</Typography.Text>
+        )}
         columns={column}
         onRow={(data) => {
           return {

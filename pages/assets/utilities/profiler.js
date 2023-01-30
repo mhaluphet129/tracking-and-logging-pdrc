@@ -411,6 +411,11 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                 rowKey={(row) => row._id}
                 style={{ width: 700 }}
                 loading={loader == "fetch-visit"}
+                footer={() => (
+                  <Typography.Text>
+                    Total: {visitData?.length ?? 0}
+                  </Typography.Text>
+                )}
                 expandable={{
                   expandedRowRender: (row) => (
                     <p>
@@ -510,6 +515,11 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
           columns={column2}
           dataSource={openRemarks.data}
           rowClassName={(record) => (record.hasViolation ? "red" : null)}
+          footer={() => (
+            <Typography.Text>
+              Total: {openRemarks.data?.length ?? 0}
+            </Typography.Text>
+          )}
         />
       </Modal>
       <Modal

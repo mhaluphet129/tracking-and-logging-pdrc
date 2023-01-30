@@ -132,6 +132,11 @@ const CheckIn = () => {
         </Space>
         <Table
           dataSource={visitorWithTimer}
+          footer={() => (
+            <Typography.Text>
+              Total: {visitorWithTimer?.length ?? 0}
+            </Typography.Text>
+          )}
           columns={column2}
           rowKey={(row) => row._id}
           pagination={false}

@@ -44,6 +44,7 @@ const VisitorPage = () => {
     show: false,
     data: null,
   });
+  let [regionObj, setRegionObj] = useState([]);
 
   const [api, contextHolder] = notification.useNotification();
 
@@ -74,9 +75,13 @@ const VisitorPage = () => {
     },
     {
       title: "Address",
-      align: "center",
-      width: 250,
-      render: (_, row) => <Typography>{row.address}</Typography>,
+      width: 200,
+      render: (_, row) => (
+        <Typography>
+          {row.citymunicipalities.name}, {row.province.name} <br />
+          {row.region.name}
+        </Typography>
+      ),
     },
     {
       title: "Gender",
@@ -263,6 +268,9 @@ const VisitorPage = () => {
       <Col span={18} offset={3}>
         <Table
           dataSource={visitors}
+          footer={() => (
+            <Typography.Text>Total: {visitors?.length ?? 0}</Typography.Text>
+          )}
           columns={printColumn}
           rowKey={(row) => row._id}
           pagination={false}
@@ -356,12 +364,26 @@ const VisitorPage = () => {
       let { data } = await axios.get("/api/visitor", {
         params: { mode: "fetch-all", search: _searchName },
       });
+      console.log(data);
       if (data.status == 200) setVisitors(data.visitor);
       setLoad("");
     };
     fetchVisitor();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trigger]);
+
+  useEffect(() => {
+    (async () => {
+      let { data } = await axios.get("/api/etc", {
+        params: {
+          mode: "get-region",
+        },
+      });
+
+      if (data.status == 200) setRegionObj(data.data);
+      else message.error(data.message);
+    })();
+  }, []);
 
   return (
     <>
@@ -403,6 +425,9 @@ const VisitorPage = () => {
           </Space>
           <Table
             dataSource={visitors}
+            footer={() => (
+              <Typography.Text>Total: {visitors?.length ?? 0}</Typography.Text>
+            )}
             columns={column}
             onRow={(data) => {
               return { onClick: () => setOpenProfile({ show: true, data }) };
@@ -414,6 +439,7 @@ const VisitorPage = () => {
         </Card>
 
         <AddVisitor
+          regionObj={regionObj}
           open={showAddVisitor}
           close={() => setShowAddVisitor(false)}
           refresh={() => setTrigger(trigger + 1)}

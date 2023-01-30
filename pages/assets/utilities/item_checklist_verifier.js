@@ -59,6 +59,9 @@ const ItemChecklistVerifier = ({ open, close, data, update }) => {
             else setChanged(false);
           },
         }}
+        footer={() => (
+          <Typography.Text>Total: {data.length ?? 0}</Typography.Text>
+        )}
       />
     </Modal>
   );

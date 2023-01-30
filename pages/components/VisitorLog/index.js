@@ -134,7 +134,14 @@ const VisitorLog = () => {
         </Row>
       </Col>
       <Col span={22} offset={1}>
-        <Table columns={column2} dataSource={recentVisit} pagination={false} />
+        <Table
+          columns={column2}
+          dataSource={recentVisit}
+          pagination={false}
+          footer={() => (
+            <Typography.Text>Total: {recentVisit?.length ?? 0}</Typography.Text>
+          )}
+        />
       </Col>
       <Col span={8} offset={3}>
         <Typography.Text
@@ -324,6 +331,11 @@ const VisitorLog = () => {
               ]}
               tableLayout="auto"
               dataSource={viewLog.data?.depositItems}
+              footer={() => (
+                <Typography.Text>
+                  Total: {viewLog.data?.depositItems?.length ?? 0}
+                </Typography.Text>
+              )}
             />
           </Space>
         </Modal>
@@ -360,6 +372,11 @@ const VisitorLog = () => {
           <Table
             columns={column2}
             dataSource={recentVisit}
+            footer={() => (
+              <Typography.Text>
+                Total: {recentVisit?.length ?? 0}
+              </Typography.Text>
+            )}
             onRow={(row) => {
               return { onClick: () => setViewLog({ show: true, data: row }) };
             }}

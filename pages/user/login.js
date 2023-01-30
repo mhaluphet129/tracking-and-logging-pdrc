@@ -22,6 +22,7 @@ const Login = () => {
   const [isError, setIsError] = useState({ show: false, description: "" });
   const [email, setEmail] = useState("");
   const [openModal, setOpenModal] = useState(false);
+  const [mode, selectedMode] = useState("signup");
 
   const [form] = Form.useForm();
 
@@ -45,13 +46,26 @@ const Login = () => {
     }
   };
 
+  const handleLogin2 = async (val) => {
+    let { data } = await axios.post("/api/auth", {
+      payload: {
+        mode: "signup",
+        email: val.email,
+      },
+    });
+
+    if (data.status == 404)
+      setIsError({ show: true, description: "Account doesn't exist" });
+    else setOpenModal(true);
+  };
+
   return (
     <>
       <div className="main-body-login">
         <BrowserView>
-          <Row>
+          <Row style={{ display: "flex", justifyContent: "center" }}>
             <Col
-              span={15}
+              span={12}
               style={{
                 backgroundColor: "#eee",
                 width: 1000,
@@ -64,10 +78,10 @@ const Login = () => {
             >
               <Image
                 preview={false}
-                src="/pdrc-logo.png"
+                src="/pdrc-logo2.png"
                 alt="logo"
                 height={300}
-                width={400}
+                width={300}
                 style={{ paddingBottom: 20 }}
               />
 
@@ -82,113 +96,233 @@ const Login = () => {
               >
                 {Jason.loginLabel.toLocaleUpperCase()}
               </Typography.Title>
-              <Typography.Text>
+              {/* <Typography.Text>
                 {Jason.school.toLocaleUpperCase()}
-              </Typography.Text>
+              </Typography.Text> */}
             </Col>
-            <Col
-              span={9}
-              style={{
-                backgroundColor: "#a0a0a0",
-                width: 100,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "column",
-                padding: 10,
-              }}
-            >
-              <Typography.Title
-                level={4}
-                style={{ color: "#fff", textAlign: "center" }}
-              >
-                Login
-              </Typography.Title>
-              <Form
-                labelCol={{
-                  span: 24,
-                }}
-                wrapperCol={{
-                  span: 24,
-                }}
-                labelAlign="right"
+            {mode == "signup" ? (
+              <Col
+                span={8}
                 style={{
-                  width: 400,
-                  padding: 30,
+                  backgroundColor: "#a0a0a0",
+                  width: 100,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  padding: 10,
                 }}
-                onFinish={handleLogin}
               >
-                <Form.Item
-                  label={
-                    <Typography style={{ color: "#fff" }}>
-                      Email / Username
-                    </Typography>
-                  }
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please input your email!",
-                    },
-                  ]}
-                  name="email"
+                <Typography.Title
+                  level={4}
+                  style={{ color: "#fff", textAlign: "center" }}
                 >
-                  <Input
-                    className="customInput"
-                    size="large"
-                    style={{
-                      backgroundColor: "#a0a0a0",
-                      border: "none",
-                      borderBottom: "1px solid #fff",
-                    }}
-                    suffix={<UserOutlined style={{ color: "#fff" }} />}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  label={
-                    <Typography style={{ color: "#fff" }}>Password</Typography>
-                  }
-                  name="password"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please input your password!",
-                    },
-                  ]}
+                  Login
+                </Typography.Title>
+                <Form
+                  labelCol={{
+                    span: 24,
+                  }}
+                  wrapperCol={{
+                    span: 24,
+                  }}
+                  labelAlign="right"
+                  style={{
+                    width: 350,
+                    padding: 30,
+                  }}
+                  onFinish={handleLogin}
                 >
-                  <Input.Password
-                    className="customInput"
-                    style={{
-                      backgroundColor: "#a0a0a0",
-                      border: "none",
-                      borderBottom: "1px solid #fff",
-                    }}
-                  />
-                </Form.Item>
-                <Form.Item>
-                  <Button
-                    style={{
-                      width: "100%",
-                      boxShadow: "1px 1px 3px #000",
-                      fontWeight: 900,
-                    }}
-                    htmlType="submit"
-                    onClick={() => setIsError({ show: false, description: "" })}
+                  <Form.Item
+                    label={
+                      <Typography style={{ color: "#fff" }}>
+                        Email / Username
+                      </Typography>
+                    }
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your email!",
+                      },
+                    ]}
+                    name="email"
                   >
-                    LOGIN
-                  </Button>
-                </Form.Item>
-                {isError.show && (
-                  <Alert
-                    description={isError.description}
-                    onClose={() => setIsError({ show: false, description: "" })}
-                    type="error"
-                    closable
-                  />
-                )}
-              </Form>
-            </Col>
+                    <Input
+                      className="customInput"
+                      size="large"
+                      style={{
+                        backgroundColor: "#a0a0a0",
+                        border: "none",
+                        borderBottom: "1px solid #fff",
+                      }}
+                      suffix={<UserOutlined style={{ color: "#fff" }} />}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    label={
+                      <Typography style={{ color: "#fff" }}>
+                        Password
+                      </Typography>
+                    }
+                    name="password"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your password!",
+                      },
+                    ]}
+                  >
+                    <Input.Password
+                      className="customInput"
+                      style={{
+                        backgroundColor: "#a0a0a0",
+                        border: "none",
+                        borderBottom: "1px solid #fff",
+                      }}
+                    />
+                  </Form.Item>
+                  <Form.Item noStyle>
+                    <Button
+                      style={{
+                        width: "100%",
+                        fontWeight: "bold",
+                      }}
+                      htmlType="submit"
+                      onClick={() =>
+                        setIsError({ show: false, description: "" })
+                      }
+                    >
+                      LOGIN
+                    </Button>
+                  </Form.Item>
+                  <Typography.Text
+                    className="signup"
+                    style={{
+                      display: "block",
+                      textAlign: "center",
+                      marginTop: 5,
+                      color: "#eee",
+                    }}
+                    onClick={() => {
+                      selectedMode(mode == "login" ? "signup" : "login");
+                    }}
+                  >
+                    {mode[0].toUpperCase() + mode.substring(1, mode.length)}
+                  </Typography.Text>
+                  {isError.show && (
+                    <Alert
+                      description={isError.description}
+                      onClose={() =>
+                        setIsError({ show: false, description: "" })
+                      }
+                      type="error"
+                      closable
+                    />
+                  )}
+                </Form>
+              </Col>
+            ) : (
+              <Col
+                span={8}
+                style={{
+                  backgroundColor: "#a0a0a0",
+                  width: 100,
+                  display: "flex",
+                  justifyContent: "start",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  padding: 10,
+                }}
+              >
+                <Typography.Title
+                  level={4}
+                  style={{ color: "#fff", textAlign: "center", marginTop: 25 }}
+                >
+                  Signup
+                </Typography.Title>
+                <Form
+                  labelCol={{
+                    span: 24,
+                  }}
+                  wrapperCol={{
+                    span: 24,
+                  }}
+                  labelAlign="right"
+                  style={{
+                    width: 400,
+                    padding: 30,
+                  }}
+                  onFinish={handleLogin2}
+                >
+                  <Form.Item
+                    label={
+                      <Typography style={{ color: "#fff" }}>
+                        Email / Username
+                      </Typography>
+                    }
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your email!",
+                      },
+                    ]}
+                    name="email"
+                  >
+                    <Input
+                      className="customInput"
+                      size="large"
+                      style={{
+                        backgroundColor: "#a0a0a0",
+                        border: "none",
+                        borderBottom: "1px solid #fff",
+                      }}
+                      suffix={<UserOutlined style={{ color: "#fff" }} />}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </Form.Item>
+                  <Form.Item noStyle>
+                    <Button
+                      style={{
+                        width: "100%",
+                        fontWeight: "bold",
+                      }}
+                      htmlType="submit"
+                      onClick={() => {
+                        setIsError({ show: false, description: "" });
+                      }}
+                    >
+                      SIGNUP
+                    </Button>
+                  </Form.Item>
+                  <Typography.Text
+                    className="signup"
+                    style={{
+                      display: "block",
+                      textAlign: "center",
+                      marginTop: 5,
+                      color: "#eee",
+                    }}
+                    onClick={() => {
+                      selectedMode(mode == "login" ? "signup" : "login");
+                    }}
+                  >
+                    {mode[0].toUpperCase() + mode.substring(1, mode.length)}
+                  </Typography.Text>
+                  {isError.show && (
+                    <Alert
+                      description={isError.description}
+                      onClose={() =>
+                        setIsError({ show: false, description: "" })
+                      }
+                      type="error"
+                      closable
+                    />
+                  )}
+                </Form>
+              </Col>
+            )}
           </Row>
 
           <Modal
@@ -205,16 +339,18 @@ const Login = () => {
             <Form
               form={form}
               onFinish={async (val) => {
-                const { confirm, password } = val;
-                if (confirm != password) {
+                delete val.email2;
+
+                const { confirm, password2 } = val;
+                if (confirm != password2) {
                   message.error("password and confirm password didn't match.");
                   return;
                 }
+                val = { ...val, email, password: password2 };
 
                 let { data } = await axios.post("/api/auth", {
                   payload: {
                     ...val,
-                    email,
                     mode: "new-user",
                   },
                 });
@@ -228,6 +364,9 @@ const Login = () => {
               }}
               labelCol={{ span: 7 }}
             >
+              <Form.Item label="email" name="email2">
+                <Input defaultValue={email} disabled />
+              </Form.Item>
               <Form.Item
                 label="Name"
                 name="name"
@@ -254,7 +393,7 @@ const Login = () => {
               </Form.Item>
               <Form.Item
                 label="Password"
-                name="password"
+                name="password2"
                 rules={[
                   {
                     required: true,

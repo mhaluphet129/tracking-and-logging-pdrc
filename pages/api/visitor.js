@@ -20,8 +20,42 @@ export default async function handler(req, res) {
                   from: "items",
                   localField: "_id",
                   foreignField: "ownerId",
+                  pipeline: [],
                   as: "items",
                 },
+              },
+              {
+                $lookup: {
+                  from: "regions",
+                  localField: "region",
+                  foreignField: "_id",
+                  as: "region",
+                },
+              },
+              {
+                $unwind: "$region",
+              },
+              {
+                $lookup: {
+                  from: "provinces",
+                  localField: "province",
+                  foreignField: "_id",
+                  as: "province",
+                },
+              },
+              {
+                $unwind: "$province",
+              },
+              {
+                $lookup: {
+                  from: "citymunicipalities",
+                  localField: "citymunicipalities",
+                  foreignField: "_id",
+                  as: "citymunicipalities",
+                },
+              },
+              {
+                $unwind: "$citymunicipalities",
               },
             ]).then((e) => {
               res.json({

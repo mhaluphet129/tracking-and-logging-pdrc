@@ -11,20 +11,9 @@ import {
   Filler,
   ArcElement,
 } from "chart.js";
-import {
-  Card,
-  Col,
-  Row,
-  Space,
-  Typography,
-  Table,
-  notification,
-  PageHeader,
-} from "antd";
+import { Card, Col, Row, Space, notification, PageHeader } from "antd";
 import { Line, Pie } from "react-chartjs-2";
-import { Timer, Profiler } from "../../assets/utilities";
 import {
-  WarningOutlined,
   UserOutlined,
   ImportOutlined,
   BlockOutlined,
@@ -50,10 +39,9 @@ const Dashboard = () => {
   let [dashbardNumericalData, setDashbardNumericalData] = useState(
     Array(12).fill(0)
   );
-  const [visitorWithTimer, setVisitorWithTimer] = useState();
+
   let [max, setMax] = useState(10);
-  const [api, contextHolder] = notification.useNotification();
-  const [openProfile, setOpenProfile] = useState({ show: false, data: null });
+
   const [cardData, setCardData] = useState({
     totalVisitor: 0,
     totalVisit: 0,
@@ -84,65 +72,6 @@ const Dashboard = () => {
     },
   };
 
-  const column2 = [
-    {
-      title: "Visitor Name",
-      render: (_, row) => (
-        <Typography>
-          {row?.visitorId.name}
-          {row?.visitorId.middlename
-            ? " " + row?.visitorId.middlename
-            : ""}{" "}
-          {row.visitorId.lastname}
-        </Typography>
-      ),
-    },
-    {
-      title: "Time left",
-      align: "center",
-      width: 200,
-      render: (_, row) => (
-        <Timer
-          endDate={row?.timeOut}
-          end={() => {
-            api["warning"]({
-              key: row?._id,
-              icon: <WarningOutlined style={{ color: "red" }} />,
-              description: (
-                <span>
-                  {row?.visitorId.name}
-                  {row?.visitorId.middlename
-                    ? " " + row?.visitorId.middlename
-                    : ""}{" "}
-                  {row.visitorId.lastname} exceed visit duration.
-                  <br />
-                  <Typography.Link
-                    onClick={async () => {
-                      let { data } = await axios.get("/api/visitor", {
-                        params: {
-                          mode: "get-visitor",
-                          id: row?.visitorId?._id,
-                        },
-                      });
-
-                      if (data.status == 200) {
-                        setOpenProfile({ show: true, data: data.data });
-                        notification.close(row?._id);
-                      }
-                    }}
-                  >
-                    Click here
-                  </Typography.Link>
-                </span>
-              ),
-              duration: 0,
-            });
-          }}
-        />
-      ),
-    },
-  ];
-
   useEffect(() => {
     (async () => {
       let { data } = await axios.get("/api/dashboard");
@@ -171,29 +100,12 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  //suck it
-
-  useEffect(() => {
-    (async () => {
-      let res = await axios.get("/api/visit", {
-        params: { mode: "visit-with-timers" },
-      });
-      if (res.data.status == 200) setVisitorWithTimer(res.data.data);
-    })();
-  }, []);
-
   return (
     <PageHeader
       title="Dashboard"
       // extra={[<Button onClick={handlePrint}>PRINT</Button>]}
     >
-      <Profiler
-        openModal={openProfile.show}
-        setOpenModal={() => setOpenProfile({ show: false, data: null })}
-        data={openProfile.data}
-      />
       <Card>
-        {contextHolder}
         <Row>
           <Col span={14}>
             <Row gutter={[16, 16]}>
@@ -272,16 +184,6 @@ const Dashboard = () => {
           </Col>
         </Row>
       </Card>
-      <div style={{ display: "none" }}>
-        <Table
-          dataSource={visitorWithTimer}
-          columns={column2}
-          rowKey={(row) => row._id}
-          pagination={{
-            pageSize: 8,
-          }}
-        />
-      </div>
     </PageHeader>
   );
 };

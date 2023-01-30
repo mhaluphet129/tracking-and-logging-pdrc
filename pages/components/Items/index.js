@@ -15,6 +15,7 @@ import {
   Tooltip,
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { IDGen } from "../../assets/utilities";
 import EditItems from "./components/EditItems";
 import axios from "axios";
 import moment from "moment";
@@ -158,10 +159,19 @@ const Inventory = () => {
           >
             <Table
               dataSource={tableData}
+              footer={() => (
+                <Typography.Text>
+                  Total: {tableData?.length ?? 0}
+                </Typography.Text>
+              )}
               loading={loader == "fetch"}
               pagination={{ pageSize: 10 }}
               scroll={{ y: 400 }}
               columns={[
+                {
+                  title: "Tag No.",
+                  render: (_, row) => "#" + IDGen(row?._id, 6),
+                },
                 {
                   title: "Name",
                   render: (_, row) => <strong>{row?.name}</strong>,

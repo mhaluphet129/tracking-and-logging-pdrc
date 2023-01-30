@@ -59,6 +59,51 @@ footer {
   color: #fff !important;
 }
 
+.signup:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.float-label {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.label {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-weight: normal;
+  font-size: 12px !important;
+  transition: 0.2s ease all;
+  pointer-events: none;
+}
+
+.label-float {
+  top: 1px;
+  font-size: 10px !important;
+}
+
+.ant-input .customInput {
+  padding: 16px 12px 4px 11px;
+}
+
+/* // .ant-select.customInput .ant-select-selector {
+//   padding: 16px 10px 4px 11px;
+// } */
+
+.ant-select-single:not(.ant-select-customize-input).customInput
+  .ant-select-selector {
+  height: 48px;
+  padding: 16px 10px 4px 11px;
+}
+
+.ant-select-single.customInput
+  .ant-select-selector
+  .ant-select-selection-search {
+  top: 16px;
+}
+
 @page {
   size: legal;
   margin: 0.5in;

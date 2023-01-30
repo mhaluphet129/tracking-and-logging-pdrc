@@ -1,6 +1,7 @@
 import Admin from "../../database/model/Admin";
 import dbConnect from "../../database/dbConnect";
 
+//4.24.1
 export default async function handler(req, res) {
   await dbConnect();
   const { method } = req;
@@ -41,6 +42,40 @@ export default async function handler(req, res) {
                   });
                 }
                 resolve();
+              })
+              .catch(() => {
+                res.status(500).json({ message: "Error in the server." });
+              });
+          }
+          case "signup": {
+            const { email } = req.body.payload;
+            await Admin.findOne({ email, role: "admin" })
+              .then((e) => {
+                if (e == null) {
+                  res.json({ status: 404, message: "Account not found." });
+                } else
+                  res.json({
+                    status: 200,
+                  });
+              })
+              .catch(() => {
+                res.status(500).json({ message: "Error in the server." });
+              });
+          }
+
+          case "new-user": {
+            const { email } = req.body.payload;
+            await Admin.findOneAndUpdate(
+              { email },
+              { $set: { ...req.body.payload } },
+              { returnOriginal: false }
+            )
+              .then((e) => {
+                res.json({
+                  status: 200,
+                  message: "Successfully updated the account",
+                  currentUser: e,
+                });
               })
               .catch(() => {
                 res.status(500).json({ message: "Error in the server." });

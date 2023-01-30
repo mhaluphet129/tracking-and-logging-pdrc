@@ -1,5 +1,6 @@
 import Visitor from "../../database/model/Visitor";
 import Admin from "../../database/model/Admin";
+import Regions from "../../database/model/Regions";
 import dbConnect from "../../database/dbConnect";
 import moment from "moment";
 
@@ -47,7 +48,7 @@ export default async function handler(req, res) {
                 res.json({ status: 200, message: "Fetch done.", data });
                 resolve();
               })
-              .catch(() => {
+              .catch((err) => {
                 res
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
@@ -82,6 +83,53 @@ export default async function handler(req, res) {
                 resolve();
               })
               .catch(() => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
+
+          case "get-region": {
+            return await Regions.aggregate([
+              {
+                $lookup: {
+                  from: "provinces",
+                  let: { regionId: "$_id" },
+                  pipeline: [
+                    { $match: { $expr: { $eq: ["$regionId", "$$regionId"] } } },
+                    {
+                      $lookup: {
+                        from: "citymunicipalities",
+                        let: { provinceId: "$_id" },
+                        pipeline: [
+                          {
+                            $match: {
+                              $expr: {
+                                $eq: ["$provinceId", "$$provinceId"],
+                              },
+                            },
+                          },
+                        ],
+                        as: "citymunicipalities",
+                      },
+                    },
+                  ],
+                  as: "provinces",
+                },
+              },
+              {
+                $project: {
+                  name: 1,
+                  island: 1,
+                  "provinces._id": 1,
+                  "provinces.name": 1,
+                  "provinces.citymunicipalities._id": 1,
+                  "provinces.citymunicipalities.name": 1,
+                },
+              },
+            ])
+              .then((e) => res.json({ status: 200, data: e }))
+              .catch((err) => {
                 res
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
