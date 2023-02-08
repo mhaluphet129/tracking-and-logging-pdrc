@@ -12,7 +12,6 @@ let isConnected = false;
 
 const SocketHandler = (req, res) => {
   if (res.socket.server.io) {
-    console.log("Sockets is already running.");
   } else {
     const io = new Server(res.socket.server);
     res.socket.server.io = io;

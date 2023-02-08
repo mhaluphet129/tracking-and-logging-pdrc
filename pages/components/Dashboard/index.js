@@ -11,7 +11,7 @@ import {
   Filler,
   ArcElement,
 } from "chart.js";
-import { Card, Col, Row, Space, notification, PageHeader } from "antd";
+import { Card, Col, Row, Space } from "antd";
 import { Line, Pie } from "react-chartjs-2";
 import {
   UserOutlined,
@@ -101,90 +101,90 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <PageHeader
-      title="Dashboard"
-      // extra={[<Button onClick={handlePrint}>PRINT</Button>]}
-    >
-      <Card>
-        <Row>
-          <Col span={14}>
-            <Row gutter={[16, 16]}>
-              <Space style={{ width: "100%" }}>
-                <Cards
-                  color="cyan"
-                  icon={<UserOutlined />}
-                  name="Total Visitor"
-                  value={cardData.totalVisitor}
-                />
-                <Cards
-                  color="orange"
-                  icon={<ImportOutlined />}
-                  name="Total Visits"
-                  value={cardData.totalVisit}
-                />
-                <Cards
-                  color="green"
-                  icon={<CalendarOutlined />}
-                  name="Visit This Month"
-                  value={cardData.totalVisitMonth}
-                />
-              </Space>
-
-              <Line
-                options={options}
-                data={{
-                  labels: jayson.months,
-                  datasets: [
-                    {
-                      label: "Total visit",
-                      borderColor: "rgb(53, 162, 235)",
-                      backgroundColor: "rgba(53, 162, 235, 0.5)",
-                      data: dashbardNumericalData,
-                    },
-                  ],
-                }}
+    // <PageHeader
+    //   title="Dashboard"
+    //   // extra={[<Button onClick={handlePrint}>PRINT</Button>]}
+    // >
+    <Card>
+      <Row>
+        <Col span={14}>
+          <Row gutter={[16, 16]}>
+            <Space style={{ width: "100%" }}>
+              <Cards
+                color="cyan"
+                icon={<UserOutlined />}
+                name="Total Visitor"
+                value={cardData.totalVisitor}
               />
-            </Row>
-          </Col>
-          <Col span={8} offset={2}>
-            <Pie
-              options={{
-                responsive: true,
-                plugins: {
-                  legend: {
-                    position: "bottom",
-                  },
-                },
-              }}
+              <Cards
+                color="orange"
+                icon={<ImportOutlined />}
+                name="Total Visits"
+                value={cardData.totalVisit}
+              />
+              <Cards
+                color="green"
+                icon={<CalendarOutlined />}
+                name="Visit This Month"
+                value={cardData.totalVisitMonth}
+              />
+            </Space>
+
+            <Line
+              options={options}
               data={{
-                labels: ["Total Claimed", "Total Unclaimed"],
+                labels: jayson.months,
                 datasets: [
                   {
-                    data: [pieData.claimed, pieData.unclaimed],
-                    backgroundColor: [
-                      "rgba(54, 162, 235, 1)",
-                      "rgba(54, 162, 235, 0.2)",
-                    ],
-                    borderColor: [
-                      "rgba(54, 162, 235, 1)",
-                      "rgba(54, 162, 235, 1)",
-                    ],
-                    borderWidth: 1,
+                    label: "Total visit",
+                    borderColor: "rgb(53, 162, 235)",
+                    backgroundColor: "rgba(53, 162, 235, 0.5)",
+                    data: dashbardNumericalData,
                   },
                 ],
               }}
             />
-            <Cards
-              name="Total Deposit Items"
-              color="blue"
-              icon={<BlockOutlined />}
-              value={pieData.total}
-              hoverable
-            />
-          </Col>
-        </Row>
-      </Card>
-    </PageHeader>
+          </Row>
+        </Col>
+        <Col span={8} offset={2}>
+          <Pie
+            options={{
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: "bottom",
+                },
+              },
+            }}
+            data={{
+              labels: ["Total Claimed", "Total Unclaimed"],
+              datasets: [
+                {
+                  data: [pieData.claimed, pieData.unclaimed],
+                  backgroundColor: [
+                    "rgba(54, 162, 235, 1)",
+                    "rgba(54, 162, 235, 0.2)",
+                  ],
+                  borderColor: [
+                    "rgba(54, 162, 235, 1)",
+                    "rgba(54, 162, 235, 1)",
+                  ],
+                  borderWidth: 1,
+                },
+              ],
+            }}
+          />
+          <Cards
+            name="Total Deposit Items"
+            color="blue"
+            icon={<BlockOutlined />}
+            value={pieData.total}
+            hoverable
+          />
+        </Col>
+      </Row>
+    </Card>
+    // </PageHeader>
   );
 };
 

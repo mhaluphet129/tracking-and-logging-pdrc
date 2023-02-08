@@ -14,13 +14,14 @@ export default async function handler(req, res) {
 
         switch (mode) {
           case "fetch-all": {
-            return await Visitor.aggregate([
+            const { startDate, endDate } = req.query;
+
+            let query = [
               {
                 $lookup: {
                   from: "items",
                   localField: "_id",
                   foreignField: "ownerId",
-                  pipeline: [],
                   as: "items",
                 },
               },
@@ -57,7 +58,18 @@ export default async function handler(req, res) {
               {
                 $unwind: "$citymunicipalities",
               },
-            ]).then((e) => {
+            ];
+
+            if (startDate != undefined && endDate != undefined)
+              query.unshift({
+                $match: {
+                  createdAt: {
+                    $gte: new Date(startDate),
+                    $lte: new Date(endDate),
+                  },
+                },
+              });
+            return await Visitor.aggregate(query).then((e) => {
               res.json({
                 status: 200,
                 message: "Successfully fetched the data",

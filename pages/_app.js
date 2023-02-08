@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "antd/dist/antd.css";
 import "../styles/main.styles.css";
 import SettingsContextProvider from "./context";
 import axios from "axios";
@@ -7,11 +6,12 @@ import axios from "axios";
 import Head from "next/head";
 import { message, Typography, Table, notification } from "antd";
 import { WarningOutlined } from "@ant-design/icons";
-import { Timer, Profiler, changeTitle } from "./assets/utilities";
+import { Timer, changeTitle } from "./assets/utilities";
 
 function MyApp({ Component, pageProps }) {
   const [visitorWithTimer, setVisitorWithTimer] = useState();
-  const [openProfile, setOpenProfile] = useState({ show: false, data: null });
+  const [openProfile, setOpenProfile] = useState(false);
+  const [profileData, setProfileData] = useState(null);
   const [api, contextHolder] = notification.useNotification();
 
   useEffect(() => {
@@ -35,23 +35,18 @@ function MyApp({ Component, pageProps }) {
     })();
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      let res = await axios.get("/api/visit", {
-        params: { mode: "visit-with-timers" },
-      });
-      if (res.data.status == 200) setVisitorWithTimer(res.data.data);
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     let res = await axios.get("/api/visit", {
+  //       params: { mode: "visit-with-timers" },
+  //     });
+  //     if (res.data.status == 200) setVisitorWithTimer(res.data.data);
+  //   })();
+  // }, []);
 
   return (
     <SettingsContextProvider>
       {contextHolder}
-      <Profiler
-        openModal={openProfile.show}
-        setOpenModal={() => setOpenProfile({ show: false, data: null })}
-        data={openProfile.data}
-      />
       <div style={{ display: "none" }}>
         <Table
           dataSource={visitorWithTimer}
@@ -116,7 +111,8 @@ function MyApp({ Component, pageProps }) {
                               });
 
                               if (data.status == 200) {
-                                setOpenProfile({ show: true, data: data.data });
+                                setOpenProfile(false);
+                                setProfileData(data.data);
                                 notification.close(row?._id);
                               }
                             }}

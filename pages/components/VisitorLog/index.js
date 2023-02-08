@@ -7,7 +7,7 @@ import {
   DatePicker,
   Modal,
   Tag,
-  PageHeader,
+  // PageHeader,
   Card,
   Row,
   Col,
@@ -15,6 +15,7 @@ import {
 } from "antd";
 import axios from "axios";
 import moment from "moment";
+import dayjs from "dayjs";
 
 const VisitorLog = () => {
   const [recentVisit, setRecentVisit] = useState([]);
@@ -233,158 +234,153 @@ const VisitorLog = () => {
 
   return (
     <>
-      <PageHeader title="Visit Logs">
-        <Modal
-          footer={null}
-          maskClosable={false}
-          open={viewLog.show}
-          onCancel={() => setViewLog({ show: false, data: null })}
-          style={{ top: 30 }}
-        >
-          <Space direction="vertical">
-            <Space>
-              Visitor name:{" "}
-              <strong>
-                {viewLog.data?.user.name}
-                {viewLog.data?.user.middlename
-                  ? " " + viewLog.data?.user.middlename
-                  : ""}{" "}
-                {viewLog.data?.user.lastname}
-              </strong>
-            </Space>
-            <Space>
-              Visitee name: <strong>{viewLog.data?.prisonerName}</strong>
-            </Space>
-            <Space>
-              Date visited:{" "}
-              <strong>
-                {moment(viewLog.data?.timeIn).format("MMMM DD, YYYY")}
-              </strong>
-            </Space>
-            <Space>
-              Time Checked In:{" "}
-              <strong> {moment(viewLog.data?.timeIn).format("hh:mm a")}</strong>
-            </Space>
-            <Space>
-              Expected Checkout:{" "}
-              <>
-                <strong>
-                  {moment(viewLog.data?.timeOut).format("hh:mm a")}
-                </strong>
-                {moment
-                  .duration(
-                    moment(viewLog.data?.timeOutTimeAfterDone).diff(
-                      moment(viewLog.data?.timeOut)
-                    )
-                  )
-                  .asSeconds() > 0 ? (
-                  ""
-                ) : viewLog.data?.timeOutTimeAfterDone != null ||
-                  viewLog.data?.timeOutTimeAfterDone != undefined ? (
-                  <Tag>
-                    check-out early @{" "}
-                    {moment(viewLog.data?.timeOutTimeAfterDone).format(
-                      "hh:mm a"
-                    )}
-                  </Tag>
-                ) : (
-                  ""
-                )}
-              </>
-            </Space>
-            Items:
-            <Table
-              locale={{ emptyText: "No desposited items" }}
-              pagination={false}
-              style={{
-                overflowY: "auto",
-                maxHeight: "calc(100vh - 200px)",
-                height: 500,
-              }}
-              columns={[
-                {
-                  title: "Name",
-                  width: 200,
-                  render: (_, row) => row?.name,
-                },
-                {
-                  title: "Description",
-                  width: 200,
-                  render: (_, row) => row?.description,
-                },
-                {
-                  title: "Status",
-                  render: (row) => (
-                    <Tag
-                      color={
-                        checkItemStatus(row) == "DISPOSED"
-                          ? "blue"
-                          : checkItemStatus(row) == "CLAIMED"
-                          ? "success"
-                          : "default"
-                      }
-                    >
-                      {checkItemStatus(row)}
-                    </Tag>
-                  ),
-                },
-              ]}
-              tableLayout="auto"
-              dataSource={viewLog.data?.depositItems}
-              footer={() => (
-                <Typography.Text>
-                  Total: {viewLog.data?.depositItems?.length ?? 0}
-                </Typography.Text>
-              )}
-            />
-          </Space>
-        </Modal>
-        <Card>
+      {/* <PageHeader title="Visit Logs"> */}
+      <Modal
+        footer={null}
+        maskClosable={false}
+        open={viewLog.show}
+        onCancel={() => setViewLog({ show: false, data: null })}
+        style={{ top: 30 }}
+      >
+        <Space direction="vertical">
           <Space>
-            <AutoComplete
-              style={{
-                width: 200,
-              }}
-              loading={loader}
-              placeholder="Search by Name/ID"
-              filterOption={(inputValue, option) =>
-                option.value
-                  ?.toUpperCase()
-                  .indexOf(inputValue.toUpperCase()) !== -1
-              }
-              onChange={(_) => {
-                runTimer(_);
-                if (_?.length <= 0) {
-                  setLoader(false);
-                  setTrigger(trigger + 1);
-                }
-              }}
-              autoFocus
-              allowClear
-            />
-            Date:
-            <DatePicker.RangePicker
-              format="MMM DD, YYYY"
-              defaultValue={[moment("01/01/1990", "MM/DD/YYYY"), moment()]}
-              onCalendarChange={handleCalendarChange}
-            />
+            Visitor name:{" "}
+            <strong>
+              {viewLog.data?.user.name}
+              {viewLog.data?.user.middlename
+                ? " " + viewLog.data?.user.middlename
+                : ""}{" "}
+              {viewLog.data?.user.lastname}
+            </strong>
           </Space>
+          <Space>
+            Visitee name: <strong>{viewLog.data?.prisonerName}</strong>
+          </Space>
+          <Space>
+            Date visited:{" "}
+            <strong>
+              {moment(viewLog.data?.timeIn).format("MMMM DD, YYYY")}
+            </strong>
+          </Space>
+          <Space>
+            Time Checked In:{" "}
+            <strong> {moment(viewLog.data?.timeIn).format("hh:mm a")}</strong>
+          </Space>
+          <Space>
+            Expected Checkout:{" "}
+            <>
+              <strong>{moment(viewLog.data?.timeOut).format("hh:mm a")}</strong>
+              {moment
+                .duration(
+                  moment(viewLog.data?.timeOutTimeAfterDone).diff(
+                    moment(viewLog.data?.timeOut)
+                  )
+                )
+                .asSeconds() > 0 ? (
+                ""
+              ) : viewLog.data?.timeOutTimeAfterDone != null ||
+                viewLog.data?.timeOutTimeAfterDone != undefined ? (
+                <Tag>
+                  check-out early @{" "}
+                  {moment(viewLog.data?.timeOutTimeAfterDone).format("hh:mm a")}
+                </Tag>
+              ) : (
+                ""
+              )}
+            </>
+          </Space>
+          Items:
           <Table
-            columns={column2}
-            dataSource={recentVisit}
+            locale={{ emptyText: "No desposited items" }}
+            pagination={false}
+            style={{
+              overflowY: "auto",
+              maxHeight: "calc(100vh - 200px)",
+              height: 500,
+            }}
+            columns={[
+              {
+                title: "Name",
+                width: 200,
+                render: (_, row) => row?.name,
+              },
+              {
+                title: "Description",
+                width: 200,
+                render: (_, row) => row?.description,
+              },
+              {
+                title: "Status",
+                render: (row) => (
+                  <Tag
+                    color={
+                      checkItemStatus(row) == "DISPOSED"
+                        ? "blue"
+                        : checkItemStatus(row) == "CLAIMED"
+                        ? "success"
+                        : "default"
+                    }
+                  >
+                    {checkItemStatus(row)}
+                  </Tag>
+                ),
+              },
+            ]}
+            tableLayout="auto"
+            dataSource={viewLog.data?.depositItems}
             footer={() => (
               <Typography.Text>
-                Total: {recentVisit?.length ?? 0}
+                Total: {viewLog.data?.depositItems?.length ?? 0}
               </Typography.Text>
             )}
-            onRow={(row) => {
-              return { onClick: () => setViewLog({ show: true, data: row }) };
-            }}
-            style={{ marginTop: 10 }}
-            scroll={{ y: 450 }}
           />
-        </Card>
-      </PageHeader>
+        </Space>
+      </Modal>
+      <Card>
+        <Space style={{ display: "flex", justifyContent: "space-between" }}>
+          <AutoComplete
+            style={{
+              width: 200,
+            }}
+            loading={loader}
+            placeholder="Search by Name/ID"
+            filterOption={(inputValue, option) =>
+              option.value?.toUpperCase().indexOf(inputValue.toUpperCase()) !==
+              -1
+            }
+            onChange={(_) => {
+              runTimer(_);
+              if (_?.length <= 0) {
+                setLoader(false);
+                setTrigger(trigger + 1);
+              }
+            }}
+            autoFocus
+            allowClear
+          />
+          <div>
+            Date:{" "}
+            <DatePicker.RangePicker
+              format="MMM DD, YYYY"
+              defaultValue={[dayjs("01/01/1990", "MM/DD/YYYY"), dayjs()]}
+              onCalendarChange={handleCalendarChange}
+            />
+          </div>
+        </Space>
+        <Table
+          columns={column2}
+          dataSource={recentVisit}
+          footer={() => (
+            <Typography.Text>Total: {recentVisit?.length ?? 0}</Typography.Text>
+          )}
+          onRow={(row) => {
+            return { onClick: () => setViewLog({ show: true, data: row }) };
+          }}
+          style={{ marginTop: 10 }}
+          scroll={{ y: 450 }}
+        />
+      </Card>
+      {/* </PageHeader> */}
     </>
   );
 };

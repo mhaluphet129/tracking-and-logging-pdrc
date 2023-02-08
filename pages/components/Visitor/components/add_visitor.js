@@ -29,6 +29,7 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
   let [loader, setLoader] = useState("");
   let [doneVerify, setDoneVerify] = useState(false);
   let [image, setImage] = useState();
+  let [dateBirth, setDateBirth] = useState("");
 
   let [regions, setRegion] = useState({});
   let [province, setProvince] = useState({});
@@ -158,6 +159,7 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
             ]}
           >
             <Input
+              disabled={doneVerify}
               onChange={(e) =>
                 setName((_) => {
                   return { ..._, name: e.target.value };
@@ -167,6 +169,7 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
           </Form.Item>
           <Form.Item label="Middle Name (Optional)" name="middlename">
             <Input
+              disabled={doneVerify}
               onChange={(e) =>
                 setName((_) => {
                   return { ..._, middlename: e.target.value };
@@ -185,6 +188,7 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
             ]}
           >
             <Input
+              disabled={doneVerify}
               onChange={(e) =>
                 setName((_) => {
                   return { ..._, lastname: e.target.value };
@@ -239,7 +243,15 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
                 },
               ]}
             >
-              <DatePicker />
+              <DatePicker
+                value={dateBirth}
+                format="MMM DD, YYYY"
+                onChange={(e) => {
+                  if (moment().subtract(e.year(), "years").year() < 18) {
+                    message.warn("Visitor should be atleast 18 years old.");
+                  } else setDateBirth(e);
+                }}
+              />
             </Form.Item>
           )}
 

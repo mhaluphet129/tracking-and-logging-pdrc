@@ -1,3 +1,11 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
 .main-body-login {
   display: flex;
   justify-content: center;
@@ -102,6 +110,16 @@ footer {
   .ant-select-selector
   .ant-select-selection-search {
   top: 16px;
+}
+
+.custom-table td.ant-table-cell {
+  padding: 0 !important;
+  padding-left: 1px;
+  font-size: 0.8em;
+}
+
+.myTable th.ant-table-cell {
+  text-align: center !important;
 }
 
 @page {

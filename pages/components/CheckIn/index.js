@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  PageHeader,
+  // PageHeader,
   Table,
   Typography,
   Space,
@@ -96,78 +96,78 @@ const CheckIn = () => {
   }, [trigger]);
 
   return (
-    <PageHeader title="Visit Time">
-      <Card>
-        <Space style={{ marginBottom: 5 }}>
-          <Button
-            type="primary"
-            onClick={() => {
-              if (selectedRowKeys.length == 0)
-                setSelectedRowKeys(visitorWithTimer.map((e) => e?._id));
-              else setSelectedRowKeys([]);
-            }}
-          >
-            {selectedRowKeys?.length > 0 ? "Unselect All" : "Select All"}
-          </Button>
-          <Button
-            disabled={selectedRowKeys?.length == 0}
-            onClick={async () => {
-              setLoad("fetch");
-              let { data } = await axios.get("/api/visit", {
-                params: {
-                  mode: "visit-out-many",
-                  ids: JSON.stringify(selectedRowKeys),
-                },
-              });
+    // <PageHeader title="Visit Time">
+    <Card>
+      <Space style={{ marginBottom: 5 }}>
+        <Button
+          type="primary"
+          onClick={() => {
+            if (selectedRowKeys.length == 0)
+              setSelectedRowKeys(visitorWithTimer.map((e) => e?._id));
+            else setSelectedRowKeys([]);
+          }}
+        >
+          {selectedRowKeys?.length > 0 ? "Unselect All" : "Select All"}
+        </Button>
+        <Button
+          disabled={selectedRowKeys?.length == 0}
+          onClick={async () => {
+            setLoad("fetch");
+            let { data } = await axios.get("/api/visit", {
+              params: {
+                mode: "visit-out-many",
+                ids: JSON.stringify(selectedRowKeys),
+              },
+            });
 
-              if (data.status == 200) {
-                message.success(data?.message);
-                setTrigger(trigger + 1);
-              }
-              setLoad("");
-            }}
-          >
-            Check Out
-          </Button>
-        </Space>
-        <Table
-          dataSource={visitorWithTimer}
-          footer={() => (
-            <Typography.Text>
-              Total: {visitorWithTimer?.length ?? 0}
-            </Typography.Text>
-          )}
-          columns={column2}
-          rowKey={(row) => row._id}
-          pagination={false}
-          loading={load == "fetch"}
-          scroll={{
-            y: 500,
-          }}
-          rowClassName={(row) => {
-            if (!row?.timeOutDone) {
-              if (
-                moment
-                  .duration(moment(row?.timeOut).diff(moment(moment())))
-                  .asSeconds() > 0
-              )
-                return "green-status";
-              else return "red-status";
+            if (data.status == 200) {
+              message.success(data?.message);
+              setTrigger(trigger + 1);
             }
+            setLoad("");
           }}
-          rowSelection={{
-            type: "checkbox",
-            selectedRowKeys,
-            onSelect: (i) => {
-              if (selectedRowKeys?.includes(i?._id)) {
-                setSelectedRowKeys((e) => e.filter((_) => _ != i?._id));
-              } else setSelectedRowKeys((e) => [...e, i?._id]);
-            },
-          }}
-          bordered
-        />
-      </Card>
-    </PageHeader>
+        >
+          Check Out
+        </Button>
+      </Space>
+      <Table
+        dataSource={visitorWithTimer}
+        footer={() => (
+          <Typography.Text>
+            Total: {visitorWithTimer?.length ?? 0}
+          </Typography.Text>
+        )}
+        columns={column2}
+        rowKey={(row) => row._id}
+        pagination={false}
+        loading={load == "fetch"}
+        scroll={{
+          y: 500,
+        }}
+        rowClassName={(row) => {
+          if (!row?.timeOutDone) {
+            if (
+              moment
+                .duration(moment(row?.timeOut).diff(moment(moment())))
+                .asSeconds() > 0
+            )
+              return "green-status";
+            else return "red-status";
+          }
+        }}
+        rowSelection={{
+          type: "checkbox",
+          selectedRowKeys,
+          onSelect: (i) => {
+            if (selectedRowKeys?.includes(i?._id)) {
+              setSelectedRowKeys((e) => e.filter((_) => _ != i?._id));
+            } else setSelectedRowKeys((e) => [...e, i?._id]);
+          },
+        }}
+        bordered
+      />
+    </Card>
+    // </PageHeader>
   );
 };
 

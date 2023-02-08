@@ -32,6 +32,7 @@ import { SettingsContext } from "../../context";
 import { VisitForm } from "../../components/Visitor/components";
 import CheckLister from "./item_checklist_verifier";
 import ItemChecklist from "./items-checklist";
+import QRViewer from "./qr_view";
 
 const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
   const [qr, setQr] = useState("");
@@ -73,7 +74,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
       setOpenAddRemarks(false);
       message.success(res.data.message);
       setTrigger(trigger + 1);
-      setTrigger2((trig) => trig + 1);
+      if (typeof setTrigger2 == "function") setTrigger2((trig) => trig + 1);
     }
   };
 
@@ -87,7 +88,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
     });
     if (res.data.status == 200) {
       setTrigger(trigger + 1);
-      setTrigger2((trig) => trig + 1);
+      if (typeof setTrigger2 == "function") setTrigger2((trig) => trig + 1);
       setOpenModal(false);
       message.success("Timed OUT.");
     }
@@ -247,20 +248,21 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
         setItems={setItems}
         setUnclaimTotal={setUnclaimTotal}
       />
-      <Modal
+      <QRViewer open={openQr} close={() => setOpenQr(false)} id={data?._id} />
+      {/* <Modal
         open={openQr}
         footer={null}
         onCancel={() => setOpenQr(false)}
         maskClosable={false}
-      >
-        <span style={{ fontSize: 10, margin: 0 }}>ID: {data?._id}</span>
-        <Badge.Ribbon
+      > */}
+      {/* <span style={{ fontSize: 10, margin: 0 }}>ID: {data?._id}</span> */}
+      {/* <Badge.Ribbon
           text={refViolation ? "Has Violation" : "No Violation"}
           color={refViolation ? "red" : "blue"}
-        >
-          <div>{qr}</div>
-        </Badge.Ribbon>
-      </Modal>
+        > */}
+      {/* <div>{qr}</div> */}
+      {/* </Badge.Ribbon> */}
+      {/* </Modal> */}
       <Modal
         open={openModal}
         footer={null}
@@ -290,9 +292,6 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                   </div>
                 )}
               </div>
-              <Button onClick={() => setOpenQr(true)} style={{ width: 200 }}>
-                View QR
-              </Button>
               <strong>Fullname</strong>
               <span style={{ marginLeft: 10 }}>
                 {data?.name} {data?.middlename ?? ""} {data?.lastname}
@@ -306,9 +305,19 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
                 {moment(data?.dateOfBirth).format("MMMM DD, YYYY")}
               </span>
               <strong>Address</strong>
-              <span style={{ marginLeft: 10 }}>{data?.address}</span>
+              <span style={{ marginLeft: 10 }}>
+                {data?.citymunicipalities?.name}, {data?.province?.name} <br />
+                <span style={{ marginLeft: 10 }}>{data?.region?.name}</span>
+              </span>
               <strong>Contact Number</strong>
               <span style={{ marginLeft: 10 }}>{data?.contactNumber}</span>
+              <strong>Registered Date</strong>
+              <span style={{ marginLeft: 10 }}>
+                {moment(data?.createdAt).format("MMMM DD, YYYY")}
+              </span>
+              <Button onClick={() => setOpenQr(true)} style={{ width: 200 }}>
+                View QR
+              </Button>
             </Space>
           </Col>
           <Col span={16}>

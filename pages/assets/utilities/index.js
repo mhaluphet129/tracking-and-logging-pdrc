@@ -5,6 +5,7 @@ import Timer from "./timer";
 import ItemChecklist from "./items-checklist";
 import Floatlabel from "./floatlabel";
 import changeTitle from "./title";
+import QRViewer from "./qr_view";
 const Utilities = () => {
   return <></>;
 };
@@ -16,5 +17,6 @@ export {
   ItemChecklist,
   Floatlabel,
   changeTitle,
+  QRViewer,
 };
 export default Utilities;

@@ -11,9 +11,9 @@ import {
   notification,
   Popconfirm,
   message,
-  PageHeader,
   Card,
   Image,
+  DatePicker,
 } from "antd";
 import {
   UserAddOutlined,
@@ -45,6 +45,7 @@ const VisitorPage = () => {
     data: null,
   });
   let [regionObj, setRegionObj] = useState([]);
+  const [dateFilter, setDateFilter] = useState([]);
 
   const [api, contextHolder] = notification.useNotification();
 
@@ -52,7 +53,7 @@ const VisitorPage = () => {
     {
       title: "ID",
       align: "center",
-      width: 50,
+      width: 70,
       render: (_, row) => (
         <Typography.Link>{IDGen(row?._id, 6)}</Typography.Link>
       ),
@@ -60,6 +61,8 @@ const VisitorPage = () => {
     {
       title: "Name",
       width: 150,
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      sortDirections: ["ascend", "descend"],
       render: (_, row) => (
         <Typography>
           {row.name}
@@ -71,6 +74,8 @@ const VisitorPage = () => {
       title: "Age",
       width: 1,
       align: "center",
+      sorter: (a, b) => a.age - b.age,
+      sortDirections: ["ascend", "descend"],
       render: (_, row) => <Typography>{row.age}</Typography>,
     },
     {
@@ -362,7 +367,12 @@ const VisitorPage = () => {
     const fetchVisitor = async () => {
       setLoad("fetch");
       let { data } = await axios.get("/api/visitor", {
-        params: { mode: "fetch-all", search: _searchName },
+        params: {
+          mode: "fetch-all",
+          search: _searchName,
+          startDate: dateFilter[0]?.toDate(),
+          endDate: dateFilter[1]?.toDate(),
+        },
       });
       console.log(data);
       if (data.status == 200) setVisitors(data.visitor);
@@ -387,17 +397,21 @@ const VisitorPage = () => {
 
   return (
     <>
-      <PageHeader title="Visitors Profile">
-        {contextHolder}
-        <Card>
-          <Space
-            style={{
-              marginBottom: 5,
-            }}
-          >
+      {/* <PageHeader title="Visitors Profile"> */}
+      {contextHolder}
+      <Card>
+        <Space
+          style={{
+            marginBottom: 5,
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
             <Button
               onClick={() => setShowAddVisitor(true)}
               icon={<UserAddOutlined />}
+              style={{ marginRight: 5 }}
             >
               New Visitor
             </Button>
@@ -422,51 +436,65 @@ const VisitorPage = () => {
               }}
               autoFocus
             />
-          </Space>
-          <Table
-            dataSource={visitors}
-            footer={() => (
-              <Typography.Text>Total: {visitors?.length ?? 0}</Typography.Text>
-            )}
-            columns={column}
-            onRow={(data) => {
-              return { onClick: () => setOpenProfile({ show: true, data }) };
+          </div>
+          <DatePicker.RangePicker
+            onCalendarChange={(e) => {
+              try {
+                if (e[0] != null && e[1] != null) {
+                  setDateFilter(e);
+                  setTrigger(trigger + 1);
+                }
+              } catch {
+                setDateFilter([]);
+                setTrigger(trigger + 1);
+              }
             }}
-            rowKey={(row) => row._id}
-            loading={load == "fetch"}
-            // rowClassName={(row) => console.log(row)}
           />
-        </Card>
+        </Space>
+        <Table
+          dataSource={visitors}
+          footer={() => (
+            <Typography.Text>Total: {visitors?.length ?? 0}</Typography.Text>
+          )}
+          columns={column}
+          onRow={(data) => {
+            return { onClick: () => setOpenProfile({ show: true, data }) };
+          }}
+          rowKey={(row) => row._id}
+          loading={load == "fetch"}
+          // rowClassName={(row) => console.log(row)}
+        />
+      </Card>
 
-        <AddVisitor
-          regionObj={regionObj}
-          open={showAddVisitor}
-          close={() => setShowAddVisitor(false)}
-          refresh={() => setTrigger(trigger + 1)}
-        />
-        <UpdateVisitor
-          open={updateVisitor.open}
-          close={() =>
-            setUpdateVisitor((e) => {
-              return { open: false, data: { ...e.data } };
-            })
-          }
-          data={updateVisitor.data}
-          refresh={() => setTrigger(trigger + 1)}
-        />
-        <Profiler
-          openModal={openProfile.show}
-          setOpenModal={setOpenProfile}
-          data={openProfile.data}
-          setTrigger2={setTrigger}
-        />
-        <VisitForm
-          open={openVisitForm.show}
-          close={() => setOpenVisitForm({ show: false, data: null })}
-          data={openVisitForm.data}
-          setTrigger={setTrigger}
-        />
-      </PageHeader>
+      <AddVisitor
+        regionObj={regionObj}
+        open={showAddVisitor}
+        close={() => setShowAddVisitor(false)}
+        refresh={() => setTrigger(trigger + 1)}
+      />
+      <UpdateVisitor
+        open={updateVisitor.open}
+        close={() =>
+          setUpdateVisitor((e) => {
+            return { open: false, data: { ...e.data } };
+          })
+        }
+        data={updateVisitor.data}
+        refresh={() => setTrigger(trigger + 1)}
+      />
+      <Profiler
+        openModal={openProfile.show}
+        setOpenModal={setOpenProfile}
+        data={openProfile.data}
+        setTrigger2={setTrigger}
+      />
+      <VisitForm
+        open={openVisitForm.show}
+        close={() => setOpenVisitForm({ show: false, data: null })}
+        data={openVisitForm.data}
+        setTrigger={setTrigger}
+      />
+      {/* </PageHeader> */}
     </>
   );
 };

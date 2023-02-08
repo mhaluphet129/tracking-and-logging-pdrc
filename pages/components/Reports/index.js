@@ -3,7 +3,7 @@ import { useReactToPrint } from "react-to-print";
 import axios from "axios";
 import moment from "moment";
 import {
-  PageHeader,
+  // PageHeader,
   Card,
   Button,
   Drawer,
@@ -127,9 +127,13 @@ const Report = () => {
     },
     {
       title: "Address",
-      align: "center",
-      width: 250,
-      render: (_, row) => <Typography>{row.address}</Typography>,
+      width: 350,
+      render: (_, row) => (
+        <Typography>
+          {row.citymunicipalities.name}, {row?.province.name} <br />
+          {row?.region.name}
+        </Typography>
+      ),
     },
     {
       title: "Gender",
@@ -442,7 +446,7 @@ const Report = () => {
           <Col>
             <Image
               preview={false}
-              src="/pdrc-logo2.png"
+              src="/pdrc-logo.png"
               alt="logo"
               width={150}
             />
@@ -489,9 +493,9 @@ const Report = () => {
           <Col>
             <Image
               preview={false}
-              src="/pdrc-logo.png"
+              src="/pdrc-logo2.png"
+              alt="logo"
               width={150}
-              alt="pdrc logo"
             />
           </Col>
         </Row>
@@ -502,6 +506,8 @@ const Report = () => {
           columns={printColumn1}
           rowKey={(row) => row._id}
           pagination={false}
+          className="myTable"
+          rowClassName="custom-table"
           bordered
         />
       </Col>
@@ -569,7 +575,7 @@ const Report = () => {
           <Col>
             <Image
               preview={false}
-              src="/pdrc-logo2.png"
+              src="/pdrc-logo.png"
               alt="logo"
               width={150}
             />
@@ -667,7 +673,7 @@ const Report = () => {
           <Col>
             <Image
               preview={false}
-              src="/pdrc-logo.png"
+              src="/pdrc-logo2.png"
               width={150}
               alt="image 1"
             />
@@ -794,7 +800,8 @@ const Report = () => {
     })();
   }, []);
   return (
-    <PageHeader title="Report">
+    <>
+      {/* <PageHeader title="Report"> */}
       <Drawer
         open={openPrintDrawer2}
         onClose={() => {
@@ -874,7 +881,8 @@ const Report = () => {
           </Button>
         </Space>
       </Card>
-    </PageHeader>
+      {/* </PageHeader> */}
+    </>
   );
 };
 

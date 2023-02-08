@@ -6,7 +6,7 @@ import {
   Badge,
   Typography,
   Table,
-  PageHeader,
+  // PageHeader,
   AutoComplete,
   Space,
   Tag,
@@ -113,7 +113,8 @@ const Inventory = () => {
   }, [trigger]);
 
   return (
-    <PageHeader title="Inventory Page">
+    <>
+      {/* <PageHeader title="Inventory Page"> */}
       <EditItems
         open={openEditModal.show}
         close={() => setOpenEditModal({ show: false, data: null })}
@@ -264,7 +265,8 @@ const Inventory = () => {
           </Card>
         </Col>
       </Row>
-    </PageHeader>
+      {/* </PageHeader> */}
+    </>
   );
 };
 

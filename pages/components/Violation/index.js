@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  PageHeader,
+  // PageHeader,
   Row,
   Col,
   Space,
@@ -65,91 +65,91 @@ const Violation = () => {
     })();
   }, []);
   return (
-    <PageHeader title="Violation">
-      <Card>
-        <Row gutter={[16, 16]}>
-          <Col span={18}>
-            <Typography.Title level={5}>List of Violators</Typography.Title>
-            <Table
-              columns={column}
-              footer={() => (
-                <Typography.Text>
-                  Total: {listViolators?.length ?? 0}
-                </Typography.Text>
-              )}
-              dataSource={listViolators}
-              loading={loader == "fetch"}
-              pagination={{ pageSize: 10 }}
-            />
-          </Col>
-          <Col span={6}>
-            <Radio.Group
-              defaultValue="pie"
-              buttonStyle="solid"
-              onChange={(e) => setType(e.target.value)}
-              style={{
-                marginBottom: 10,
-                display: "flex",
-                justifyContent: "end",
-              }}
-              size="small"
-            >
-              <Radio.Button value="pie">Pie</Radio.Button>
-              <Radio.Button value="card">Card</Radio.Button>
-            </Radio.Group>
-            {type == "pie" ? (
-              <Pie
-                style={{ marginTop: 10 }}
-                options={{
-                  responsive: true,
-                  plugins: {
-                    title: {
-                      display: true,
-                      text: `A Total of ${totalVisitor} visitors`,
-                    },
-                    legend: {
-                      position: "bottom",
-                    },
-                  },
-                }}
-                data={{
-                  labels: ["Total Violators", "Total Non-Violators"],
-                  datasets: [
-                    {
-                      data: [total, totalVisitor - total],
-                      backgroundColor: [
-                        "rgba(255, 99, 132, 0.2)",
-                        "rgba(54, 162, 235, 0.2)",
-                      ],
-                      borderColor: [
-                        "rgba(255, 99, 132, 1)",
-                        "rgba(54, 162, 235, 1)",
-                      ],
-                      borderWidth: 1,
-                    },
-                  ],
-                }}
-              />
-            ) : (
-              <Space direction="vertical">
-                <Cards
-                  color="rgba(255,0,0,0.5)"
-                  icon={<WarningOutlined />}
-                  name="Total Violator"
-                  value={total}
-                />
-                <Cards
-                  color="rgba(0,0,255,0.5)"
-                  icon={<UserOutlined />}
-                  name="Total Non-Violators"
-                  value={totalVisitor - total}
-                />
-              </Space>
+    // <PageHeader title="Violation">
+    <Card>
+      <Row gutter={[16, 16]}>
+        <Col span={18}>
+          <Typography.Title level={5}>List of Violators</Typography.Title>
+          <Table
+            columns={column}
+            footer={() => (
+              <Typography.Text>
+                Total: {listViolators?.length ?? 0}
+              </Typography.Text>
             )}
-          </Col>
-        </Row>
-      </Card>
-    </PageHeader>
+            dataSource={listViolators}
+            loading={loader == "fetch"}
+            pagination={{ pageSize: 10 }}
+          />
+        </Col>
+        <Col span={6}>
+          <Radio.Group
+            defaultValue="pie"
+            buttonStyle="solid"
+            onChange={(e) => setType(e.target.value)}
+            style={{
+              marginBottom: 10,
+              display: "flex",
+              justifyContent: "end",
+            }}
+            size="small"
+          >
+            <Radio.Button value="pie">Pie</Radio.Button>
+            <Radio.Button value="card">Card</Radio.Button>
+          </Radio.Group>
+          {type == "pie" ? (
+            <Pie
+              style={{ marginTop: 10 }}
+              options={{
+                responsive: true,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: `A Total of ${totalVisitor} visitors`,
+                  },
+                  legend: {
+                    position: "bottom",
+                  },
+                },
+              }}
+              data={{
+                labels: ["Total Violators", "Total Non-Violators"],
+                datasets: [
+                  {
+                    data: [total, totalVisitor - total],
+                    backgroundColor: [
+                      "rgba(255, 99, 132, 0.2)",
+                      "rgba(54, 162, 235, 0.2)",
+                    ],
+                    borderColor: [
+                      "rgba(255, 99, 132, 1)",
+                      "rgba(54, 162, 235, 1)",
+                    ],
+                    borderWidth: 1,
+                  },
+                ],
+              }}
+            />
+          ) : (
+            <Space direction="vertical">
+              <Cards
+                color="rgba(255,0,0,0.5)"
+                icon={<WarningOutlined />}
+                name="Total Violator"
+                value={total}
+              />
+              <Cards
+                color="rgba(0,0,255,0.5)"
+                icon={<UserOutlined />}
+                name="Total Non-Violators"
+                value={totalVisitor - total}
+              />
+            </Space>
+          )}
+        </Col>
+      </Row>
+    </Card>
+    // </PageHeader>
   );
 };
 

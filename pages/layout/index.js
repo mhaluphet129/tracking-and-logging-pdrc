@@ -30,7 +30,6 @@ import axios from "axios";
 import moment from "moment";
 import VisitorPage from "../components/Visitor";
 import DashboardPage from "../components/Dashboard";
-import Profiler from "../assets/utilities/profiler";
 import VisitorLog from "../components/VisitorLog";
 import ItemPage from "../components/Items";
 import Violation from "../components/Violation";
@@ -374,28 +373,7 @@ const Content = ({ selectedKey }) => {
 };
 
 const Main = () => {
-  const [openModal, setOpenModal] = useState(false);
-  const [data, setData] = useState({});
-
-  fetch("/api/socket").finally(() => {
-    socket = io();
-
-    socket.on("open-profile", async (id) => {
-      if (id != null) {
-        let res = await axios.get("/api/visitor", {
-          params: { id, mode: "get-visitor" },
-        });
-
-        if (res.data.status == 200) {
-          setData(res.data.data);
-          setOpenModal(true);
-        } else message.error("Error on scanning the QR code");
-      }
-    });
-  });
-  return (
-    <Profiler openModal={openModal} setOpenModal={setOpenModal} data={data} />
-  );
+  return <></>;
 };
 export default Main;
 export { Sider, Header, Content };
