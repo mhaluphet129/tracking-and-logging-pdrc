@@ -2,7 +2,7 @@ import { Card, Row, Col, Typography } from "antd";
 
 const DashboardCards = (props) => {
   return (
-    <Card bodyStyle={{ padding: 5, overflow: "scroll" }} {...props}>
+    <Card bodyStyle={{ padding: 5 }} {...props}>
       <Row gutter={[16, 0]}>
         <Col>
           <div
