@@ -11,6 +11,7 @@ import {
   Input,
   Dropdown,
   message,
+  Affix,
 } from "antd";
 import {
   SettingFilled,
@@ -24,6 +25,7 @@ import {
   BlockOutlined,
   LoginOutlined,
   DiffOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -98,19 +100,22 @@ const Sider = ({ selectedIndex }) => {
   }, []);
 
   return (
-    <Layout.Sider collapsible theme="light">
-      <div style={{ height: "10vh", backgroundColor: "#fff" }} />
-      <Menu
-        onClick={selectedIndex}
-        items={items}
-        defaultSelectedKeys="dashboard"
-        style={{
-          minHeight: "85vh",
-          fontSize: 15,
-          fontWeight: 700,
-        }}
-      />
-    </Layout.Sider>
+    <Affix>
+      <Layout.Sider collapsible theme="light">
+        <Menu
+          onClick={selectedIndex}
+          items={items}
+          defaultSelectedKeys="dashboard"
+          style={{
+            height: "100vh",
+            fontSize: 15,
+            fontWeight: 700,
+            border: "none",
+            marginTop: 30,
+          }}
+        />
+      </Layout.Sider>
+    </Affix>
   );
 };
 
@@ -312,46 +317,72 @@ const Header = () => {
           </Form.Item>
         </Form>
       </Modal>
-      <Layout.Header
-        style={{
-          backgroundColor: "#aaa",
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <Dropdown
-          placement="bottom"
-          overlayStyle={{ width: 150 }}
-          menu={{
-            items: [
-              {
-                key: 1,
-                label: "Profile Settings",
-                icon: <SettingFilled />,
-                onClick: () => setShowSettings(true),
-              },
-              {
-                key: 2,
-                label: "Log Out",
-                icon: <LogoutOutlined />,
-                onClick: () => {
-                  Cookies.remove("currentUser");
-                  Cookies.remove("loggedIn");
-                  window.location.reload();
-                },
-              },
-            ],
+      <Affix>
+        <Layout.Header
+          style={{
+            backgroundColor: "#aaa",
+            display: "flex",
+            alignItems: "center",
+            paddingInline: 15,
           }}
         >
-          <Avatar
-            size="large"
-            style={{ marginLeft: "auto", cursor: "pointer" }}
+          <div
+            style={{
+              marginLeft: "auto",
+              cursor: "pointer",
+
+              background: "#fff",
+              borderRadius: 5,
+            }}
           >
-            {currentUser.name[0]?.toUpperCase()}{" "}
-            {currentUser.lastname[0]?.toUpperCase()}
-          </Avatar>
-        </Dropdown>
-      </Layout.Header>
+            <Dropdown
+              placement="bottom"
+              overlayStyle={{ width: 180 }}
+              menu={{
+                items: [
+                  {
+                    key: 1,
+                    label: "Profile Settings",
+                    icon: <SettingFilled />,
+                    onClick: () => setShowSettings(true),
+                  },
+                  {
+                    key: 2,
+                    label: "Log Out",
+                    icon: <LogoutOutlined />,
+                    onClick: () => {
+                      Cookies.remove("currentUser");
+                      Cookies.remove("loggedIn");
+                      window.location.reload();
+                    },
+                  },
+                ],
+              }}
+            >
+              <div
+                style={{
+                  width: 160,
+                  display: "flex",
+                  alignItems: "center",
+                  height: 50,
+                  justifyContent: "space-around",
+                }}
+              >
+                <Avatar size={40} icon={<UserOutlined />} />
+                <Typography>
+                  {currentUser.name[0]?.toUpperCase() +
+                    currentUser.name.substring(1, currentUser.name.length)}{" "}
+                  {currentUser.lastname[0]?.toUpperCase() +
+                    currentUser.lastname.substring(
+                      1,
+                      currentUser.lastname.length
+                    )}
+                </Typography>
+              </div>
+            </Dropdown>
+          </div>
+        </Layout.Header>
+      </Affix>
     </>
   );
 };

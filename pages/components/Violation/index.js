@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
-import {
-  // PageHeader,
-  Row,
-  Col,
-  Space,
-  Card,
-  Table,
-  Typography,
-  Radio,
-} from "antd";
+import { Row, Col, Space, Card, Table, Typography, Segmented } from "antd";
 import Cards from "../Dashboard/components/cards";
 import axios from "axios";
-import { WarningOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  WarningOutlined,
+  UserOutlined,
+  PieChartOutlined,
+  BarsOutlined,
+} from "@ant-design/icons";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import moment from "moment";
@@ -83,20 +79,14 @@ const Violation = () => {
           />
         </Col>
         <Col span={6}>
-          <Radio.Group
-            defaultValue="pie"
-            buttonStyle="solid"
-            onChange={(e) => setType(e.target.value)}
-            style={{
-              marginBottom: 10,
-              display: "flex",
-              justifyContent: "end",
-            }}
-            size="small"
-          >
-            <Radio.Button value="pie">Pie</Radio.Button>
-            <Radio.Button value="card">Card</Radio.Button>
-          </Radio.Group>
+          <Segmented
+            options={[
+              { label: "Pie", value: "pie", icon: <PieChartOutlined /> },
+              { label: "Card", value: "card", icon: <BarsOutlined /> },
+            ]}
+            onChange={(e) => setType(e)}
+          />
+
           {type == "pie" ? (
             <Pie
               style={{ marginTop: 10 }}
@@ -135,7 +125,7 @@ const Violation = () => {
               <Cards
                 color="rgba(255,0,0,0.5)"
                 icon={<WarningOutlined />}
-                name="Total Violator"
+                name="Total Violators"
                 value={total}
               />
               <Cards

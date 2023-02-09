@@ -24,8 +24,6 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
-import QRCode from "qrcode";
-import parse from "html-react-parser";
 import axios from "axios";
 
 import { SettingsContext } from "../../context";
@@ -34,8 +32,7 @@ import CheckLister from "./item_checklist_verifier";
 import ItemChecklist from "./items-checklist";
 import QRViewer from "./qr_view";
 
-const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
-  const [qr, setQr] = useState("");
+const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
   const [loader, setLoader] = useState("");
   const [visitData, setVisitData] = useState([]);
   const [visitIn, setVisitIn] = useState(false);
@@ -56,7 +53,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
   const [image, setImage] = useState("");
   const [openQr, setOpenQr] = useState(false);
 
-  const { setVisitHour, visitHour } = useContext(SettingsContext);
+  const { visitHour, titleRef } = useContext(SettingsContext);
 
   const handleFinishRemarks = async (val) => {
     console.log(openRemarksIndex);
@@ -74,7 +71,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
       setOpenAddRemarks(false);
       message.success(res.data.message);
       setTrigger(trigger + 1);
-      if (typeof setTrigger2 == "function") setTrigger2((trig) => trig + 1);
+      if (typeof refresh == "function") refresh((trig) => trig + 1);
     }
   };
 
@@ -87,8 +84,9 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
       },
     });
     if (res.data.status == 200) {
+      if (titleRef.current != undefined) clearInterval(titleRef.current);
       setTrigger(trigger + 1);
-      if (typeof setTrigger2 == "function") setTrigger2((trig) => trig + 1);
+      if (typeof refresh == "function") refresh((trig) => trig + 1);
       setOpenModal(false);
       message.success("Timed OUT.");
     }
@@ -190,10 +188,6 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
     setImage(localStorage.getItem(data?.photo));
     (async () => {
       if (data != null || data != "") {
-        QRCode.toString(data?._id?.toString(), function (err, url) {
-          setQr(parse(url || ""));
-        });
-
         setLoader("fetch-visit");
         let res = await axios.get("/api/visit", {
           params: {
@@ -232,7 +226,7 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
         close={() => setVisitIn(false)}
         data={data}
         setTrigger={setTrigger}
-        setTrigger2={setTrigger2}
+        setTrigger2={refresh}
         parentClose={() => setOpenModal(false)}
       />
       <CheckLister
@@ -273,25 +267,28 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
         <Row>
           <Col span={8}>
             <Space direction="vertical">
-              <div style={{ width: 200 }}>
+              <div
+                style={{
+                  height: 180,
+                  width: 200,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  background: "#eee",
+                  borderRadius: "5%",
+                }}
+              >
                 {image != null ? (
                   <Image src={image} />
                 ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: 180,
-                      width: 180,
-                    }}
-                  >
-                    <Typography.Title type="secondary" italic>
-                      No Image
-                    </Typography.Title>
-                  </div>
+                  <Typography.Title type="secondary" level={3} italic>
+                    No Image
+                  </Typography.Title>
                 )}
               </div>
+              <Button onClick={() => setOpenQr(true)} style={{ width: 200 }}>
+                View QR
+              </Button>
               <strong>Fullname</strong>
               <span style={{ marginLeft: 10 }}>
                 {data?.name} {data?.middlename ?? ""} {data?.lastname}
@@ -315,9 +312,6 @@ const Profiler = ({ openModal, setOpenModal, data, setTrigger2 }) => {
               <span style={{ marginLeft: 10 }}>
                 {moment(data?.createdAt).format("MMMM DD, YYYY")}
               </span>
-              <Button onClick={() => setOpenQr(true)} style={{ width: 200 }}>
-                View QR
-              </Button>
             </Space>
           </Col>
           <Col span={16}>

@@ -374,7 +374,6 @@ const VisitorPage = () => {
           endDate: dateFilter[1]?.toDate(),
         },
       });
-      console.log(data);
       if (data.status == 200) setVisitors(data.visitor);
       setLoad("");
     };
@@ -481,12 +480,13 @@ const VisitorPage = () => {
         }
         data={updateVisitor.data}
         refresh={() => setTrigger(trigger + 1)}
+        regionObj={regionObj}
       />
       <Profiler
         openModal={openProfile.show}
         setOpenModal={setOpenProfile}
         data={openProfile.data}
-        setTrigger2={setTrigger}
+        refresh={setTrigger}
       />
       <VisitForm
         open={openVisitForm.show}

@@ -1,7 +1,7 @@
 import Visitor from "../../database/model/Visitor";
 import Visit from "../../database/model/Visit";
-import Item from "../../database/model/Item";
 import dbConnect from "../../database/dbConnect";
+var ObjectId = require("mongodb").ObjectId;
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -105,9 +105,44 @@ export default async function handler(req, res) {
           case "get-visitor": {
             const { id } = req.query;
 
-            return await Visitor.findOne({ _id: id })
+            return await Visitor.aggregate([
+              { $match: { _id: ObjectId(id) } },
+              {
+                $lookup: {
+                  from: "regions",
+                  localField: "region",
+                  foreignField: "_id",
+                  as: "region",
+                },
+              },
+              {
+                $unwind: "$region",
+              },
+              {
+                $lookup: {
+                  from: "provinces",
+                  localField: "province",
+                  foreignField: "_id",
+                  as: "province",
+                },
+              },
+              {
+                $unwind: "$province",
+              },
+              {
+                $lookup: {
+                  from: "citymunicipalities",
+                  localField: "citymunicipalities",
+                  foreignField: "_id",
+                  as: "citymunicipalities",
+                },
+              },
+              {
+                $unwind: "$citymunicipalities",
+              },
+            ])
               .then((e) => {
-                res.json({ status: 200, message: "Success", data: e });
+                res.json({ status: 200, message: "Success", data: e[0] });
                 resolve();
               })
               .catch((err) => {

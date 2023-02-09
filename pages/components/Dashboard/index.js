@@ -58,7 +58,8 @@ const Dashboard = () => {
     plugins: {
       title: {
         display: true,
-        text: "Visitor Analytical Display/Dashboard - 2022",
+        text:
+          "Visitor Analytical Display/Dashboard - " + new Date().getFullYear(),
       },
       legend: {
         position: "bottom",
@@ -175,7 +176,7 @@ const Dashboard = () => {
             }}
           />
           <Cards
-            name="Total Deposit Items"
+            name="Total Deposited Items"
             color="blue"
             icon={<BlockOutlined />}
             value={pieData.total}

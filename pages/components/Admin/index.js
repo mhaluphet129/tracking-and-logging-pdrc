@@ -107,7 +107,9 @@ const AdminPage = () => {
 
   return (
     <div>
-      <Button onClick={() => setShowAddAdmin(true)}>Add Admin</Button>
+      <Button onClick={() => setShowAddAdmin(true)} style={{ marginBottom: 5 }}>
+        Add Admin
+      </Button>
       <Table
         dataSource={admins}
         footer={() => (

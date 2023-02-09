@@ -1,7 +1,7 @@
 const changeTitle = (data) => {
   let flag = false;
 
-  setInterval(() => {
+  return setInterval(() => {
     flag = !flag;
     document.title = flag
       ? data.title

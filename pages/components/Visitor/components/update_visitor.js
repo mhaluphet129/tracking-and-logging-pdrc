@@ -8,14 +8,15 @@ import {
   Radio,
   InputNumber,
   DatePicker,
-  Modal,
+  Select,
   message,
   Spin,
 } from "antd";
 import moment from "moment";
 import axios from "axios";
+import { Floatlabel } from "../../../assets/utilities";
 
-const UpdateSenior = ({ open, close, data, refresh }) => {
+const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
   const [edited, setEdited] = useState(false);
   const [inputData, setInputData] = useState({
     name: "",
@@ -24,10 +25,16 @@ const UpdateSenior = ({ open, close, data, refresh }) => {
     gender: "",
     dateOfBirth: "",
     age: "",
-    address: "",
     contactNumber: "",
+    region: "",
+    province: "",
+    citymunicipalities: "",
   });
   const [load, setLoad] = useState("");
+
+  let [regions, setRegion] = useState({});
+  let [province, setProvince] = useState({});
+  let [citymunicipalities, setCitymunicipalities] = useState([]);
 
   const handleSave = async () => {
     setLoad("saving");
@@ -50,6 +57,24 @@ const UpdateSenior = ({ open, close, data, refresh }) => {
   // dynamically update input data when data is updated
   useEffect(() => {
     setInputData(data);
+  }, [data]);
+
+  useEffect(() => {
+    let filteredRegions = regionObj?.filter(
+      (e) => e._id == data?.region._id
+    )[0];
+    setRegion(filteredRegions);
+    setProvince(
+      filteredRegions?.provinces.filter((e) => e._id == data?.province._id)[0]
+    );
+
+    setCitymunicipalities(
+      filteredRegions?.provinces
+        ?.filter((e) => e._id == data?.province._id)[0]
+        ?.citymunicipalities.filter(
+          (e) => e._id == data?.citymunicipalities._id
+        )[0]
+    );
   }, [data]);
 
   return (
@@ -147,16 +172,99 @@ const UpdateSenior = ({ open, close, data, refresh }) => {
                 }}
               />
             </Form.Item>
-            <Form.Item label="Address">
-              <Input
-                value={inputData?.address || ""}
-                style={{ width: "60%" }}
-                onChange={(e) => {
-                  setInputData((_) => {
-                    return { ..._, address: e.target.value };
-                  });
-                }}
-              />
+            <Form.Item label="Address" name="address">
+              <Floatlabel label="Region" value={regions?.name != ""}>
+                <Select
+                  className="customInput"
+                  showSearch
+                  defaultValue={regions?.name}
+                  onChange={(_) => {
+                    setRegion(regionObj?.filter((e) => e._id == _)[0]);
+                    setProvince({});
+                    setCitymunicipalities();
+                  }}
+                  filterOption={(input, option) =>
+                    (option?.label ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  options={[
+                    ...regionObj.map((e) => {
+                      return {
+                        label: e.name,
+                        value: e._id,
+                      };
+                    }),
+                  ]}
+                />
+              </Floatlabel>
+              <Floatlabel label="Province" value={province?.name != null}>
+                <Select
+                  className="customInput"
+                  showSearch
+                  defaultValue={province?.name}
+                  value={province?.name}
+                  onChange={(_) => {
+                    setProvince(regions.provinces.filter((e) => e._id == _)[0]);
+                    setCitymunicipalities({});
+                  }}
+                  filterOption={(input, option) =>
+                    (option?.label ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  options={
+                    regions?._id != null
+                      ? [
+                          ...regionObj
+                            .filter((e) => e._id == regions._id)[0]
+                            ?.provinces.map((e) => {
+                              return {
+                                label: e.name,
+                                value: e._id,
+                              };
+                            }),
+                        ]
+                      : []
+                  }
+                />
+              </Floatlabel>
+              <Floatlabel
+                label="City Municipalities"
+                value={citymunicipalities?.name != null}
+              >
+                <Select
+                  className="customInput"
+                  showSearch
+                  onChange={(_) => {
+                    setCitymunicipalities(
+                      province.citymunicipalities.filter((e) => e._id == _)[0]
+                    );
+                  }}
+                  defaultValue={citymunicipalities?.name}
+                  value={citymunicipalities?.name}
+                  filterOption={(input, option) =>
+                    (option?.label ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  options={
+                    province?._id != null
+                      ? [
+                          ...regionObj
+                            .filter((e) => e._id == regions._id)[0]
+                            ?.provinces.filter((e) => e._id == province._id)[0]
+                            ?.citymunicipalities.map((e) => {
+                              return {
+                                label: e.name,
+                                value: e._id,
+                              };
+                            }),
+                        ]
+                      : []
+                  }
+                />
+              </Floatlabel>
             </Form.Item>
             <Form.Item label="Contact Number">
               <InputNumber
