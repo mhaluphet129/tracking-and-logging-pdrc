@@ -11,9 +11,11 @@ import {
   Select,
   message,
   Spin,
+  Image,
 } from "antd";
 import moment from "moment";
 import axios from "axios";
+import { PickerDropPane } from "filestack-react";
 import { Floatlabel } from "../../../assets/utilities";
 
 const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
@@ -29,6 +31,7 @@ const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
     region: "",
     province: "",
     citymunicipalities: "",
+    photo: null,
   });
   const [load, setLoad] = useState("");
 
@@ -95,6 +98,7 @@ const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
           </Button>,
         ]}
         closable={false}
+        destroyOnClose
       >
         <Spin spinning={load == "saving"}>
           <Form
@@ -109,6 +113,36 @@ const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
             }}
             colon={false}
           >
+            <Form.Item label="Profile">
+              <div style={{ width: 255 }}>
+                {inputData?.photo == null || inputData?.photo == "" ? (
+                  <PickerDropPane
+                    apikey={"AKXY0x47MRoyw21abVGzJz"}
+                    onUploadDone={(res) => {
+                      setInputData((_) => {
+                        return { ..._, photo: res?.filesUploaded[0]?.url };
+                      });
+                      setEdited(true);
+                    }}
+                  />
+                ) : null}
+              </div>
+
+              {inputData?.photo != null && inputData?.photo != "" ? (
+                <div>
+                  <Image src={inputData?.photo} />
+                  <Button
+                    style={{ padding: 0, border: "none" }}
+                    danger
+                    onClick={() => {
+                      setImage(null);
+                    }}
+                  >
+                    remove
+                  </Button>
+                </div>
+              ) : null}
+            </Form.Item>
             <Form.Item label="First Name">
               <Input
                 value={inputData?.name || ""}

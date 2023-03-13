@@ -10,17 +10,14 @@ import {
   Typography,
   Card,
   message,
-  Upload,
+  Image,
   Select,
 } from "antd";
 import axios from "axios";
 import moment from "moment";
 import { Floatlabel } from "../../../assets/utilities";
-import {
-  ArrowRightOutlined,
-  CheckCircleOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { ArrowRightOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { PickerDropPane } from "filestack-react";
 
 const AddVisitor = ({ open, close, refresh, regionObj }) => {
   let [form] = Form.useForm();
@@ -41,9 +38,16 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
     lastname: "",
   });
 
+  let [error, setError] = useState(false);
+
   const handleFinish = async (val) => {
     if (province._id == null || citymunicipalities._id == null) {
       message.warn("Please provide a complete address");
+      return;
+    }
+
+    if (error) {
+      message.error("Only 18 years old and above is eligible for visit.");
       return;
     }
 
@@ -68,7 +72,6 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
     });
 
     if (data.status == 200) {
-      localStorage.setItem(`${image}`, image);
       close();
       refresh();
       message.success(data.message);
@@ -244,12 +247,17 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
               ]}
             >
               <DatePicker
+                style={{ border: error ? "1px solid #f00" : null }}
                 value={dateBirth}
                 format="MMM DD, YYYY"
                 onChange={(e) => {
-                  if (moment().subtract(e.year(), "years").year() < 18) {
-                    message.warn("Visitor should be atleast 18 years old.");
-                  } else setDateBirth(e);
+                  if (moment().subtract(e?.year(), "years").year() < 18) {
+                    message.warning("Visitor should be atleast 18 years old.");
+                    setError(true);
+                  } else {
+                    setDateBirth(e);
+                    setError(false);
+                  }
                 }}
               />
             </Form.Item>
@@ -362,31 +370,31 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
               <Input prefix="+63" maxLength={11} />
             </Form.Item>
           )}
-
           {verifyContinue && (
-            <Form.Item label="Picture" name="pic">
-              <Upload
-                listType="picture-card"
-                onChange={(e) => {
-                  let objImage = URL.createObjectURL(
-                    e.fileList[0].originFileObj
-                  );
-                  setImage(objImage);
-                }}
-              >
+            <Form.Item label="Profile" style={{ marginTop: 20 }}>
+              <div style={{ width: 255 }}>
                 {image == null || image == "" ? (
-                  <div>
-                    <PlusOutlined />
-                    <div
-                      style={{
-                        marginTop: 8,
-                      }}
-                    >
-                      Upload
-                    </div>
-                  </div>
+                  <PickerDropPane
+                    apikey={"AKXY0x47MRoyw21abVGzJz"}
+                    onUploadDone={(res) => setImage(res?.filesUploaded[0]?.url)}
+                  />
                 ) : null}
-              </Upload>
+              </div>
+
+              {image != null && image != "" ? (
+                <div>
+                  <Image src={image} />
+                  <Button
+                    style={{ padding: 0, border: "none" }}
+                    danger
+                    onClick={() => {
+                      setImage(null);
+                    }}
+                  >
+                    remove
+                  </Button>
+                </div>
+              ) : null}
             </Form.Item>
           )}
         </Form>

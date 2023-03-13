@@ -4,7 +4,7 @@ import axios from "axios";
 import io from "socket.io-client";
 import { message } from "antd";
 import { isBrowser } from "react-device-detect";
-import { Profiler, InvisibleTimer } from "./assets/utilities";
+import { Profiler, InvisibleTimer, Settings } from "./assets/utilities";
 
 let socket;
 
@@ -69,13 +69,16 @@ function SettingsContextProvider(props) {
         titleRef,
       }}
     >
-      <InvisibleTimer visitorWithTimer={visitorWithTimer} />
       {isBrowser && (
-        <Profiler
-          openModal={openProfile}
-          setOpenModal={setOpenProfile}
-          data={profileData}
-        />
+        <>
+          <InvisibleTimer visitorWithTimer={visitorWithTimer} />
+          <Settings />
+          <Profiler
+            openModal={openProfile}
+            setOpenModal={setOpenProfile}
+            data={profileData}
+          />
+        </>
       )}
 
       {props.children}

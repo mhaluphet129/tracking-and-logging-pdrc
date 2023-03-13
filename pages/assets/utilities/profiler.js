@@ -50,7 +50,6 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
   const [items, setItems] = useState([]);
   const [show, setShow] = useState(false);
   const [openRemarksIndex, setOpenRemarksIndex] = useState(-1);
-  const [image, setImage] = useState("");
   const [openQr, setOpenQr] = useState(false);
 
   const { visitHour, titleRef } = useContext(SettingsContext);
@@ -185,7 +184,6 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
   }, [data?._id, trigger]);
 
   useEffect(() => {
-    setImage(localStorage.getItem(data?.photo));
     (async () => {
       if (data != null || data != "") {
         setLoader("fetch-visit");
@@ -278,8 +276,8 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
                   borderRadius: "5%",
                 }}
               >
-                {image != null ? (
-                  <Image src={image} />
+                {data?.photo != null ? (
+                  <Image src={data?.photo} />
                 ) : (
                   <Typography.Title type="secondary" level={3} italic>
                     No Image

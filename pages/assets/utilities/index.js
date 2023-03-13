@@ -7,6 +7,7 @@ import Floatlabel from "./floatlabel";
 import changeTitle from "./title";
 import QRViewer from "./qr_view";
 import InvisibleTimer from "./invisible_timer";
+import Settings from "./settings";
 const Utilities = () => {
   return <></>;
 };
@@ -20,5 +21,6 @@ export {
   changeTitle,
   QRViewer,
   InvisibleTimer,
+  Settings,
 };
 export default Utilities;
