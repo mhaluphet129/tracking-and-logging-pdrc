@@ -192,6 +192,34 @@ export default async function handler(req, res) {
                   .json({ success: false, message: "Error: " + err });
               });
           }
+          case "check-validity": {
+            const { userId, qrId } = req.query;
+
+            return await Visitor.findOne({ _id: userId }).then((doc) => {
+              if (!doc) res.json({ status: 201, message: "Invalid QR Code" });
+              if (doc?.qr[doc?.qr.length - 1] == qrId)
+                res.json({ status: 200 });
+              else
+                res.json({
+                  status: 201,
+                  message:
+                    "QR code is already expired. Please generate a new one in the system.",
+                });
+            });
+          }
+
+          case "check-inactive-visitor": {
+            let visitors = await Visitor.find();
+            let mappedVisitors = visitors
+              ?.filter((e) => moment(e?.lastVisit).isSameOrAfter(moment()))
+              .map((e) => e._id);
+            await Visitor.updateMany(
+              { _id: { $in: mappedVisitors } },
+              { $set: { status: "INACTIVE" } }
+            )
+              .then(() => true)
+              .catch(() => false);
+          }
         }
       });
     case "POST": {
@@ -229,6 +257,27 @@ export default async function handler(req, res) {
               .then(() => {
                 res.json({ status: 200, message: "Successfully updated" });
                 resolve();
+              })
+              .catch((err) => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
+
+          case "new-qr-key": {
+            const { data, id } = req.body.payload;
+
+            return await Visitor.findOneAndUpdate(
+              { _id: id },
+              { $push: { qr: data } }
+            )
+              .then(() => {
+                res.json({
+                  status: 200,
+                  data: data.id,
+                  message: "Successfully generated new QR",
+                });
               })
               .catch((err) => {
                 res

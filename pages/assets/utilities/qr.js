@@ -5,6 +5,7 @@ import io from "socket.io-client";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { SettingsContext } from "../../context";
+import axios from "axios";
 
 let socket;
 
@@ -29,8 +30,20 @@ const QRCamera = () => {
     setLoad("");
   };
 
-  const handleSuccessScan = (data) => {
-    socket.emit("open-visitor", data);
+  const handleSuccessScan = async (_) => {
+    const [id, _id] = _.split("/");
+
+    let { data } = await axios.get("/api/visitor", {
+      params: {
+        mode: "check-validity",
+        userId: _id,
+        qrId: id,
+      },
+    });
+
+    if (data.status == 200) {
+      socket.emit("open-visitor", _id);
+    } else message.error(data.message);
   };
 
   useEffect(() => {

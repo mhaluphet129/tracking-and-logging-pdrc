@@ -31,7 +31,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <SettingsContextProvider>
       <Head>
-        {/* <link rel='shortcut icon' href='/logo-icon.svg' /> */}
+        <link rel="shortcut icon" href="/pdrc-logo2.png" />
         <title>PDRC - Visitor Tracking and Logging System</title>
         <meta
           name="description"

@@ -2,6 +2,7 @@ import Visit from "../../database/model/Visit";
 import dbConnect from "../../database/dbConnect";
 import moment from "moment";
 import Item from "../../database/model/Item";
+import Visitor from "../../database/model/Visitor";
 var ObjectId = require("mongodb").ObjectId;
 
 export default async function handler(req, res) {
@@ -197,6 +198,7 @@ export default async function handler(req, res) {
         switch (mode) {
           case "new-visit": {
             let { items } = req.body.payload.data;
+            console.log(req.body.payload.data);
             let newVisit = Visit(req.body.payload.data);
             items = items.map((e) => {
               return { ...e, visitId: newVisit._id, depositDate: moment() };
@@ -205,6 +207,10 @@ export default async function handler(req, res) {
               .save()
               .then(async () => {
                 await Item.insertMany(items);
+                await Visitor.findOneAndUpdate(
+                  { _id: newVisit.visitorId },
+                  { $set: { lastVisit: moment() } }
+                );
                 res.json({ status: 200, message: "Successfully Added" });
                 resolve();
               })

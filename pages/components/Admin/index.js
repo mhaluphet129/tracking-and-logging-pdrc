@@ -13,6 +13,7 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import axios from "axios";
 
 import { AddAdmin, UpdateAdmin } from "./components";
+import { autoCap } from "../../assets/utilities";
 
 const AdminPage = () => {
   const [showAddAdmin, setShowAddAdmin] = useState(false);
@@ -27,7 +28,7 @@ const AdminPage = () => {
       render: (_, row) => (
         <Typography>
           {row?.name && row?.lastname ? (
-            row.name + " " + row.lastname
+            autoCap(row.name) + " " + autoCap(row.lastname)
           ) : (
             <Typography.Text disabled italic>
               Not set

@@ -130,7 +130,7 @@ const Inventory = () => {
                   width: 400,
                 }}
                 loading={loader == "searching"}
-                placeholder="Search Name, Items or Description"
+                placeholder="Search By Tag Number, Name or Description"
                 onChange={(_) => {
                   runTimer(_);
                   if (_?.length <= 0) {
@@ -171,7 +171,9 @@ const Inventory = () => {
               columns={[
                 {
                   title: "Tag No.",
-                  render: (_, row) => "#" + IDGen(row?._id, 6),
+                  render: (_, row) => (
+                    <Typography.Link>{IDGen(row?._id, 6)}</Typography.Link>
+                  ),
                 },
                 {
                   title: "Name",

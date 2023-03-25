@@ -11,6 +11,7 @@ import {
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import moment from "moment";
+import { autoCap } from "../../assets/utilities";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -29,11 +30,11 @@ const Violation = () => {
       sortDirections: ["descend"],
       render: (_, row) => (
         <Typography>
-          {row?.visitorId.name}
+          {autoCap(row?.visitorId.name)}
           {row?.visitorId.middlename
-            ? " " + row?.visitorId.middlename
+            ? " " + autoCap(row?.visitorId.middlename)
             : ""}{" "}
-          {row.visitorId.lastname}
+          {autoCap(row.visitorId.lastname)}
         </Typography>
       ),
     },

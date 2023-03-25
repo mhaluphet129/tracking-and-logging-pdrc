@@ -8,7 +8,7 @@ import {
   Card,
   message,
 } from "antd";
-import { Timer } from "../../assets/utilities";
+import { autoCap, Timer } from "../../assets/utilities";
 import axios from "axios";
 import moment from "moment";
 
@@ -27,11 +27,11 @@ const CheckIn = () => {
       title: "Visitor Name",
       render: (_, row) => (
         <Typography>
-          {row?.visitorId.name}
+          {autoCap(row?.visitorId.name)}
           {row?.visitorId.middlename
-            ? " " + row?.visitorId.middlename
+            ? " " + autoCap(row?.visitorId.middlename)
             : ""}{" "}
-          {row.visitorId.lastname}
+          {autoCap(row.visitorId.lastname)}
         </Typography>
       ),
     },

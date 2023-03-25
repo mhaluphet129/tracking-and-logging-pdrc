@@ -24,8 +24,9 @@ import {
 } from "@ant-design/icons";
 
 import { AddVisitor, UpdateVisitor, VisitForm } from "./components";
-import { IDGen, Profiler } from "../../assets/utilities";
+import { IDGen, Profiler, autoCap } from "../../assets/utilities";
 import axios from "axios";
+import moment from "moment";
 
 const VisitorPage = () => {
   const [showAddVisitor, setShowAddVisitor] = useState(false);
@@ -50,14 +51,14 @@ const VisitorPage = () => {
   const [api, contextHolder] = notification.useNotification();
 
   const column = [
-    {
-      title: "ID",
-      align: "center",
-      width: 70,
-      render: (_, row) => (
-        <Typography.Link>{IDGen(row?._id, 6)}</Typography.Link>
-      ),
-    },
+    // {
+    //   title: "ID",
+    //   align: "center",
+    //   width: 70,
+    //   render: (_, row) => (
+    //     <Typography.Link>{IDGen(row?._id, 6)}</Typography.Link>
+    //   ),
+    // },
     {
       title: "Name",
       width: 150,
@@ -65,8 +66,9 @@ const VisitorPage = () => {
       sortDirections: ["ascend", "descend"],
       render: (_, row) => (
         <Typography>
-          {row.name}
-          {row?.middlename ? " " + row?.middlename : ""} {row.lastname}
+          {autoCap(row?.name)}{" "}
+          {row?.middlename != null ? autoCap(row?.middlename) : ""}{" "}
+          {autoCap(row?.lastname)}
         </Typography>
       ),
     },
@@ -90,18 +92,28 @@ const VisitorPage = () => {
     },
     {
       title: "Gender",
-      width: 150,
+      width: 100,
       align: "center",
       render: (_, row) => <Typography>{row?.gender}</Typography>,
     },
     {
-      title: "Actions",
+      title: "Date Registered",
+      width: 150,
+      align: "center",
+      render: (_, row) => (
+        <Typography>
+          {moment(row?.createdAt).format("MMM DD, YYYY hh:mm:ss a")}
+        </Typography>
+      ),
+    },
+    {
+      title: "Quick Actions",
       align: "center",
       width: 50,
       render: (_, row) => (
         <>
-          <Row style={{ display: "flex", justifyContent: "space-around" }}>
-            <Col>
+          <Row style={{ display: "flex", justifyContent: "center" }}>
+            <Col style={{ marginRight: 5 }}>
               <Tooltip title="Check In">
                 <Typography.Link
                   onClick={(e) => {
@@ -113,7 +125,7 @@ const VisitorPage = () => {
                 </Typography.Link>
               </Tooltip>
             </Col>
-            <Col>
+            <Col style={{ marginLeft: 5 }}>
               <Tooltip title="Edit">
                 <Typography.Link
                   onClick={(e) => {
@@ -126,8 +138,8 @@ const VisitorPage = () => {
               </Tooltip>
             </Col>
           </Row>
-          <Row style={{ display: "flex", justifyContent: "space-around" }}>
-            <Col>
+          <Row style={{ display: "flex", justifyContent: "center" }}>
+            <Col style={{ marginRight: 5 }}>
               <Tooltip title="View">
                 <Typography.Link
                   onClick={(e) => {
@@ -139,7 +151,7 @@ const VisitorPage = () => {
                 </Typography.Link>
               </Tooltip>
             </Col>
-            <Col>
+            <Col style={{ marginLeft: 5 }}>
               <Tooltip title="Delete">
                 <Popconfirm
                   title="Are you sure ?"

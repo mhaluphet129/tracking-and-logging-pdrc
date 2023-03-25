@@ -8,6 +8,7 @@ import changeTitle from "./title";
 import QRViewer from "./qr_view";
 import InvisibleTimer from "./invisible_timer";
 import Settings from "./settings";
+import autoCap from "./autocapital";
 const Utilities = () => {
   return <></>;
 };
@@ -22,5 +23,6 @@ export {
   QRViewer,
   InvisibleTimer,
   Settings,
+  autoCap,
 };
 export default Utilities;

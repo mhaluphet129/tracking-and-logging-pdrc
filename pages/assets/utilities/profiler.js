@@ -13,8 +13,10 @@ import {
   Checkbox,
   Tooltip,
   Badge,
-  message,
   Image,
+  Collapse,
+  message,
+  theme,
 } from "antd";
 import {
   LoginOutlined,
@@ -22,6 +24,7 @@ import {
   QuestionCircleOutlined,
   CheckOutlined,
   DeleteOutlined,
+  CaretRightOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import axios from "axios";
@@ -31,6 +34,7 @@ import { VisitForm } from "../../components/Visitor/components";
 import CheckLister from "./item_checklist_verifier";
 import ItemChecklist from "./items-checklist";
 import QRViewer from "./qr_view";
+import autoCap from "./autocapital";
 
 const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
   const [loader, setLoader] = useState("");
@@ -52,7 +56,11 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
   const [openRemarksIndex, setOpenRemarksIndex] = useState(-1);
   const [openQr, setOpenQr] = useState(false);
 
+  const [showFullInfo, setShowFullInfo] = useState(false);
+
   const { visitHour, titleRef } = useContext(SettingsContext);
+
+  const { token } = theme.useToken();
 
   const handleFinishRemarks = async (val) => {
     console.log(openRemarksIndex);
@@ -148,7 +156,7 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
             setOpenRemarksIndex(i);
           }}
         >
-          REMARKS
+          ADD REMARKS
         </Button>
       ),
     },
@@ -240,7 +248,12 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
         setItems={setItems}
         setUnclaimTotal={setUnclaimTotal}
       />
-      <QRViewer open={openQr} close={() => setOpenQr(false)} id={data?._id} />
+      <QRViewer
+        open={openQr}
+        close={() => setOpenQr(false)}
+        id={data?._id}
+        data={data}
+      />
       {/* <Modal
         open={openQr}
         footer={null}
@@ -263,11 +276,10 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
         maskClosable={false}
       >
         <Row>
-          <Col span={8}>
+          <Col span={6}>
             <Space direction="vertical">
               <div
                 style={{
-                  height: 180,
                   width: 200,
                   display: "flex",
                   justifyContent: "center",
@@ -277,42 +289,113 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
                 }}
               >
                 {data?.photo != null ? (
-                  <Image src={data?.photo} />
+                  <>
+                    {refViolation && (
+                      <Badge.Ribbon text="Has Violation" color="red">
+                        <Image src={data?.photo} />
+                      </Badge.Ribbon>
+                    )}
+                    {!refViolation && <Image src={data?.photo} />}
+                  </>
                 ) : (
                   <Typography.Title type="secondary" level={3} italic>
                     No Image
                   </Typography.Title>
                 )}
               </div>
+              {!showFullInfo && (
+                <strong
+                  style={{
+                    textAlign: "center",
+                    display: "block",
+                    width: 200,
+                  }}
+                >
+                  {autoCap(data?.name)}{" "}
+                  {data?.middlename != null ? autoCap(data?.middlename) : ""}{" "}
+                  {autoCap(data?.lastname)}
+                </strong>
+              )}
               <Button onClick={() => setOpenQr(true)} style={{ width: 200 }}>
-                View QR
+                Generate QR
               </Button>
-              <strong>Fullname</strong>
-              <span style={{ marginLeft: 10 }}>
-                {data?.name} {data?.middlename ?? ""} {data?.lastname}
-              </span>
-              <strong>Age and Gender</strong>
-              <span style={{ marginLeft: 10 }}>
-                {data?.age} , {data?.gender}
-              </span>
-              <strong>Date of Birth</strong>
-              <span style={{ marginLeft: 10 }}>
-                {moment(data?.dateOfBirth).format("MMMM DD, YYYY")}
-              </span>
-              <strong>Address</strong>
-              <span style={{ marginLeft: 10 }}>
-                {data?.citymunicipalities?.name}, {data?.province?.name} <br />
-                <span style={{ marginLeft: 10 }}>{data?.region?.name}</span>
-              </span>
-              <strong>Contact Number</strong>
-              <span style={{ marginLeft: 10 }}>{data?.contactNumber}</span>
-              <strong>Registered Date</strong>
-              <span style={{ marginLeft: 10 }}>
-                {moment(data?.createdAt).format("MMMM DD, YYYY")}
-              </span>
+
+              <Collapse
+                bordered={false}
+                expandIcon={({ isActive }) => (
+                  <CaretRightOutlined rotate={isActive ? 90 : 0} />
+                )}
+                style={{
+                  background: token.colorBgContainer,
+                }}
+                onChange={() => setShowFullInfo(!showFullInfo)}
+              >
+                <Collapse.Panel
+                  header={
+                    showFullInfo ? "Collapse Full Info " : "Show Full Info"
+                  }
+                  style={{
+                    marginBottom: 24,
+                    background: token.colorFillAlter,
+                    borderRadius: token.borderRadiusLG,
+                    border: "none",
+                  }}
+                >
+                  <strong style={{ textDecoration: "underline" }}>
+                    Fullname
+                  </strong>{" "}
+                  <br />
+                  <span style={{ marginLeft: 10 }}>
+                    {autoCap(data?.name)}{" "}
+                    {data?.middlename != null ? autoCap(data?.middlename) : ""}{" "}
+                    {autoCap(data?.lastname)}
+                  </span>
+                  <br />
+                  <strong style={{ textDecoration: "underline" }}>
+                    Gender
+                  </strong>
+                  <br />
+                  <span style={{ marginLeft: 10 }}>{data?.gender}</span> <br />
+                  <strong style={{ textDecoration: "underline" }}>
+                    Date of Birth
+                  </strong>{" "}
+                  <br />
+                  <span style={{ marginLeft: 10 }}>
+                    {moment(data?.dateOfBirth).format("MMMM DD, YYYY")}
+                  </span>
+                  <br />
+                  <strong style={{ textDecoration: "underline" }}>Age</strong>
+                  <br />
+                  <span style={{ marginLeft: 10 }}>{data?.age} years old</span>
+                  <br />
+                  <strong style={{ textDecoration: "underline" }}>
+                    Address
+                  </strong>
+                  <br />
+                  <span style={{ marginLeft: 10 }}>
+                    {data?.citymunicipalities?.name}, {data?.province?.name}{" "}
+                    <br />
+                    <span style={{ marginLeft: 10 }}>{data?.region?.name}</span>
+                  </span>
+                  <br />
+                  <strong style={{ textDecoration: "underline" }}>
+                    Contact Number
+                  </strong>
+                  <br />
+                  <span style={{ marginLeft: 10 }}>{data?.contactNumber}</span>
+                  <br />
+                  <strong style={{ textDecoration: "underline" }}>
+                    Registered Date
+                  </strong>
+                  <br />
+                  <span style={{ marginLeft: 10 }}>
+                    {moment(data?.createdAt).format("MMMM DD, YYYY")}
+                  </span>
+                </Collapse.Panel>
+              </Collapse>
             </Space>
           </Col>
-          <Col span={16}>
+          <Col span={18}>
             <Space direction="vertical">
               <Space direction="horizontal">
                 {isTimeOut ? (
@@ -405,81 +488,85 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
                   </Button>
                 </Tooltip> */}
               </Space>
-              <strong>Recent Visit</strong>
-              <Table
-                columns={columns}
-                dataSource={visitData}
-                rowKey={(row) => row._id}
-                style={{ width: 700 }}
-                loading={loader == "fetch-visit"}
-                footer={() => (
-                  <Typography.Text>
-                    Total: {visitData?.length ?? 0}
-                  </Typography.Text>
-                )}
-                expandable={{
-                  expandedRowRender: (row) => (
-                    <p>
-                      Visit Prisoner: {row?.prisonerName} <br />
-                      Relationship to Prisoner: {row?.relationship} <br />
-                      Deposited Items{" "}
-                      <Tooltip title='"✓" means the item is claimed by owner'>
-                        <QuestionCircleOutlined />
-                      </Tooltip>
-                      :{" "}
-                      {row?.depositItems.length > 0 ? (
-                        row?.depositItems.map((e, i) => (
-                          <Tooltip
-                            key={e?.name + i}
-                            title={
-                              e?.claimed
-                                ? "CLAIMED"
-                                : e?.status &&
-                                  e?.status[e?.status?.length - 1] == "DISPOSED"
-                                ? "DISPOSED"
-                                : "UNCLAIMED"
-                            }
-                          >
-                            <Tag
-                              color={
-                                e?.claimed
-                                  ? "success"
-                                  : e?.status &&
-                                    e?.status[e?.status?.length - 1] ==
-                                      "DISPOSED"
-                                  ? "error"
-                                  : null
-                              }
-                            >
-                              {e?.claimed ? (
-                                <CheckOutlined />
-                              ) : e?.status &&
-                                e?.status[e?.status?.length - 1] ==
-                                  "DISPOSED" ? (
-                                <DeleteOutlined />
-                              ) : (
-                                ""
-                              )}{" "}
-                              {e?.name}
-                            </Tag>
+              <Collapse size="large">
+                <Collapse.Panel header="Click to see Recent Visit/Logs" key="1">
+                  <Table
+                    columns={columns}
+                    dataSource={visitData}
+                    rowKey={(row) => row._id}
+                    style={{ width: 700 }}
+                    loading={loader == "fetch-visit"}
+                    footer={() => (
+                      <Typography.Text>
+                        Total: {visitData?.length ?? 0}
+                      </Typography.Text>
+                    )}
+                    expandable={{
+                      expandedRowRender: (row) => (
+                        <p>
+                          Visit Prisoner: {row?.prisonerName} <br />
+                          Relationship to Prisoner: {row?.relationship} <br />
+                          Deposited Items{" "}
+                          <Tooltip title='"✓" means the item is claimed by owner'>
+                            <QuestionCircleOutlined />
                           </Tooltip>
-                        ))
-                      ) : (
-                        <Typography.Text type="secondary" italic>
-                          NONE
-                        </Typography.Text>
-                      )}
-                    </p>
-                  ),
-                }}
-                pagination={false}
-                scroll={{ y: 500 }}
-                rowClassName={(row) =>
-                  row?.remarks.filter((e) => e.hasViolation)?.length > 0
-                    ? "red"
-                    : "green"
-                }
-              />
+                          :{" "}
+                          {row?.depositItems.length > 0 ? (
+                            row?.depositItems.map((e, i) => (
+                              <Tooltip
+                                key={e?.name + i}
+                                title={
+                                  e?.claimed
+                                    ? "CLAIMED"
+                                    : e?.status &&
+                                      e?.status[e?.status?.length - 1] ==
+                                        "DISPOSED"
+                                    ? "DISPOSED"
+                                    : "UNCLAIMED"
+                                }
+                              >
+                                <Tag
+                                  color={
+                                    e?.claimed
+                                      ? "success"
+                                      : e?.status &&
+                                        e?.status[e?.status?.length - 1] ==
+                                          "DISPOSED"
+                                      ? "error"
+                                      : null
+                                  }
+                                >
+                                  {e?.claimed ? (
+                                    <CheckOutlined />
+                                  ) : e?.status &&
+                                    e?.status[e?.status?.length - 1] ==
+                                      "DISPOSED" ? (
+                                    <DeleteOutlined />
+                                  ) : (
+                                    ""
+                                  )}{" "}
+                                  {e?.name}
+                                </Tag>
+                              </Tooltip>
+                            ))
+                          ) : (
+                            <Typography.Text type="secondary" italic>
+                              NONE
+                            </Typography.Text>
+                          )}
+                        </p>
+                      ),
+                    }}
+                    pagination={false}
+                    scroll={{ y: 400 }}
+                    rowClassName={(row) =>
+                      row?.remarks.filter((e) => e.hasViolation)?.length > 0
+                        ? "red"
+                        : "green"
+                    }
+                  />
+                </Collapse.Panel>
+              </Collapse>
             </Space>
           </Col>
         </Row>
@@ -492,6 +579,7 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
             style={{
               display: "flex",
               justifyContent: "space-between",
+              marginTop: 20,
             }}
           >
             <Typography>

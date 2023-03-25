@@ -47,6 +47,16 @@ let VisitorSchema = new mongoose.Schema(
     photo: {
       type: String,
     },
+    qr: {
+      type: Array,
+    },
+    lastVisit: {
+      type: Date,
+    },
+    status: {
+      type: String,
+      default: "ACTIVE",
+    },
   },
   { timestamps: true }
 );

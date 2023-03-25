@@ -16,6 +16,7 @@ import {
 import axios from "axios";
 import moment from "moment";
 import dayjs from "dayjs";
+import { autoCap } from "../../assets/utilities";
 
 const VisitorLog = () => {
   const [recentVisit, setRecentVisit] = useState([]);
@@ -30,11 +31,11 @@ const VisitorLog = () => {
       width: 300,
       render: (_, row) => (
         <Typography>
-          {row?.user?.name}
+          {autoCap(row?.user?.name)}
           {row?.user?.middlename
             ? ` ${row?.user.middlename[0].toUpperCase()}.`
             : ""}{" "}
-          {row?.user?.lastname}
+          {autoCap(row?.user?.lastname)}
         </Typography>
       ),
     },
@@ -246,15 +247,15 @@ const VisitorLog = () => {
           <Space>
             Visitor name:{" "}
             <strong>
-              {viewLog.data?.user.name}
+              {autoCap(viewLog.data?.user.name)}
               {viewLog.data?.user.middlename
-                ? " " + viewLog.data?.user.middlename
+                ? " " + autoCap(viewLog.data?.user.middlename)
                 : ""}{" "}
-              {viewLog.data?.user.lastname}
+              {autoCap(viewLog.data?.user.lastname)}
             </strong>
           </Space>
           <Space>
-            Visitee name: <strong>{viewLog.data?.prisonerName}</strong>
+            Visitee name: <strong>{autoCap(viewLog.data?.prisonerName)}</strong>
           </Space>
           <Space>
             Date visited:{" "}

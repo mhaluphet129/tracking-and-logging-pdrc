@@ -12,45 +12,134 @@ export default async function handler(req, res) {
     case "GET":
       return new Promise(async (resolve, reject) => {
         try {
-          const startOfMonth = moment()
-            .startOf("month")
-            .format("YYYY-MM-DD hh:mm");
-          const endOfMonth = moment().endOf("month").format("YYYY-MM-DD hh:mm");
-          let graphValue = await Visit.aggregate([
-            {
-              $project: {
-                month: { $month: "$date" },
-              },
-            },
-            {
-              $group: {
-                _id: "$month",
-                count: { $sum: 1 },
-              },
-            },
-          ]);
+          const { filter } = req.query;
 
-          let totalVisitor = await Visitor.countDocuments();
-          let totalVisit = await Visit.countDocuments();
-          let totalVisitMonth = await Visit.countDocuments({
-            createdAt: { $gte: startOfMonth, $lte: endOfMonth },
-          });
-          let items = await Item.find();
+          if (filter == "Monthly") {
+            const startOfMonth = moment()
+              .startOf("month")
+              .format("YYYY-MM-DD hh:mm");
+            const endOfMonth = moment()
+              .endOf("month")
+              .format("YYYY-MM-DD hh:mm");
+            let graphValue = await Visit.aggregate([
+              {
+                $project: {
+                  month: { $month: "$date" },
+                },
+              },
+              {
+                $group: {
+                  _id: "$month",
+                  count: { $sum: 1 },
+                },
+              },
+            ]);
 
-          res.json({
-            status: 200,
-            data: {
-              graphValue,
-              totalVisitor,
-              totalVisit,
-              totalVisitMonth,
-              items,
-            },
-          });
+            let totalVisitor = await Visitor.countDocuments();
+            let totalVisit = await Visit.countDocuments();
+            let totalVisitMonth = await Visit.countDocuments({
+              createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+            });
+            let items = await Item.find();
+
+            res.json({
+              status: 200,
+              data: {
+                graphValue,
+                totalVisitor,
+                totalVisit,
+                totalVisitMonth,
+                items,
+              },
+            });
+          } else if (filter == "Daily") {
+            const startOfDay = moment().startOf("day");
+
+            const endOfDay = moment().endOf("day");
+            let graphValue = await Visit.aggregate([
+              {
+                $match: {
+                  createdAt: {
+                    $gte: new Date(startOfDay),
+                    $lte: new Date(endOfDay),
+                  },
+                },
+              },
+              {
+                $project: {
+                  hour: { $hour: "$date" },
+                },
+              },
+              {
+                $group: {
+                  _id: "$hour",
+                  count: { $sum: 1 },
+                },
+              },
+            ]);
+            let totalVisitor = await Visitor.countDocuments();
+            let totalVisit = await Visit.countDocuments();
+            let totalVisitDay = await Visit.countDocuments({
+              createdAt: {
+                $gte: new Date(startOfDay),
+                $lte: new Date(endOfDay),
+              },
+            });
+            let items = await Item.find();
+
+            res.json({
+              status: 200,
+              data: {
+                graphValue,
+                totalVisitor,
+                totalVisit,
+                totalVisitMonth: totalVisitDay,
+                items,
+              },
+            });
+          } else {
+            const startOfDay = moment().startOf("year");
+            const endOfDay = moment().endOf("year");
+
+            let graphValue = await Visit.aggregate([
+              {
+                $project: {
+                  year: { $year: "$date" },
+                },
+              },
+              {
+                $group: {
+                  _id: "$year",
+                  count: { $sum: 1 },
+                },
+              },
+            ]);
+
+            let totalVisitor = await Visitor.countDocuments();
+            let totalVisit = await Visit.countDocuments();
+            let totalVisitYear = await Visit.countDocuments({
+              createdAt: {
+                $gte: new Date(startOfDay),
+                $lte: new Date(endOfDay),
+              },
+            });
+            let items = await Item.find();
+            console.log(totalVisitYear);
+            res.json({
+              status: 200,
+              data: {
+                graphValue,
+                totalVisitor,
+                totalVisit,
+                totalVisitMonth: totalVisitYear,
+                items,
+              },
+            });
+          }
+          resolve();
         } catch (err) {
           res.status(500).json({ success: false, message: "Error: " + err });
         }
-        resolve();
       });
 
     default:

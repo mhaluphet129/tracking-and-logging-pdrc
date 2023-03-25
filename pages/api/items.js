@@ -95,6 +95,16 @@ export default async function handler(req, res) {
                 $unwind: "$ownerId",
               },
               {
+                $addFields: {
+                  tempId1: { $toString: "$_id" },
+                },
+              },
+              {
+                $addFields: {
+                  tempId: { $substr: ["$tempId1", 18, 24] },
+                },
+              },
+              {
                 $match: {
                   $or: [
                     { name: { $regex: re } },
@@ -102,6 +112,7 @@ export default async function handler(req, res) {
                     { "owner.name": { $regex: re } },
                     { "owner.middlename": { $regex: re } },
                     { "owner.lastname": { $regex: re } },
+                    { tempId: { $regex: re } },
                   ],
                 },
               },
@@ -109,6 +120,7 @@ export default async function handler(req, res) {
               .collation({ locale: "en" })
               .sort({ name: 1 })
               .then((e) => {
+                console.log(e);
                 res.json({
                   status: 200,
                   searchData: e,
