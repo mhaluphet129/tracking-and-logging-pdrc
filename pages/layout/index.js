@@ -36,7 +36,6 @@ import VisitorLog from "../components/VisitorLog";
 import ItemPage from "../components/Items";
 import Violation from "../components/Violation";
 import CheckIn from "../components/CheckIn";
-import Settings from "../components/Settings";
 import Report from "../components/Reports";
 import Admin from "../components/Admin";
 import io from "socket.io-client";
@@ -84,11 +83,6 @@ const Sider = ({ selectedIndex }) => {
       label: "Reports",
       key: "reports",
       icon: <DiffOutlined style={{ fontSize: 20 }} />,
-    },
-    {
-      label: "Settings",
-      key: "settings",
-      icon: <SettingOutlined style={{ fontSize: 20 }} />,
     },
   ]);
 
@@ -396,7 +390,6 @@ const Content = ({ selectedKey }) => {
       {selectedKey == "item" ? <ItemPage /> : null}
       {selectedKey == "checkin" ? <CheckIn /> : null}
       {selectedKey == "violations" ? <Violation /> : null}
-      {selectedKey == "settings" ? <Settings /> : null}
       {selectedKey == "reports" ? <Report /> : null}
       {selectedKey == "admin" ? <Admin /> : null}
     </div>

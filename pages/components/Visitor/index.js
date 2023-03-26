@@ -24,7 +24,7 @@ import {
 } from "@ant-design/icons";
 
 import { AddVisitor, UpdateVisitor, VisitForm } from "./components";
-import { IDGen, Profiler, autoCap } from "../../assets/utilities";
+import { Profiler, autoCap } from "../../assets/utilities";
 import axios from "axios";
 import moment from "moment";
 
@@ -100,6 +100,7 @@ const VisitorPage = () => {
       title: "Date Registered",
       width: 150,
       align: "center",
+      sorter: (a, b) => moment(a.createdAt).unix() - moment(b.createdAt).unix(),
       render: (_, row) => (
         <Typography>
           {moment(row?.createdAt).format("MMM DD, YYYY hh:mm:ss a")}

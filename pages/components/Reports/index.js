@@ -17,6 +17,7 @@ import {
   DatePicker,
   message,
 } from "antd";
+import { autoCap } from "../../assets/utilities";
 
 class PDF extends React.Component {
   render() {
@@ -28,12 +29,12 @@ const TableDataParser2 = (data) => {
   let _data = [];
   for (let i = 0; i < data?.length; i++)
     _data.push({
-      row1: `${data[i].user?.name}${
+      row1: `${autoCap(data[i].user?.name)}${
         data[i]?.user?.middlename
           ? ` ${data[i]?.user.middlename[0].toUpperCase()}.`
           : ""
-      } ${data[i]?.user?.lastname}`,
-      row2: data[i]?.prisonerName,
+      } ${autoCap(data[i]?.user?.lastname)}`,
+      row2: autoCap(data[i]?.prisonerName),
       row3: data[i]?.date,
       row4: data[i]?.timeIn,
       row5: data[i]?.timeOut,
@@ -110,12 +111,12 @@ const Report = () => {
       title: "Name",
       width: 150,
       render: (_, row) => (
-        <Typography>
-          {row.name}
+        <Typography style={{ paddingLeft: 10 }}>
+          {autoCap(row.name)}
           {row?.middlename
             ? " " + `${row?.middlename[0].toUpperCase()}.`
             : ""}{" "}
-          {row.lastname}
+          {autoCap(row.lastname)}
         </Typography>
       ),
     },
@@ -129,7 +130,7 @@ const Report = () => {
       title: "Address",
       width: 350,
       render: (_, row) => (
-        <Typography>
+        <Typography style={{ paddingLeft: 10 }}>
           {row.citymunicipalities.name}, {row?.province.name} <br />
           {row?.region.name}
         </Typography>
@@ -169,6 +170,7 @@ const Report = () => {
       width: 300,
       render: (_, row, index) => (
         <Typography.Text
+          style={{ paddingLeft: 10 }}
           editable={{
             triggerType: editMode ? ["icon", "text"] : [],
             icon: editMode ? false : <></>,
@@ -192,6 +194,7 @@ const Report = () => {
       ),
     },
     {
+      align: "center",
       title: (
         <Typography.Text
           editable={{
@@ -283,7 +286,9 @@ const Report = () => {
             />
           </Typography.Link>
         ) : (
-          moment(row?.row3).format("MMM DD, YYYY")
+          <Typography.Text style={{ paddingLeft: 10 }}>
+            {moment(row?.row3).format("MMM DD, YYYY")}
+          </Typography.Text>
         ),
     },
     {
@@ -331,7 +336,9 @@ const Report = () => {
             />
           </Typography.Link>
         ) : (
-          moment(row?.row4).format("hh:mm a")
+          <Typography.Text style={{ paddingLeft: 10 }}>
+            {moment(row?.row4).format("hh:mm a")}
+          </Typography.Text>
         ),
     },
     {
@@ -380,10 +387,13 @@ const Report = () => {
             />
           </Typography.Link>
         ) : (
-          moment(row?.row5).format("hh:mm a")
+          <Typography.Text>
+            {moment(row?.row5).format("hh:mm a")}
+          </Typography.Text>
         ),
     },
     {
+      align: "center",
       title: (
         <Typography.Text
           editable={{
@@ -432,9 +442,11 @@ const Report = () => {
             )}
           </Typography.Text>
         ) : moment(row?.row6).format("hh:mm a") != "Invalid date" ? (
-          moment(row?.row6).format("hh:mm a")
+          <Typography.Text>
+            {moment(row?.row6).format("hh:mm a")}
+          </Typography.Text>
         ) : (
-          row?.row6
+          <Typography.Text>{row?.row6}</Typography.Text>
         ),
     },
   ];
@@ -685,6 +697,8 @@ const Report = () => {
           columns={printColumn2}
           dataSource={reportData.tableData?.data}
           pagination={false}
+          className="myTable"
+          rowClassName="custom-table"
           bordered
         />
       </Col>
