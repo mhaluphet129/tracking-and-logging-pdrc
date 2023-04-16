@@ -7,7 +7,6 @@ import moment from "moment";
 export default async function handler(req, res) {
   await dbConnect();
   const { method } = req;
-
   switch (method) {
     case "GET":
       return new Promise(async (resolve, reject) => {
@@ -67,6 +66,22 @@ export default async function handler(req, res) {
                   data: e,
                   message: "System Settings Updated Successfully",
                 });
+                resolve();
+              })
+              .catch(() => {
+                res
+                  .status(500)
+                  .json({ success: false, message: "Error: " + err });
+              });
+          }
+
+          case "get-visit-hour": {
+            return await Admin.findOne(
+              { role: "superadmin" },
+              { _id: 0, visitLimit: 1 }
+            )
+              .then((e) => {
+                res.json({ status: 200, data: e });
                 resolve();
               })
               .catch(() => {
@@ -154,6 +169,7 @@ export default async function handler(req, res) {
           }
           case "change-password-admin": {
             const { password } = req.body.payload;
+
             return await Admin.findOneAndUpdate(
               {},
               {

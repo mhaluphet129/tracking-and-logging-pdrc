@@ -197,7 +197,7 @@ export default async function handler(req, res) {
 
             return await Visitor.findOne({ _id: userId }).then((doc) => {
               if (!doc) res.json({ status: 201, message: "Invalid QR Code" });
-              if (doc?.qr[doc?.qr.length - 1] == qrId)
+              if (doc?.qr[doc?.qr.length - 1].id == qrId)
                 res.json({ status: 200 });
               else
                 res.json({

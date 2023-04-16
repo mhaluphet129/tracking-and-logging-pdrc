@@ -48,7 +48,7 @@ const qrview = ({ open, close, id, data }) => {
         mode: "new-qr-key",
         id,
         data: {
-          id: _id + "/" + id,
+          id: _id,
           dateCreated: moment(),
           dateValid: validTill,
         },
