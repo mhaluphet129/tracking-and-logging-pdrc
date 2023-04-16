@@ -366,7 +366,10 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
                   <br />
                   <strong style={{ textDecoration: "underline" }}>Age</strong>
                   <br />
-                  <span style={{ marginLeft: 10 }}>{data?.age} years old</span>
+                  <span style={{ marginLeft: 10 }}>
+                    {moment().year() - moment(data?.dateOfBirth).year()} years
+                    old
+                  </span>
                   <br />
                   <strong style={{ textDecoration: "underline" }}>
                     Address

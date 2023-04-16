@@ -126,13 +126,13 @@ const Violation = () => {
               <Cards
                 color="rgba(255,0,0,0.5)"
                 icon={<WarningOutlined />}
-                name="Total Violators"
+                name="Violators"
                 value={total}
               />
               <Cards
                 color="rgba(0,0,255,0.5)"
                 icon={<UserOutlined />}
-                name="Total Non-Violators"
+                name="Non-Violators"
                 value={totalVisitor - total}
               />
             </Space>

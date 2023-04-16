@@ -23,6 +23,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [mode, selectedMode] = useState("signup");
+  const [mouseOn, setMouseOn] = useState(false);
 
   const [form] = Form.useForm();
 
@@ -63,7 +64,12 @@ const Login = () => {
     <>
       <div className="main-body-login">
         <BrowserView>
-          <Row style={{ display: "flex", justifyContent: "center" }}>
+          <Row
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
             <Col
               span={12}
               style={{
@@ -74,7 +80,11 @@ const Login = () => {
                 alignItems: "center",
                 flexDirection: "column",
                 padding: 10,
+                borderRadius: "10px 0 0 10px",
+                opacity: mouseOn == "info" ? 1 : 0.8,
               }}
+              onMouseOver={() => setMouseOn("info")}
+              onMouseLeave={() => setMouseOn(null)}
             >
               <Image
                 preview={false}
@@ -111,7 +121,11 @@ const Login = () => {
                   alignItems: "center",
                   flexDirection: "column",
                   padding: 10,
+                  borderRadius: "0 10px 10px 0",
+                  opacity: mouseOn == "login" ? 1 : 0.8,
                 }}
+                onMouseOver={() => setMouseOn("login")}
+                onMouseLeave={() => setMouseOn(null)}
               >
                 <Typography.Title
                   level={4}
@@ -234,7 +248,10 @@ const Login = () => {
                   alignItems: "center",
                   flexDirection: "column",
                   padding: 10,
+                  opacity: mouseOn == "login" ? 1 : 0.8,
                 }}
+                onMouseOver={() => setMouseOn("login")}
+                onMouseLeave={() => setMouseOn(null)}
               >
                 <Typography.Title
                   level={4}
