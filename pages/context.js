@@ -1,10 +1,10 @@
 import React, { createContext, useEffect, useState, useRef } from "react";
-import moment from "moment";
 import axios from "axios";
 import io from "socket.io-client";
+import Cookies from "js-cookie";
 import { message } from "antd";
 import { isBrowser } from "react-device-detect";
-import { Profiler, InvisibleTimer, Settings } from "./assets/utilities";
+import { Profiler, Settings } from "./assets/utilities";
 
 let socket;
 
@@ -14,31 +14,8 @@ function SettingsContextProvider(props) {
   const [visitHour, setVisitHour] = useState();
   const [openProfile, setOpenProfile] = useState(false);
   const [profileData, setProfileData] = useState(null);
-  const [visitorWithTimer, setVisitorWithTimer] = useState();
 
   let titleRef = useRef();
-
-  useEffect(() => {
-    (async () => {
-      let { data } = await axios.get("/api/etc", {
-        params: {
-          mode: "get-visit-hour",
-        },
-      });
-      if (data.status == 200)
-        setVisitHour(
-          moment(moment(data.data?.visitLimit).format("HH:mm"), "HH:mm")
-        );
-      else message.error("Error in context.");
-    })();
-
-    (async () => {
-      let res = await axios.get("/api/visit", {
-        params: { mode: "visit-with-timers" },
-      });
-      if (res.data.status == 200) setVisitorWithTimer(res.data.data);
-    })();
-  }, []);
 
   //sockets
   useEffect(() => {
@@ -71,8 +48,7 @@ function SettingsContextProvider(props) {
     >
       {isBrowser && (
         <>
-          <InvisibleTimer visitorWithTimer={visitorWithTimer} />
-          <Settings />
+          {Cookies.get("loggedIn") != undefined && <Settings />}
           <Profiler
             openModal={openProfile}
             setOpenModal={setOpenProfile}

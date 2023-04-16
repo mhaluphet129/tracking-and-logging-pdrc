@@ -32,12 +32,12 @@ let VisitorSchema = new mongoose.Schema(
       required: true,
       ref: "CityMunicipality",
     },
+    barangay: {
+      type: String,
+      default: "",
+    },
     dateOfBirth: {
       type: String,
-      required: true,
-    },
-    age: {
-      type: Number,
       required: true,
     },
     contactNumber: {

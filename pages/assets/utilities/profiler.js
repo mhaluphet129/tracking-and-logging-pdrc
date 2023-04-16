@@ -372,6 +372,8 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
                     Address
                   </strong>
                   <br />
+                  <span style={{ marginLeft: 10 }}>{data?.barangay}</span>
+                  <br />
                   <span style={{ marginLeft: 10 }}>
                     {data?.citymunicipalities?.name}, {data?.province?.name}{" "}
                     <br />

@@ -31,6 +31,7 @@ const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
     region: "",
     province: "",
     citymunicipalities: "",
+    barangay: "",
     photo: null,
   });
   const [load, setLoad] = useState("");
@@ -212,6 +213,7 @@ const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
                   className="customInput"
                   showSearch
                   defaultValue={regions?.name}
+                  value={regions?.name}
                   onChange={(_) => {
                     setRegion(regionObj?.filter((e) => e._id == _)[0]);
                     setProvince({});
@@ -264,7 +266,7 @@ const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
                 />
               </Floatlabel>
               <Floatlabel
-                label="City Municipalities"
+                label="City/Municipalities"
                 value={citymunicipalities?.name != null}
               >
                 <Select
@@ -299,9 +301,27 @@ const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
                   }
                 />
               </Floatlabel>
+              <Floatlabel
+                label="Barangay"
+                value={
+                  (data?.barangay != "" && data?.barangay != null) ||
+                  (inputData?.barangay != "" && inputData?.barangay != null)
+                }
+              >
+                <Input
+                  style={{ height: 45, paddingTop: 15 }}
+                  onChange={(e) =>
+                    setInputData((_) => {
+                      return { ..._, barangay: e.target.value };
+                    })
+                  }
+                  value={data?.barangay}
+                />
+              </Floatlabel>
             </Form.Item>
             <Form.Item label="Contact Number">
               <InputNumber
+                prefix="+63"
                 maxLength={11}
                 style={{ width: "60%" }}
                 value={inputData?.contactNumber || ""}

@@ -16,7 +16,11 @@ import {
 import axios from "axios";
 import moment from "moment";
 import { Floatlabel } from "../../../assets/utilities";
-import { ArrowRightOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import {
+  ArrowRightOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
 import { PickerDropPane } from "filestack-react";
 
 const AddVisitor = ({ open, close, refresh, regionObj }) => {
@@ -38,6 +42,9 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
     lastname: "",
   });
 
+  let [barangay, setBarangay] = useState("");
+  let [age, setAge] = useState(0);
+  let [ageChange, setAgeChange] = useState(false);
   let [error, setError] = useState(false);
 
   const handleFinish = async (val) => {
@@ -55,19 +62,15 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
       ...val,
       region: regions._id,
       province: province._id,
+      barangay,
       citymunicipalities: citymunicipalities._id,
+      dateOfBirth: dateBirth,
     };
-
-    let age = moment().diff(
-      moment(val?.dateOfBirth).format("YYYY-MM-DD"),
-      "years",
-      false
-    );
 
     let { data } = await axios.post("/api/visitor", {
       payload: {
         mode: "add-visitor",
-        visitor: { ...val, age, photo: image },
+        visitor: { ...val, photo: image },
       },
     });
 
@@ -125,7 +128,11 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
   return (
     <>
       <Modal
-        title={"PDRC VISITOR INFORMATION REGISTRATION FORM"}
+        title={
+          <Typography.Title level={5}>
+            PDRC VISITOR INFORMATION REGISTRATION FORM
+          </Typography.Title>
+        }
         open={open}
         onCancel={close}
         maskClosable={false}
@@ -236,30 +243,43 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
           )}
 
           {verifyContinue && (
-            <Form.Item
-              label="Date of Birth"
-              name="dateOfBirth"
-              rules={[
-                {
-                  required: true,
-                  message: "This is required.",
-                },
-              ]}
-            >
+            <Form.Item label="Date of Birth" name="dateOfBirth">
               <DatePicker
                 style={{ border: error ? "1px solid #f00" : null }}
                 value={dateBirth}
                 format="MMM DD, YYYY"
                 onChange={(e) => {
-                  if (moment().subtract(e?.year(), "years").year() < 18) {
+                  setAgeChange(true);
+                  let _age = moment().subtract(e?.year(), "years").year();
+                  setAge(_age);
+                  setDateBirth(e);
+                  if (_age < 18) {
                     message.warning("Visitor should be atleast 18 years old.");
                     setError(true);
                   } else {
-                    setDateBirth(e);
                     setError(false);
                   }
                 }}
               />
+              {ageChange && (
+                <Input
+                  value={`${age} years old`}
+                  suffix={
+                    age >= 18 ? (
+                      <CheckCircleOutlined style={{ color: "#42ba96" }} />
+                    ) : (
+                      <ExclamationCircleOutlined style={{ color: "#ff0000" }} />
+                    )
+                  }
+                  bor
+                  style={{
+                    width: 120,
+                    marginLeft: 5,
+                    border: `1px solid ${age >= 18 ? "#42ba96" : "#ff0000"}`,
+                  }}
+                  readOnly
+                />
+              )}
             </Form.Item>
           )}
 
@@ -318,7 +338,7 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
                 />
               </Floatlabel>
               <Floatlabel
-                label="City Municipalities"
+                label="City/Municipalities"
                 value={citymunicipalities?.name != null}
               >
                 <Select
@@ -353,6 +373,12 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
                   }
                 />
               </Floatlabel>
+              <Floatlabel label="Barangay" value={barangay != ""}>
+                <Input
+                  style={{ height: 45, paddingTop: 15 }}
+                  onChange={(e) => setBarangay(e.target.value)}
+                />
+              </Floatlabel>
             </Form.Item>
           )}
 
@@ -372,7 +398,7 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
           )}
           {verifyContinue && (
             <Form.Item label="Profile" style={{ marginTop: 20 }}>
-              <div style={{ width: 255 }}>
+              <div style={{ width: 255, cursor: "pointer" }}>
                 {image == null || image == "" ? (
                   <PickerDropPane
                     apikey={"AKXY0x47MRoyw21abVGzJz"}

@@ -10,6 +10,7 @@
 
 #protected variables
 .env
+dist/
 
 # next.js
 /.next/

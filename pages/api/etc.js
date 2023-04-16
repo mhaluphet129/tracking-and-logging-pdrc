@@ -76,19 +76,6 @@ export default async function handler(req, res) {
               });
           }
 
-          case "get-visit-hour": {
-            return await Admin.findOne({}, { visitLimit: 1, _id: 0 })
-              .then((e) => {
-                res.json({ status: 200, data: e });
-                resolve();
-              })
-              .catch(() => {
-                res
-                  .status(500)
-                  .json({ success: false, message: "Error: " + err });
-              });
-          }
-
           case "get-region": {
             return await Regions.aggregate([
               {
@@ -167,7 +154,6 @@ export default async function handler(req, res) {
           }
           case "change-password-admin": {
             const { password } = req.body.payload;
-
             return await Admin.findOneAndUpdate(
               {},
               {

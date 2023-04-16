@@ -76,9 +76,30 @@ const VisitorPage = () => {
       title: "Age",
       width: 1,
       align: "center",
-      sorter: (a, b) => a.age - b.age,
+      sorter: (a, b) => {
+        let _a = moment().diff(
+          moment(a?.dateOfBirth).format("YYYY-MM-DD"),
+          "years",
+          false
+        );
+        let _b = moment().diff(
+          moment(b?.dateOfBirth).format("YYYY-MM-DD"),
+          "years",
+          false
+        );
+
+        return _a - _b;
+      },
       sortDirections: ["ascend", "descend"],
-      render: (_, row) => <Typography>{row.age}</Typography>,
+      render: (_, row) => (
+        <Typography>
+          {moment().diff(
+            moment(row?.dateOfBirth).format("YYYY-MM-DD"),
+            "years",
+            false
+          )}
+        </Typography>
+      ),
     },
     {
       title: "Address",

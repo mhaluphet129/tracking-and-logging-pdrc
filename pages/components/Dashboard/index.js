@@ -178,7 +178,14 @@ const Dashboard = () => {
             }}
           />
           <Row gutter={[16, 16]}>
-            <Space style={{ width: "100%" }}>
+            <Space
+              style={{
+                maxWidth: 1200,
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
+            >
               <Cards
                 color="cyan"
                 icon={<UserOutlined />}
@@ -208,7 +215,6 @@ const Dashboard = () => {
                 color="blue"
                 icon={<BlockOutlined />}
                 value={pieData.total}
-                hoverable
               />
               <div>
                 <div style={{ width: 200 }}>
