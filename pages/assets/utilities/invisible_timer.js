@@ -1,16 +1,26 @@
-import React, { useContext } from "react";
-import { Typography, Table, notification } from "antd";
+import React, { useContext, useEffect, useState } from "react";
+import { Typography, Table, message, notification } from "antd";
 import { WarningOutlined } from "@ant-design/icons";
 import { SettingsContext } from "../../context";
 import axios from "axios";
 import Timer from "./timer";
 import changeTitle from "./title";
 
-const InvisibleTimer = ({ visitorWithTimer }) => {
+const InvisibleTimer = () => {
   const [api, contextHolder] = notification.useNotification();
 
   const { setOpenProfile, setProfileData, titleRef } =
     useContext(SettingsContext);
+  const [visitorWithTimer, setVisitorWithTimer] = useState();
+
+  useEffect(() => {
+    (async () => {
+      let res = await axios.get("/api/visit", {
+        params: { mode: "visit-with-timers" },
+      });
+      if (res.data.status == 200) setVisitorWithTimer(res.data.data);
+    })();
+  }, []);
 
   return (
     <>
@@ -58,6 +68,7 @@ const InvisibleTimer = ({ visitorWithTimer }) => {
                       metaDescription:
                         "Dynamic title should when there is a visitor exceed their time visit.",
                     });
+                    console.log(1);
                     api["warning"]({
                       key: row?._id,
                       icon: <WarningOutlined style={{ color: "red" }} />,

@@ -24,9 +24,10 @@ import {
 } from "@ant-design/icons";
 
 import { AddVisitor, UpdateVisitor, VisitForm } from "./components";
-import { Profiler, autoCap } from "../../assets/utilities";
+import { InvisibleTimer, Profiler, autoCap } from "../../assets/utilities";
 import axios from "axios";
 import moment from "moment";
+import { PageHeader } from "@ant-design/pro-layout";
 
 const VisitorPage = () => {
   const [showAddVisitor, setShowAddVisitor] = useState(false);
@@ -106,8 +107,11 @@ const VisitorPage = () => {
       width: 200,
       render: (_, row) => (
         <Typography>
-          {row.citymunicipalities.name}, {row.province.name} <br />
-          {row.region.name}
+          {row.barangay != "" || row.barangay != null
+            ? row.barangay + ", "
+            : ""}
+          {row.cityId.name}, {row.provinceId.name} <br />
+          {row.regionId.name}
         </Typography>
       ),
     },
@@ -429,9 +433,9 @@ const VisitorPage = () => {
   }, []);
 
   return (
-    <>
-      {/* <PageHeader title="Visitors Profile"> */}
+    <PageHeader title="Visitors Profiles">
       {contextHolder}
+      <InvisibleTimer />
       <Card>
         <Space
           style={{
@@ -528,8 +532,7 @@ const VisitorPage = () => {
         data={openVisitForm.data}
         setTrigger={setTrigger}
       />
-      {/* </PageHeader> */}
-    </>
+    </PageHeader>
   );
 };
 

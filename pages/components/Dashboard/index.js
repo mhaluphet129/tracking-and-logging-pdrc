@@ -22,7 +22,7 @@ import {
 import Cards from "./components/cards";
 import jayson from "../../assets/json/index.json";
 import axios from "axios";
-import moment from "moment";
+import { InvisibleTimer } from "../../assets/utilities";
 
 ChartJS.register(
   CategoryScale,
@@ -163,123 +163,125 @@ const Dashboard = () => {
   }, [trigger]);
 
   return (
-    <Card>
-      <Row>
-        <Col span={24}>
-          <Segmented
-            defaultValue={filter}
-            value={filter}
-            options={["Daily", "Monthly", "Yearly"]}
-            style={{ marginBottom: 5, marginLeft: -10 }}
-            onChange={(e) => {
-              setFilter(e);
-              setMax(0);
-              setTrigger(trigger + 1);
-            }}
-          />
-          <Row gutter={[16, 16]}>
-            <Space
-              style={{
-                maxWidth: 1200,
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "center",
+    <>
+      <InvisibleTimer />
+      <Card>
+        <Row>
+          <Col span={24}>
+            <Segmented
+              defaultValue={filter}
+              value={filter}
+              options={["Daily", "Monthly", "Yearly"]}
+              style={{ marginBottom: 5, marginLeft: -10 }}
+              onChange={(e) => {
+                setFilter(e);
+                setMax(0);
+                setTrigger(trigger + 1);
               }}
-            >
-              <Cards
-                color="cyan"
-                icon={<UserOutlined />}
-                name="Total Visitor"
-                value={cardData.totalVisitor}
-              />
-              <Cards
-                color="orange"
-                icon={<ImportOutlined />}
-                name="Total Visits"
-                value={cardData.totalVisit}
-              />
-              <Cards
-                color="green"
-                icon={<CalendarOutlined />}
-                name={`Visit This ${
-                  filter == "Monthly"
-                    ? "Month"
-                    : filter == "Daily"
-                    ? "Today"
-                    : "Year"
-                }`}
-                value={cardData.totalVisitMonth}
-              />
-              <Cards
-                name="Total Deposited Items"
-                color="blue"
-                icon={<BlockOutlined />}
-                value={pieData.total}
-              />
-              <div>
-                <div style={{ width: 200 }}>
-                  <Pie
-                    options={{
-                      responsive: true,
-                      plugins: {
-                        legend: {
-                          position: "bottom",
-                        },
-                      },
-                    }}
-                    data={{
-                      labels: ["Total Claimed", "Total Unclaimed"],
-                      datasets: [
-                        {
-                          data: [pieData.claimed, pieData.unclaimed],
-                          backgroundColor: [
-                            "rgba(54, 162, 235, 1)",
-                            "rgba(54, 162, 235, 0.2)",
-                          ],
-                          borderColor: [
-                            "rgba(54, 162, 235, 1)",
-                            "rgba(54, 162, 235, 1)",
-                          ],
-                          borderWidth: 1,
-                        },
-                      ],
-                    }}
-                  />
-                </div>
-              </div>
-            </Space>
-
-            <Col span={20}>
-              <Line
-                options={options}
-                data={{
-                  labels:
-                    filter == "Monthly"
-                      ? jayson.months
-                      : filter == "Daily"
-                      ? Array.from({ length: 24 }, (_, i) => {
-                          if (i < 11) return i + 1 + "AM";
-                          else if (i == 11) return i + 1 + "PM";
-                          else if (i == 23) return "12AM";
-                          else return i - 11 + "PM";
-                        })
-                      : Array.from({ length: 10 }, (_, i) => 2023 + i),
-                  datasets: [
-                    {
-                      label: "Total visit",
-                      borderColor: "rgb(53, 162, 235)",
-                      backgroundColor: "rgba(53, 162, 235, 0.5)",
-                      data: dashbardNumericalData,
-                    },
-                  ],
+            />
+            <Row gutter={[16, 16]}>
+              <Space
+                style={{
+                  maxWidth: 1200,
+                  display: "flex",
+                  flexWrap: "wrap",
+                  justifyContent: "center",
                 }}
-              />
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </Card>
-    // </PageHeader>
+              >
+                <Cards
+                  color="cyan"
+                  icon={<UserOutlined />}
+                  name="Total Visitor"
+                  value={cardData.totalVisitor}
+                />
+                <Cards
+                  color="orange"
+                  icon={<ImportOutlined />}
+                  name="Total Visits"
+                  value={cardData.totalVisit}
+                />
+                <Cards
+                  color="green"
+                  icon={<CalendarOutlined />}
+                  name={`Visit This ${
+                    filter == "Monthly"
+                      ? "Month"
+                      : filter == "Daily"
+                      ? "Today"
+                      : "Year"
+                  }`}
+                  value={cardData.totalVisitMonth}
+                />
+                <Cards
+                  name="Total Deposited Items"
+                  color="blue"
+                  icon={<BlockOutlined />}
+                  value={pieData.total}
+                />
+                <div>
+                  <div style={{ width: 200 }}>
+                    <Pie
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          legend: {
+                            position: "bottom",
+                          },
+                        },
+                      }}
+                      data={{
+                        labels: ["Total Claimed", "Total Unclaimed"],
+                        datasets: [
+                          {
+                            data: [pieData.claimed, pieData.unclaimed],
+                            backgroundColor: [
+                              "rgba(54, 162, 235, 1)",
+                              "rgba(54, 162, 235, 0.2)",
+                            ],
+                            borderColor: [
+                              "rgba(54, 162, 235, 1)",
+                              "rgba(54, 162, 235, 1)",
+                            ],
+                            borderWidth: 1,
+                          },
+                        ],
+                      }}
+                    />
+                  </div>
+                </div>
+              </Space>
+
+              <Col span={20}>
+                <Line
+                  options={options}
+                  data={{
+                    labels:
+                      filter == "Monthly"
+                        ? jayson.months
+                        : filter == "Daily"
+                        ? Array.from({ length: 24 }, (_, i) => {
+                            if (i < 11) return i + 1 + "AM";
+                            else if (i == 11) return i + 1 + "PM";
+                            else if (i == 23) return "12AM";
+                            else return i - 11 + "PM";
+                          })
+                        : Array.from({ length: 10 }, (_, i) => 2023 + i),
+                    datasets: [
+                      {
+                        label: "Total visit",
+                        borderColor: "rgb(53, 162, 235)",
+                        backgroundColor: "rgba(53, 162, 235, 0.5)",
+                        data: dashbardNumericalData,
+                      },
+                    ],
+                  }}
+                />
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      </Card>
+    </>
   );
 };
 

@@ -13,7 +13,8 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import axios from "axios";
 
 import { AddAdmin, UpdateAdmin } from "./components";
-import { autoCap } from "../../assets/utilities";
+import { InvisibleTimer, autoCap } from "../../assets/utilities";
+import { PageHeader } from "@ant-design/pro-layout";
 
 const AdminPage = () => {
   const [showAddAdmin, setShowAddAdmin] = useState(false);
@@ -107,7 +108,8 @@ const AdminPage = () => {
   }, [trigger]);
 
   return (
-    <div>
+    <PageHeader title="Admin Page">
+      <InvisibleTimer />
       <Button onClick={() => setShowAddAdmin(true)} style={{ marginBottom: 5 }}>
         Add Admin
       </Button>
@@ -137,7 +139,7 @@ const AdminPage = () => {
         data={updateAdmin.data}
         refresh={() => setTrigger(trigger + 1)}
       />
-    </div>
+    </PageHeader>
   );
 };
 

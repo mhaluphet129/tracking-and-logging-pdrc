@@ -15,10 +15,11 @@ import {
   Tooltip,
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { IDGen } from "../../assets/utilities";
+import { IDGen, InvisibleTimer } from "../../assets/utilities";
 import EditItems from "./components/EditItems";
 import axios from "axios";
 import moment from "moment";
+import { PageHeader } from "@ant-design/pro-layout";
 
 const Inventory = () => {
   const [items, setItems] = useState([]);
@@ -113,8 +114,8 @@ const Inventory = () => {
   }, [trigger]);
 
   return (
-    <>
-      {/* <PageHeader title="Inventory Page"> */}
+    <PageHeader title="Inventory Page">
+      <InvisibleTimer />
       <EditItems
         open={openEditModal.show}
         close={() => setOpenEditModal({ show: false, data: null })}
@@ -267,8 +268,7 @@ const Inventory = () => {
           </Card>
         </Col>
       </Row>
-      {/* </PageHeader> */}
-    </>
+    </PageHeader>
   );
 };
 

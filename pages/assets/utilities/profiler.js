@@ -57,8 +57,9 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
   const [openQr, setOpenQr] = useState(false);
 
   const [showFullInfo, setShowFullInfo] = useState(false);
+  const [visitHour, setVisitHour] = useState(null);
 
-  const { visitHour, titleRef } = useContext(SettingsContext);
+  const { titleRef } = useContext(SettingsContext);
 
   const { token } = theme.useToken();
 
@@ -160,6 +161,7 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
         </Button>
       ),
     },
+    Table.EXPAND_COLUMN,
   ];
 
   const column2 = [
@@ -224,6 +226,20 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
       }
     })();
   }, [data, trigger]);
+
+  useEffect(() => {
+    (async () => {
+      let d = await axios.get("/api/etc", {
+        params: {
+          mode: "get-visit-hour",
+        },
+      });
+
+      if (d.data.status == 200) {
+        setVisitHour(d.data.data.visitLimit);
+      } else message.error(d.data.data.message);
+    })();
+  }, []);
 
   return (
     <>

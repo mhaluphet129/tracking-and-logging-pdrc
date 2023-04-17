@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  // PageHeader,
-  Table,
-  Typography,
-  Space,
-  Button,
-  Card,
-  message,
-} from "antd";
+import { Table, Typography, Space, Button, Card, message } from "antd";
+import { PageHeader } from "@ant-design/pro-layout";
 import { autoCap, Timer } from "../../assets/utilities";
 import axios from "axios";
 import moment from "moment";
@@ -23,6 +16,7 @@ const CheckIn = () => {
   });
 
   const column2 = [
+    Table.SELECTION_COLUMN,
     {
       title: "Visitor Name",
       render: (_, row) => (
@@ -96,78 +90,83 @@ const CheckIn = () => {
   }, [trigger]);
 
   return (
-    // <PageHeader title="Visit Time">
-    <Card>
-      <Space style={{ marginBottom: 5 }}>
-        <Button
-          type="primary"
-          onClick={() => {
-            if (selectedRowKeys.length == 0)
-              setSelectedRowKeys(visitorWithTimer.map((e) => e?._id));
-            else setSelectedRowKeys([]);
-          }}
-        >
-          {selectedRowKeys?.length > 0 ? "Unselect All" : "Select All"}
-        </Button>
-        <Button
-          disabled={selectedRowKeys?.length == 0}
-          onClick={async () => {
-            setLoad("fetch");
-            let { data } = await axios.get("/api/visit", {
-              params: {
-                mode: "visit-out-many",
-                ids: JSON.stringify(selectedRowKeys),
-              },
-            });
+    <>
+      <PageHeader title="Visit Time">
+        <Card>
+          <Space style={{ marginBottom: 5 }}>
+            <Button
+              type="primary"
+              onClick={() => {
+                if (selectedRowKeys.length == 0)
+                  setSelectedRowKeys(visitorWithTimer.map((e) => e?._id));
+                else setSelectedRowKeys([]);
+              }}
+            >
+              {selectedRowKeys?.length > 0 ? "Unselect All" : "Select All"}
+            </Button>
+            <Button
+              disabled={selectedRowKeys?.length == 0}
+              onClick={async () => {
+                setLoad("fetch");
+                let { data } = await axios.get("/api/visit", {
+                  params: {
+                    mode: "visit-out-many",
+                    ids: JSON.stringify(selectedRowKeys),
+                  },
+                });
 
-            if (data.status == 200) {
-              message.success(data?.message);
-              setTrigger(trigger + 1);
-            }
-            setLoad("");
-          }}
-        >
-          Check Out
-        </Button>
-      </Space>
-      <Table
-        dataSource={visitorWithTimer}
-        footer={() => (
-          <Typography.Text>
-            Total: {visitorWithTimer?.length ?? 0}
-          </Typography.Text>
-        )}
-        columns={column2}
-        rowKey={(row) => row._id}
-        pagination={false}
-        loading={load == "fetch"}
-        scroll={{
-          y: 500,
-        }}
-        rowClassName={(row) => {
-          if (!row?.timeOutDone) {
-            if (
-              moment
-                .duration(moment(row?.timeOut).diff(moment(moment())))
-                .asSeconds() > 0
-            )
-              return "green-status";
-            else return "red-status";
-          }
-        }}
-        rowSelection={{
-          type: "checkbox",
-          selectedRowKeys,
-          onSelect: (i) => {
-            if (selectedRowKeys?.includes(i?._id)) {
-              setSelectedRowKeys((e) => e.filter((_) => _ != i?._id));
-            } else setSelectedRowKeys((e) => [...e, i?._id]);
-          },
-        }}
-        bordered
-      />
-    </Card>
-    // </PageHeader>
+                if (data.status == 200) {
+                  message.success(data?.message);
+                  setTrigger(trigger + 1);
+                }
+                setLoad("");
+              }}
+            >
+              Check Out
+            </Button>
+          </Space>
+          <Table
+            dataSource={visitorWithTimer}
+            footer={() => (
+              <Typography.Text>
+                Total: {visitorWithTimer?.length ?? 0}
+              </Typography.Text>
+            )}
+            columns={column2}
+            rowKey={(row) => row._id}
+            pagination={false}
+            loading={load == "fetch"}
+            scroll={{
+              y: 500,
+            }}
+            rowClassName={(row) => {
+              if (!row?.timeOutDone) {
+                if (
+                  moment
+                    .duration(moment(row?.timeOut).diff(moment(moment())))
+                    .asSeconds() > 0
+                )
+                  return "green-status";
+                else return "red-status";
+              }
+            }}
+            rowSelection={{
+              selectedRowKeys,
+              onSelectAll: (_) => {
+                if (_) setSelectedRowKeys(visitorWithTimer.map((e) => e?._id));
+                else setSelectedRowKeys([]);
+              },
+              onSelect: (i) => {
+                if (selectedRowKeys?.includes(i?._id)) {
+                  setSelectedRowKeys((e) => e.filter((_) => _ != i?._id));
+                } else setSelectedRowKeys((e) => [...e, i?._id]);
+              },
+            }}
+            bordered
+          />
+        </Card>
+      </PageHeader>
+    </>
   );
 };
 

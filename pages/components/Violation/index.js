@@ -11,7 +11,8 @@ import {
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import moment from "moment";
-import { autoCap } from "../../assets/utilities";
+import { InvisibleTimer, autoCap } from "../../assets/utilities";
+import { PageHeader } from "@ant-design/pro-layout";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -62,85 +63,86 @@ const Violation = () => {
     })();
   }, []);
   return (
-    // <PageHeader title="Violation">
-    <Card>
-      <Row gutter={[16, 16]}>
-        <Col span={18}>
-          <Typography.Title level={5}>List of Violators</Typography.Title>
-          <Table
-            columns={column}
-            footer={() => (
-              <Typography.Text>
-                Total: {listViolators?.length ?? 0}
-              </Typography.Text>
-            )}
-            dataSource={listViolators}
-            loading={loader == "fetch"}
-            pagination={{ pageSize: 10 }}
-          />
-        </Col>
-        <Col span={6}>
-          <Segmented
-            options={[
-              { label: "Pie", value: "pie", icon: <PieChartOutlined /> },
-              { label: "Card", value: "card", icon: <BarsOutlined /> },
-            ]}
-            onChange={(e) => setType(e)}
-          />
-
-          {type == "pie" ? (
-            <Pie
-              style={{ marginTop: 10 }}
-              options={{
-                responsive: true,
-                plugins: {
-                  title: {
-                    display: true,
-                    text: `A Total of ${totalVisitor} visitors`,
-                  },
-                  legend: {
-                    position: "bottom",
-                  },
-                },
-              }}
-              data={{
-                labels: ["Total Violators", "Total Non-Violators"],
-                datasets: [
-                  {
-                    data: [total, totalVisitor - total],
-                    backgroundColor: [
-                      "rgba(255, 99, 132, 0.2)",
-                      "rgba(54, 162, 235, 0.2)",
-                    ],
-                    borderColor: [
-                      "rgba(255, 99, 132, 1)",
-                      "rgba(54, 162, 235, 1)",
-                    ],
-                    borderWidth: 1,
-                  },
-                ],
-              }}
+    <PageHeader title="Violation">
+      <InvisibleTimer />
+      <Card>
+        <Row gutter={[16, 16]}>
+          <Col span={18}>
+            <Typography.Title level={5}>List of Violators</Typography.Title>
+            <Table
+              columns={column}
+              footer={() => (
+                <Typography.Text>
+                  Total: {listViolators?.length ?? 0}
+                </Typography.Text>
+              )}
+              dataSource={listViolators}
+              loading={loader == "fetch"}
+              pagination={{ pageSize: 10 }}
             />
-          ) : (
-            <Space direction="vertical">
-              <Cards
-                color="rgba(255,0,0,0.5)"
-                icon={<WarningOutlined />}
-                name="Violators"
-                value={total}
+          </Col>
+          <Col span={6}>
+            <Segmented
+              options={[
+                { label: "Pie", value: "pie", icon: <PieChartOutlined /> },
+                { label: "Card", value: "card", icon: <BarsOutlined /> },
+              ]}
+              onChange={(e) => setType(e)}
+            />
+
+            {type == "pie" ? (
+              <Pie
+                style={{ marginTop: 10 }}
+                options={{
+                  responsive: true,
+                  plugins: {
+                    title: {
+                      display: true,
+                      text: `A Total of ${totalVisitor} visitors`,
+                    },
+                    legend: {
+                      position: "bottom",
+                    },
+                  },
+                }}
+                data={{
+                  labels: ["Total Violators", "Total Non-Violators"],
+                  datasets: [
+                    {
+                      data: [total, totalVisitor - total],
+                      backgroundColor: [
+                        "rgba(255, 99, 132, 0.2)",
+                        "rgba(54, 162, 235, 0.2)",
+                      ],
+                      borderColor: [
+                        "rgba(255, 99, 132, 1)",
+                        "rgba(54, 162, 235, 1)",
+                      ],
+                      borderWidth: 1,
+                    },
+                  ],
+                }}
               />
-              <Cards
-                color="rgba(0,0,255,0.5)"
-                icon={<UserOutlined />}
-                name="Non-Violators"
-                value={totalVisitor - total}
-              />
-            </Space>
-          )}
-        </Col>
-      </Row>
-    </Card>
-    // </PageHeader>
+            ) : (
+              <Space direction="vertical">
+                <Cards
+                  color="rgba(255,0,0,0.5)"
+                  icon={<WarningOutlined />}
+                  name="Violators"
+                  value={total}
+                />
+                <Cards
+                  color="rgba(0,0,255,0.5)"
+                  icon={<UserOutlined />}
+                  name="Non-Violators"
+                  value={totalVisitor - total}
+                />
+              </Space>
+            )}
+          </Col>
+        </Row>
+      </Card>
+    </PageHeader>
   );
 };
 

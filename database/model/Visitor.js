@@ -17,17 +17,17 @@ let VisitorSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    region: {
+    regionId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "Regions",
     },
-    province: {
+    provinceId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "Province",
     },
-    citymunicipalities: {
+    cityId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "CityMunicipality",

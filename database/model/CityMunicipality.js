@@ -26,7 +26,6 @@ const CityMunicipalitySchema = new mongoose.Schema(
       required: false,
     },
     regionId: {
-      //from regionID
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "Regions",
@@ -37,12 +36,10 @@ const CityMunicipalitySchema = new mongoose.Schema(
       ref: "Province",
     },
     name: {
-      //from citymunicipalityname
       type: String,
       required: true,
     },
     type: {
-      //from citymunicipalitytype
       type: String,
       required: true,
     },

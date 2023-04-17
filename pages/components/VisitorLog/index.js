@@ -16,7 +16,8 @@ import {
 import axios from "axios";
 import moment from "moment";
 import dayjs from "dayjs";
-import { autoCap } from "../../assets/utilities";
+import { InvisibleTimer, autoCap } from "../../assets/utilities";
+import { PageHeader } from "@ant-design/pro-layout";
 
 const VisitorLog = () => {
   const [recentVisit, setRecentVisit] = useState([]);
@@ -234,8 +235,8 @@ const VisitorLog = () => {
   }, [trigger]);
 
   return (
-    <>
-      {/* <PageHeader title="Visit Logs"> */}
+    <PageHeader title="Visit Logs">
+      <InvisibleTimer />
       <Modal
         footer={null}
         maskClosable={false}
@@ -381,8 +382,7 @@ const VisitorLog = () => {
           scroll={{ y: 450 }}
         />
       </Card>
-      {/* </PageHeader> */}
-    </>
+    </PageHeader>
   );
 };
 

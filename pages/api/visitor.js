@@ -1,6 +1,8 @@
 import Visitor from "../../database/model/Visitor";
 import Visit from "../../database/model/Visit";
 import dbConnect from "../../database/dbConnect";
+import Province from "../../database/model/Province";
+import CityMunicipality from "../../database/model/CityMunicipality";
 var ObjectId = require("mongodb").ObjectId;
 
 export default async function handler(req, res) {
@@ -28,35 +30,35 @@ export default async function handler(req, res) {
               {
                 $lookup: {
                   from: "regions",
-                  localField: "region",
+                  localField: "regionId",
                   foreignField: "_id",
-                  as: "region",
+                  as: "regionId",
                 },
               },
               {
-                $unwind: "$region",
+                $unwind: "$regionId",
               },
               {
                 $lookup: {
                   from: "provinces",
-                  localField: "province",
+                  localField: "provinceId",
                   foreignField: "_id",
-                  as: "province",
+                  as: "provinceId",
                 },
               },
               {
-                $unwind: "$province",
+                $unwind: "$provinceId",
               },
               {
                 $lookup: {
                   from: "citymunicipalities",
-                  localField: "citymunicipalities",
+                  localField: "cityId",
                   foreignField: "_id",
-                  as: "citymunicipalities",
+                  as: "cityId",
                 },
               },
               {
-                $unwind: "$citymunicipalities",
+                $unwind: "$cityId",
               },
             ];
 
@@ -89,9 +91,11 @@ export default async function handler(req, res) {
                 { middlename: { $regex: re } },
               ],
             })
+              .populate("regionId provinceId cityId")
               .collation({ locale: "en" })
               .sort({ name: 1 })
               .then((e) => {
+                console.log(e);
                 res.json({ status: 200, searchData: e });
                 resolve();
               })

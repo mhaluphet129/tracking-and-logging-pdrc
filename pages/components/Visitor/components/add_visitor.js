@@ -60,10 +60,10 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
 
     val = {
       ...val,
-      region: regions._id,
-      province: province._id,
+      regionId: regions._id,
+      provinceId: province._id,
       barangay,
-      citymunicipalities: citymunicipalities._id,
+      cityId: citymunicipalities._id,
       dateOfBirth: dateBirth,
     };
 
