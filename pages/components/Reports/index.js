@@ -3,7 +3,6 @@ import { useReactToPrint } from "react-to-print";
 import axios from "axios";
 import moment from "moment";
 import {
-  // PageHeader,
   Card,
   Button,
   Drawer,
@@ -17,6 +16,7 @@ import {
   DatePicker,
   message,
 } from "antd";
+import { PageHeader } from "@ant-design/pro-layout";
 import { autoCap } from "../../assets/utilities";
 
 class PDF extends React.Component {
@@ -815,87 +815,87 @@ const Report = () => {
   }, []);
   return (
     <>
-      {/* <PageHeader title="Report"> */}
-      <Drawer
-        open={openPrintDrawer2}
-        onClose={() => {
-          setOpenPrintDrawer2(false);
-          setEditMode(false);
-        }}
-        title="Print Preview"
-        placement="bottom"
-        height="100%"
-        extra={[
-          <Space key="1">
-            <Checkbox
-              style={{ width: 100 }}
-              checked={editMode}
-              onChange={(e) => {
-                setEditMode(e.target.checked);
-              }}
+      <PageHeader title="Report">
+        <Drawer
+          open={openPrintDrawer2}
+          onClose={() => {
+            setOpenPrintDrawer2(false);
+            setEditMode(false);
+          }}
+          title="Print Preview"
+          placement="bottom"
+          height="100%"
+          extra={[
+            <Space key="1">
+              <Checkbox
+                style={{ width: 100 }}
+                checked={editMode}
+                onChange={(e) => {
+                  setEditMode(e.target.checked);
+                }}
+              >
+                Edit Mode
+              </Checkbox>
+              <Button
+                onClick={() => {
+                  if (editMode) {
+                    message.warning(
+                      "Please turn off the edit mode before printing."
+                    );
+                    return;
+                  }
+                  handlePrint2();
+                }}
+                key="log1"
+              >
+                PRINT
+              </Button>
+            </Space>,
+          ]}
+        >
+          <PDF ref={ref2}>
+            <CustomTable2 />
+          </PDF>
+        </Drawer>
+        <Drawer
+          open={openPrintDrawer}
+          onClose={() => setOpenPrintDrawer(false)}
+          placement="bottom"
+          height="100%"
+          title="Print Preview"
+          width="200"
+          extra={[
+            <Button onClick={handlePrint} key="visit1">
+              PRINT
+            </Button>,
+          ]}
+        >
+          <PDF ref={ref}>
+            <CustomTable1 />
+          </PDF>
+        </Drawer>
+        <Card>
+          <Space direction="vertical">
+            <Button
+              key="visit2"
+              onClick={() => setOpenPrintDrawer(true)}
+              style={{ width: 200 }}
             >
-              Edit Mode
-            </Checkbox>
+              Print Visitor List
+            </Button>
             <Button
               onClick={() => {
-                if (editMode) {
-                  message.warning(
-                    "Please turn off the edit mode before printing."
-                  );
-                  return;
-                }
-                handlePrint2();
+                setOpenPrintDrawer2(true);
+                updateReportData("2");
               }}
-              key="log1"
+              style={{ width: 200 }}
+              key="log2"
             >
-              PRINT
+              Print Visit Logs
             </Button>
-          </Space>,
-        ]}
-      >
-        <PDF ref={ref2}>
-          <CustomTable2 />
-        </PDF>
-      </Drawer>
-      <Drawer
-        open={openPrintDrawer}
-        onClose={() => setOpenPrintDrawer(false)}
-        placement="bottom"
-        height="100%"
-        title="Print Preview"
-        width="200"
-        extra={[
-          <Button onClick={handlePrint} key="visit1">
-            PRINT
-          </Button>,
-        ]}
-      >
-        <PDF ref={ref}>
-          <CustomTable1 />
-        </PDF>
-      </Drawer>
-      <Card>
-        <Space direction="vertical">
-          <Button
-            key="visit2"
-            onClick={() => setOpenPrintDrawer(true)}
-            style={{ width: 200 }}
-          >
-            Print Visitor List
-          </Button>
-          <Button
-            onClick={() => {
-              setOpenPrintDrawer2(true);
-              updateReportData("2");
-            }}
-            style={{ width: 200 }}
-            key="log2"
-          >
-            Print Visit Logs
-          </Button>
-        </Space>
-      </Card>
-      {/* </PageHeader> */}
+          </Space>
+        </Card>
+      </PageHeader>
     </>
   );
 };

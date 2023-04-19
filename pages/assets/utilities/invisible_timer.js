@@ -14,6 +14,10 @@ const InvisibleTimer = () => {
   const [visitorWithTimer, setVisitorWithTimer] = useState();
 
   useEffect(() => {
+    clearInterval(titleRef.current);
+  }, []);
+
+  useEffect(() => {
     (async () => {
       let res = await axios.get("/api/visit", {
         params: { mode: "visit-with-timers" },
