@@ -131,8 +131,8 @@ const Report = () => {
       width: 350,
       render: (_, row) => (
         <Typography style={{ paddingLeft: 10 }}>
-          {row.citymunicipalities.name}, {row?.province.name} <br />
-          {row?.region.name}
+          {row.cityId.name}, {row?.provinceId.name} <br />
+          {row?.regionId.name}
         </Typography>
       ),
     },
