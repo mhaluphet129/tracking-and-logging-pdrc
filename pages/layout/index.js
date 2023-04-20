@@ -12,6 +12,7 @@ import {
   Dropdown,
   message,
   Affix,
+  Image,
 } from "antd";
 import {
   SettingFilled,
@@ -96,6 +97,7 @@ const Sider = ({ selectedIndex }) => {
   return (
     <Affix>
       <Layout.Sider collapsible theme="light">
+        <Image src="pdrc-logo2.png" preview={false} style={{ padding: 20 }} />
         <Menu
           onClick={selectedIndex}
           items={items}
@@ -105,7 +107,6 @@ const Sider = ({ selectedIndex }) => {
             fontSize: 15,
             fontWeight: 700,
             border: "none",
-            marginTop: 30,
           }}
         />
       </Layout.Sider>

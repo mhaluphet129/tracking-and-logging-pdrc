@@ -72,7 +72,6 @@ const InvisibleTimer = () => {
                       metaDescription:
                         "Dynamic title should when there is a visitor exceed their time visit.",
                     });
-                    console.log(1);
                     api["warning"]({
                       key: row?._id,
                       icon: <WarningOutlined style={{ color: "red" }} />,
@@ -96,7 +95,7 @@ const InvisibleTimer = () => {
                               if (data.status == 200) {
                                 setOpenProfile(true);
                                 setProfileData(data.data);
-                                api["destroy"]();
+                                api["destroy"](row?._id);
                               }
                             }}
                           >
