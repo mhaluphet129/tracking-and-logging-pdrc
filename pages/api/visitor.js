@@ -114,7 +114,7 @@ export default async function handler(req, res) {
               {
                 $lookup: {
                   from: "regions",
-                  localField: "region",
+                  localField: "regionId",
                   foreignField: "_id",
                   as: "region",
                 },
@@ -125,7 +125,7 @@ export default async function handler(req, res) {
               {
                 $lookup: {
                   from: "provinces",
-                  localField: "province",
+                  localField: "provinceId",
                   foreignField: "_id",
                   as: "province",
                 },
@@ -136,7 +136,7 @@ export default async function handler(req, res) {
               {
                 $lookup: {
                   from: "citymunicipalities",
-                  localField: "citymunicipalities",
+                  localField: "cityId",
                   foreignField: "_id",
                   as: "citymunicipalities",
                 },
