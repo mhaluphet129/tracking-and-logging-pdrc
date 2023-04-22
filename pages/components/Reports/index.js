@@ -14,10 +14,20 @@ import {
   Table,
   Checkbox,
   DatePicker,
+  Modal,
+  Form,
+  Select,
+  Input,
   message,
+  InputNumber,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
-import { autoCap } from "../../assets/utilities";
+import { autoCap, Floatlabel } from "../../assets/utilities";
+import {
+  ArrowRightOutlined,
+  CloseOutlined,
+  MinusCircleOutlined,
+} from "@ant-design/icons";
 
 class PDF extends React.Component {
   render() {
@@ -51,6 +61,7 @@ const Report = () => {
   const [editMode, setEditMode] = useState(false);
   const [visitors, setVisitors] = useState([]);
   const [recentVisit, setRecentVisit] = useState([]);
+  const [filterOpened, setFilterOpened] = useState(false);
   const ref = useRef();
   const ref2 = useRef();
   const [reportData, setReportData] = useState({
@@ -66,6 +77,75 @@ const Report = () => {
   const handlePrint2 = useReactToPrint({
     content: () => ref2.current,
   });
+
+  let [regions, setRegion] = useState({});
+  let [province, setProvince] = useState({});
+  let [citymunicipalities, setCitymunicipalities] = useState([]);
+  let [barangay, setBarangay] = useState("");
+  let [regionObj, setRegionObj] = useState([]);
+  let [filters, setFilter] = useState({
+    dateRegistered: { from: null, to: null },
+    gender: "",
+    age: { min: 0, max: 100 },
+    address: { cityId: null, provinceId: null, regionId: null, barangay: "" },
+  });
+  const [activeFilter, setActiveFilter] = useState([]);
+  const [openFilterId, setOpenFilterId] = useState(0);
+  const [minAge, setMinAge] = useState(18);
+  const [maxAge, setMaxAge] = useState(100);
+
+  const [addressOpened, setAddressOpened] = useState([false, false, false]);
+
+  const [column1Title, setColumn1Title] = useState("");
+
+  const generatePrint = async () => {
+    if (!addressOpened[0])
+      filters = {
+        ...filters,
+        address: {
+          ...filters.address,
+          provinceId: null,
+          cityId: null,
+          barangay: "",
+        },
+      };
+    else if (!addressOpened[[1]]) {
+      filters = {
+        ...filters,
+        address: {
+          ...filters.address,
+          cityId: null,
+          barangay: "",
+        },
+      };
+      setColumn1Title(`${province.name}, ${regions.name.split("–")[0]}`);
+    } else if (!addressOpened[2]) {
+      filters = {
+        ...filters,
+        address: {
+          ...filters.address,
+          barangay: "",
+        },
+      };
+      setColumn1Title(
+        `${citymunicipalities.name} - ${province.name}, ${
+          regions.name.split("–")[0]
+        }`
+      );
+    }
+
+    await fetchVisitor();
+  };
+
+  const fetchVisitor = async () => {
+    let { data } = await axios.get("/api/visitor", {
+      params: { mode: "fetch-all", filters: JSON.stringify(filters) },
+    });
+    if (data.status == 200) {
+      setVisitors(data.visitor);
+      setOpenPrintDrawer(true);
+    }
+  };
 
   const updateReportData = (mode) => {
     if (mode == "2") {
@@ -124,13 +204,18 @@ const Report = () => {
       title: "Age",
       width: 1,
       align: "center",
-      render: (_, row) => <Typography>{row.age}</Typography>,
+      render: (_, row) => (
+        <Typography>
+          {moment().year() - moment(row?.dateOfBirth).year()}
+        </Typography>
+      ),
     },
     {
       title: "Address",
       width: 350,
       render: (_, row) => (
         <Typography style={{ paddingLeft: 10 }}>
+          {row?.barangay != "" ? row?.barangay + ", " : ""}
           {row.cityId.name}, {row?.provinceId.name} <br />
           {row?.regionId.name}
         </Typography>
@@ -496,7 +581,7 @@ const Report = () => {
               fontSize: "1.5em",
             }}
           >
-            Masterlist of Visitor
+            List of Visitors
           </Typography.Text>
         </Space>
       </Col>
@@ -513,6 +598,7 @@ const Report = () => {
         </Row>
       </Col>
       <Col span={18} offset={3}>
+        <p>{column1Title}</p>
         <Table
           dataSource={visitors}
           columns={printColumn1}
@@ -806,15 +892,485 @@ const Report = () => {
       let res = await axios.get("/api/visit", {
         params: { mode: "fetch-recent" },
       });
-      let { data } = await axios.get("/api/visitor", {
-        params: { mode: "fetch-all" },
-      });
-      if (data.status == 200) setVisitors(data.visitor);
       if (res.data.status == 200) setRecentVisit(res.data.data);
+    })();
+  }, []);
+
+  useEffect(() => {
+    let filteredRegions = regionObj?.filter(
+      (e) => e._id == "614c2580dd90f126474a5e25"
+    )[0];
+    setRegion(filteredRegions);
+    setProvince(
+      filteredRegions?.provinces.filter(
+        (e) => e._id == "614c2580dd90f126474a5e26"
+      )[0]
+    );
+
+    setCitymunicipalities(
+      filteredRegions?.provinces
+        ?.filter((e) => e._id == "614c2580dd90f126474a5e26")[0]
+        ?.citymunicipalities.filter(
+          (e) => e._id == "614c2581dd90f126474a5e29"
+        )[0]
+    );
+  }, [regionObj]);
+
+  useEffect(() => {
+    (async () => {
+      let { data } = await axios.get("/api/etc", {
+        params: {
+          mode: "get-region",
+        },
+      });
+
+      if (data.status == 200) setRegionObj(data.data);
+      else message.error(data.message);
     })();
   }, []);
   return (
     <>
+      <Modal
+        title="Report Filter"
+        open={filterOpened}
+        footer={null}
+        maskClosable={false}
+        onCancel={() => {
+          setFilterOpened(false);
+          setActiveFilter([]);
+        }}
+      >
+        {openFilterId == 1 && (
+          <Form
+            labelCol={{
+              span: 24,
+            }}
+            wrapperCol={{
+              span: 24,
+            }}
+            labelAlign="right"
+            // onFinish={handleLogin}
+          >
+            <Select
+              mode="multiple"
+              style={{ width: "100%" }}
+              value={activeFilter}
+              placeholder="Select a filter......"
+              options={[
+                { value: "dateRegistered", label: "Date Registered" },
+                { value: "gender", label: "Gender" },
+                { value: "ageRange", label: "Age Range" },
+                { value: "address", label: "Address" },
+              ]}
+              onChange={(e) => {
+                setActiveFilter(e);
+                if (!e.includes("dateRegistered"))
+                  setFilter({
+                    ...filters,
+                    dateRegistered: { from: null, to: null },
+                  });
+                if (!e.includes("gender"))
+                  setFilter({ ...filters, gender: "" });
+                if (!e.includes("ageRange"))
+                  setFilter({ ...filters, age: { min: 0, max: 100 } });
+                if (!e.includes("address"))
+                  setFilter({
+                    ...filters,
+                    address: {
+                      cityId: null,
+                      provinceId: null,
+                      regionId: null,
+                      barangay: "",
+                    },
+                  });
+                else
+                  setFilter({
+                    ...filters,
+                    address: {
+                      regionId: regions._id,
+                      provinceId: province?._id,
+                      cityId: citymunicipalities?._id,
+                      barangay: "",
+                    },
+                  });
+              }}
+              allowClear
+            />
+            {activeFilter.includes("dateRegistered") && (
+              <Card
+                title="Date Registered"
+                style={{ marginTop: 10 }}
+                extra={
+                  <CloseOutlined
+                    style={{ fontSize: 20, color: "#f00" }}
+                    onClick={() =>
+                      setActiveFilter(
+                        activeFilter.filter((e) => e != "dateRegistered")
+                      )
+                    }
+                  />
+                }
+              >
+                <Form.Item>
+                  <DatePicker.RangePicker
+                    onCalendarChange={(e) => {
+                      setFilter({
+                        ...filters,
+                        dateRegistered: {
+                          from: e[0],
+                          to: e[1],
+                        },
+                      });
+                    }}
+                  />
+                </Form.Item>
+              </Card>
+            )}
+            {activeFilter.includes("gender") && (
+              <Card
+                title="gender"
+                style={{ marginTop: 10 }}
+                extra={
+                  <CloseOutlined
+                    style={{ fontSize: 20, color: "#f00" }}
+                    onClick={() =>
+                      setActiveFilter(activeFilter.filter((e) => e != "gender"))
+                    }
+                  />
+                }
+              >
+                <Form.Item>
+                  <Select
+                    onChange={(e) => setFilter({ ...filters, gender: e })}
+                  >
+                    <Select.Option value="male">Male</Select.Option>
+                    <Select.Option value="female">Female</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Card>
+            )}
+            {activeFilter.includes("ageRange") && (
+              <Card
+                title="Age range"
+                style={{ marginTop: 10 }}
+                extra={
+                  <CloseOutlined
+                    style={{ fontSize: 20, color: "#f00" }}
+                    onClick={() =>
+                      setActiveFilter(
+                        activeFilter.filter((e) => e != "ageRange")
+                      )
+                    }
+                  />
+                }
+              >
+                <Form.Item>
+                  <InputNumber
+                    min={18}
+                    max={100}
+                    value={minAge}
+                    prefix={
+                      <Typography.Text type="secondary">min</Typography.Text>
+                    }
+                    onKeyUp={(e) => {
+                      setMinAge(e.target.value);
+                      if (e.target.value < 18) setMinAge(18);
+                      if (e.target.value > 100) setMinAge(100);
+                      setFilter({
+                        ...filters,
+                        age: {
+                          min:
+                            e.target.value < 18
+                              ? 18
+                              : e.target.value > 100
+                              ? 100
+                              : e.target.value,
+                          max: filters.age.max,
+                        },
+                      });
+                    }}
+                  />{" "}
+                  -{" "}
+                  <InputNumber
+                    min={18}
+                    max={100}
+                    value={maxAge}
+                    prefix={
+                      <Typography.Text type="secondary">max</Typography.Text>
+                    }
+                    onKeyUp={(e) => {
+                      setMaxAge(e.target.value);
+                      if (e.target.value < 18) setMinAge(18);
+                      if (e.target.value > 100) setMaxAge(100);
+                      setFilter({
+                        ...filters,
+                        age: {
+                          min: filters.age.min,
+                          max:
+                            e.target.value < 18
+                              ? 18
+                              : e.target.value > 100
+                              ? 100
+                              : e.target.value,
+                        },
+                      });
+                    }}
+                  />
+                </Form.Item>
+              </Card>
+            )}
+            {activeFilter.includes("address") && (
+              <Card
+                style={{ marginTop: 10 }}
+                title="Address"
+                extra={
+                  <CloseOutlined
+                    style={{ fontSize: 20, color: "#f00" }}
+                    onClick={() =>
+                      setActiveFilter(
+                        activeFilter.filter((e) => e != "address")
+                      )
+                    }
+                  />
+                }
+              >
+                <Form.Item name="address" noStyle>
+                  <Floatlabel label="Region" value={regions?.name != ""}>
+                    <Select
+                      className="customInput"
+                      defaultValue={regions?.name}
+                      style={{ width: 370 }}
+                      onChange={(_) => {
+                        setRegion(regionObj?.filter((e) => e._id == _)[0]);
+                        setProvince({});
+                        setCitymunicipalities();
+                      }}
+                      filterOption={(input, option) =>
+                        (option?.label ?? "")
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      options={[
+                        ...regionObj.map((e) => {
+                          return {
+                            label: e.name,
+                            value: e._id,
+                          };
+                        }),
+                      ]}
+                      showSearch
+                    />
+                  </Floatlabel>
+                  {!addressOpened[0] && (
+                    <Button
+                      onClick={() => {
+                        let _ = [...addressOpened];
+                        _[0] = true;
+                        setAddressOpened(_);
+                      }}
+                    >
+                      Add Province
+                    </Button>
+                  )}
+                  {addressOpened[0] && (
+                    <Floatlabel label="Province" value={province?.name != null}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Select
+                          className="customInput"
+                          style={{ width: 370 }}
+                          defaultValue={province?.name}
+                          value={province?.name}
+                          onChange={(_) => {
+                            setProvince(
+                              regions.provinces.filter((e) => e._id == _)[0]
+                            );
+                            setCitymunicipalities({});
+                          }}
+                          filterOption={(input, option) =>
+                            (option?.label ?? "")
+                              .toLowerCase()
+                              .includes(input.toLowerCase())
+                          }
+                          options={[
+                            ...regionObj
+                              .filter((e) => e._id == regions._id)[0]
+                              .provinces.map((e) => {
+                                return {
+                                  label: e.name,
+                                  value: e._id,
+                                };
+                              }),
+                          ]}
+                          showSearch
+                        />
+                        {!addressOpened[1] && (
+                          <MinusCircleOutlined
+                            style={{
+                              fontSize: 25,
+                              color: "#f00",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              let _ = [...addressOpened];
+                              _[0] = false;
+                              setAddressOpened(_);
+                            }}
+                          />
+                        )}
+                      </div>
+                    </Floatlabel>
+                  )}
+                  {addressOpened[0] && !addressOpened[1] && (
+                    <Button
+                      onClick={() => {
+                        let _ = [...addressOpened];
+                        _[1] = true;
+                        setAddressOpened(_);
+                      }}
+                    >
+                      Add City/Municipalities
+                    </Button>
+                  )}
+                  {addressOpened[1] && (
+                    <Floatlabel
+                      label="City/Municipalities"
+                      value={citymunicipalities?.name != null}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Select
+                          className="customInput"
+                          onChange={(_) => {
+                            setCitymunicipalities(
+                              province.citymunicipalities.filter(
+                                (e) => e._id == _
+                              )[0]
+                            );
+                          }}
+                          defaultValue={citymunicipalities?.name}
+                          value={citymunicipalities?.name}
+                          style={{ width: 370 }}
+                          filterOption={(input, option) =>
+                            (option?.label ?? "")
+                              .toLowerCase()
+                              .includes(input.toLowerCase())
+                          }
+                          options={
+                            province?._id != null
+                              ? [
+                                  ...regionObj
+                                    .filter((e) => e._id == regions._id)[0]
+                                    ?.provinces.filter(
+                                      (e) => e._id == province._id
+                                    )[0]
+                                    ?.citymunicipalities.map((e) => {
+                                      return {
+                                        label: e.name,
+                                        value: e._id,
+                                      };
+                                    }),
+                                ]
+                              : []
+                          }
+                          showSearch
+                        />
+                        {!addressOpened[2] && (
+                          <MinusCircleOutlined
+                            style={{
+                              fontSize: 25,
+                              color: "#f00",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              let _ = [...addressOpened];
+                              _[1] = false;
+                              setAddressOpened(_);
+                            }}
+                          />
+                        )}
+                      </div>
+                    </Floatlabel>
+                  )}
+                  {addressOpened[0] &&
+                    addressOpened[1] &&
+                    !addressOpened[2] && (
+                      <Button
+                        onClick={() => {
+                          let _ = [...addressOpened];
+                          _[2] = true;
+                          setAddressOpened(_);
+                        }}
+                      >
+                        Add Barangay
+                      </Button>
+                    )}
+                  {addressOpened[2] && (
+                    <Floatlabel label="Barangay" value={barangay != ""}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Input
+                          style={{ height: 45, paddingTop: 15, width: 370 }}
+                          onChange={(e) => {
+                            setBarangay(e.target.value);
+                            setFilter({
+                              ...filters,
+                              address: {
+                                ...filters.address,
+                                barangay: e.target.value,
+                              },
+                            });
+                          }}
+                        />
+                        <MinusCircleOutlined
+                          style={{
+                            fontSize: 25,
+                            color: "#f00",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            let _ = [...addressOpened];
+                            _[2] = false;
+                            setAddressOpened(_);
+                          }}
+                        />
+                      </div>
+                    </Floatlabel>
+                  )}
+                </Form.Item>
+              </Card>
+            )}
+            <Form.Item noStyle>
+              <Button
+                type="primary"
+                size="large"
+                style={{ width: "100%", marginTop: 20 }}
+                onClick={generatePrint}
+              >
+                Proceed <ArrowRightOutlined />
+              </Button>
+            </Form.Item>
+          </Form>
+        )}
+      </Modal>
       <PageHeader title="Report">
         <Drawer
           open={openPrintDrawer2}
@@ -827,7 +1383,7 @@ const Report = () => {
           height="100%"
           extra={[
             <Space key="1">
-              <Checkbox
+              {/* <Checkbox
                 style={{ width: 100 }}
                 checked={editMode}
                 onChange={(e) => {
@@ -835,7 +1391,7 @@ const Report = () => {
                 }}
               >
                 Edit Mode
-              </Checkbox>
+              </Checkbox> */}
               <Button
                 onClick={() => {
                   if (editMode) {
@@ -859,7 +1415,10 @@ const Report = () => {
         </Drawer>
         <Drawer
           open={openPrintDrawer}
-          onClose={() => setOpenPrintDrawer(false)}
+          onClose={() => {
+            setOpenPrintDrawer(false);
+            setColumn1Title("");
+          }}
           placement="bottom"
           height="100%"
           title="Print Preview"
@@ -878,7 +1437,10 @@ const Report = () => {
           <Space direction="vertical">
             <Button
               key="visit2"
-              onClick={() => setOpenPrintDrawer(true)}
+              onClick={() => {
+                setOpenFilterId(1);
+                setFilterOpened(true);
+              }}
               style={{ width: 200 }}
             >
               Print Visitor List

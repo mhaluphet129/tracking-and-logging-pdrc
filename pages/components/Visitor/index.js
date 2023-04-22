@@ -410,6 +410,17 @@ const VisitorPage = () => {
           search: _searchName,
           startDate: dateFilter[0]?.toDate(),
           endDate: dateFilter[1]?.toDate(),
+          filters: JSON.stringify({
+            dateRegistered: { from: null, to: null },
+            gender: "",
+            age: { min: 0, max: 100 },
+            address: {
+              cityId: null,
+              provinceId: null,
+              regionId: null,
+              barangay: "",
+            },
+          }),
         },
       });
       if (data.status == 200) setVisitors(data.visitor);

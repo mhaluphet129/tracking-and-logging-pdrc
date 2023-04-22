@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
-import { Input, Button, Space, message, Typography } from "antd";
+import { Input, Button, Space, message, Typography, Alert } from "antd";
 import io from "socket.io-client";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import moment from "moment";
@@ -49,13 +49,15 @@ const QRCamera = () => {
 
   useEffect(() => {
     if (visitHour != null) {
-      let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
-        fps: 30,
-        qrbox: 300,
-      });
-      html5QrcodeScanner.render(handleSuccessScan);
+      if (connected) {
+        let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+          fps: 30,
+          qrbox: 300,
+        });
+        html5QrcodeScanner.render(handleSuccessScan);
+      }
     }
-  }, [visitHour]);
+  }, [visitHour, connected]);
 
   useEffect(() => {
     fetch("/api/socket").finally(() => {
@@ -91,42 +93,64 @@ const QRCamera = () => {
       {moment().hour() < moment(visitHour).hour() && visitHour != undefined ? (
         <>
           <div>
-            <div id="reader" style={{ alignSelf: "flex-start" }} />
-          </div>
-          <div>
             {connected ? (
-              <Space
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  marginTop: 10,
-                }}
-              >
-                <CheckCircleOutlined /> Connected <br />
-                <Button
-                  onClick={() => {
-                    setConnected(false);
-                    socket.emit("disconnected");
+              <>
+                <div>
+                  <div id="reader" style={{ alignSelf: "flex-start" }} />
+                </div>
+                <Space
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: 10,
                   }}
                 >
-                  DISCONNECT
-                </Button>
-              </Space>
+                  <CheckCircleOutlined /> Connected <br />
+                  <Button
+                    onClick={() => {
+                      setConnected(false);
+                      socket.emit("disconnected");
+                    }}
+                  >
+                    DISCONNECT
+                  </Button>
+                </Space>
+              </>
             ) : (
               <Space
                 style={{
                   display: "flex",
                   justifyContent: "center",
                   marginTop: 10,
+                  flexDirection: "column",
                 }}
               >
-                <Input
-                  onChange={(e) => setInputKey(e.target.value)}
-                  value={inputKey}
+                <Alert
+                  message="Important Notes"
+                  description={
+                    <p>
+                      You need a <strong>VALID System Code</strong> to use the
+                      QR Ccanner for Security Measure. Please get the code in{" "}
+                      <strong>settings</strong>.
+                    </p>
+                  }
+                  type="info"
+                  style={{ marginRight: 20, marginLeft: 20 }}
+                  showIcon
                 />
-                <Button onClick={handleConnect} loading={load == "connecting"}>
-                  CONNECT
-                </Button>
+                <div>
+                  <Input
+                    onChange={(e) => setInputKey(e.target.value)}
+                    value={inputKey}
+                    style={{ width: 200, marginRight: 20 }}
+                  />
+                  <Button
+                    onClick={handleConnect}
+                    loading={load == "connecting"}
+                  >
+                    CONNECT
+                  </Button>
+                </div>
               </Space>
             )}
           </div>
@@ -137,10 +161,20 @@ const QRCamera = () => {
           only.
         </Typography.Text>
       )}
+      <Typography.Text
+        style={{
+          position: "absolute",
+          left: "50%",
+          transform: "translate(-50%, 0)",
+          bottom: 0,
+          color: "#eee",
+          opacity: 0.5,
+        }}
+      >
+        System develop with a heart
+      </Typography.Text>
     </>
   );
-
-  return 1;
 };
 
 export default QRCamera;

@@ -16,8 +16,9 @@ export default async function handler(req, res) {
 
         switch (mode) {
           case "fetch-all": {
-            const { startDate, endDate } = req.query;
-
+            const { startDate, endDate, filters } = req.query;
+            const { dateRegistered, gender, age, address } =
+              JSON.parse(filters);
             let query = [
               {
                 $lookup: {
@@ -60,6 +61,34 @@ export default async function handler(req, res) {
               {
                 $unwind: "$cityId",
               },
+              {
+                $addFields: {
+                  objectDate: {
+                    $dateFromString: {
+                      dateString: "$dateOfBirth",
+                    },
+                  },
+                },
+              },
+              {
+                $addFields: {
+                  age: {
+                    $dateDiff: {
+                      startDate: "$objectDate",
+                      endDate: "$$NOW",
+                      unit: "year",
+                    },
+                  },
+                },
+              },
+              {
+                $match: {
+                  age: {
+                    $gte: parseInt(age.min),
+                    $lte: parseInt(age.max),
+                  },
+                },
+              },
             ];
 
             if (startDate != undefined && endDate != undefined)
@@ -71,7 +100,65 @@ export default async function handler(req, res) {
                   },
                 },
               });
+
+            if (
+              Object.values(address).filter((e) => e != null && e != "")
+                .length != 0
+            ) {
+              let _ = [];
+              if (address?.regionId)
+                _.push({ regionId: ObjectId(address.regionId) });
+              if (address?.provinceId)
+                _.push({ provinceId: ObjectId(address.provinceId) });
+              if (address?.cityId) _.push({ cityId: ObjectId(address.cityId) });
+              if (address?.barangay != "")
+                _.push({ barangay: address.barangay });
+              query.unshift({
+                $match: {
+                  $and: _,
+                },
+              });
+            }
+
+            if (gender != "") {
+              query.unshift({
+                $match: {
+                  gender,
+                },
+              });
+            }
+
+            if (dateRegistered?.from != null && dateRegistered?.to != null) {
+              query.unshift({
+                $match: {
+                  createdAt: {
+                    $gte: new Date(dateRegistered?.from),
+                    $lte: new Date(dateRegistered?.to),
+                  },
+                },
+              });
+            } else {
+              if (dateRegistered?.from != null) {
+                query.unshift({
+                  $match: {
+                    createdAt: {
+                      $gte: new Date(dateRegistered?.from),
+                    },
+                  },
+                });
+              } else if (dateRegistered?.to != null) {
+                query.unshift({
+                  $match: {
+                    createdAt: {
+                      $lte: new Date(dateRegistered?.to),
+                    },
+                  },
+                });
+              }
+            }
+
             return await Visitor.aggregate(query).then((e) => {
+              console.log(e.length);
               res.json({
                 status: 200,
                 message: "Successfully fetched the data",
