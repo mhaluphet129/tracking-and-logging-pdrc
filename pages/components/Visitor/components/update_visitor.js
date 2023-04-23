@@ -65,19 +65,17 @@ const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
 
   useEffect(() => {
     let filteredRegions = regionObj?.filter(
-      (e) => e._id == data?.region._id
+      (e) => e._id == data?.regionId._id
     )[0];
     setRegion(filteredRegions);
     setProvince(
-      filteredRegions?.provinces.filter((e) => e._id == data?.province._id)[0]
+      filteredRegions?.provinces.filter((e) => e._id == data?.provinceId._id)[0]
     );
 
     setCitymunicipalities(
       filteredRegions?.provinces
-        ?.filter((e) => e._id == data?.province._id)[0]
-        ?.citymunicipalities.filter(
-          (e) => e._id == data?.citymunicipalities._id
-        )[0]
+        ?.filter((e) => e._id == data?.provinceId._id)[0]
+        ?.citymunicipalities.filter((e) => e._id == data?.cityId._id)[0]
     );
   }, [data]);
 
