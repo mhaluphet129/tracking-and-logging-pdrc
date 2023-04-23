@@ -20,6 +20,8 @@ import {
   Input,
   message,
   InputNumber,
+  AutoComplete,
+  Tooltip,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import { autoCap, Floatlabel } from "../../assets/utilities";
@@ -27,6 +29,8 @@ import {
   ArrowRightOutlined,
   CloseOutlined,
   MinusCircleOutlined,
+  InfoCircleOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 
 class PDF extends React.Component {
@@ -37,6 +41,7 @@ class PDF extends React.Component {
 
 const TableDataParser2 = (data) => {
   let _data = [];
+
   for (let i = 0; i < data?.length; i++)
     _data.push({
       row1: `${autoCap(data[i].user?.name)}${
@@ -51,6 +56,7 @@ const TableDataParser2 = (data) => {
       row6: data[i]?.timeOutTimeAfterDone
         ? data[i]?.timeOutTimeAfterDone
         : "Not yet",
+      row7: data[i]?.relationship || "Prefer not to say",
     });
   return _data;
 };
@@ -62,6 +68,11 @@ const Report = () => {
   const [visitors, setVisitors] = useState([]);
   const [recentVisit, setRecentVisit] = useState([]);
   const [filterOpened, setFilterOpened] = useState(false);
+  const [activeFilter, setActiveFilter] = useState([]);
+  const [openFilterId, setOpenFilterId] = useState(0);
+
+  const timerRef = useRef(null);
+
   const ref = useRef();
   const ref2 = useRef();
   const [reportData, setReportData] = useState({
@@ -89,14 +100,22 @@ const Report = () => {
     age: { min: 0, max: 100 },
     address: { cityId: null, provinceId: null, regionId: null, barangay: "" },
   });
-  const [activeFilter, setActiveFilter] = useState([]);
-  const [openFilterId, setOpenFilterId] = useState(0);
+  let [filters2, setFilter2] = useState({
+    specificVisitorId: "",
+    specificVisiteeName: "",
+    checkinDateRange: { from: null, to: null },
+  });
   const [minAge, setMinAge] = useState(18);
   const [maxAge, setMaxAge] = useState(100);
 
   const [addressOpened, setAddressOpened] = useState([false, false, false]);
-
   const [column1Title, setColumn1Title] = useState("");
+  const [selectedVisitor, setSelectedVisitor] = useState({});
+
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState(false);
+
+  const [applied, setApplied] = useState(false);
 
   const generatePrint = async () => {
     if (!addressOpened[0])
@@ -134,20 +153,82 @@ const Report = () => {
       );
     }
 
-    await fetchVisitor();
+    await fetchVisitor("fetch-all", filters);
   };
 
-  const fetchVisitor = async () => {
+  const generatePrint2 = async () => {
+    if (activeFilter.includes("specificVisitor") && !selected) {
+      setFilter2({ ...filters2, specificVisitorId: "" });
+    }
+    if (activeFilter.includes("specificVisitee") && !applied) {
+      message.warning(
+        "Please check applied before proceed. (Specific Visitee)"
+      );
+      return;
+    }
+    if (activeFilter.includes("dateChekinRange")) {
+      if (
+        filters2.checkinDateRange.from == null ||
+        filters2.checkinDateRange.to == null
+      ) {
+        message.warning(
+          `Please provide ${
+            filters2.checkinDateRange.from == null ? "begin" : "end"
+          } date for the filter otherwise remove this filter.`
+        );
+        return;
+      }
+    }
+    await fetchVisitor("fetch-logs", filters2);
+  };
+
+  const fetchVisitor = async (mode, _filters) => {
     let { data } = await axios.get("/api/visitor", {
-      params: { mode: "fetch-all", filters: JSON.stringify(filters) },
+      params: { mode, filters: JSON.stringify(_filters) },
     });
     if (data.status == 200) {
-      setVisitors(data.visitor);
-      setOpenPrintDrawer(true);
+      if (mode == "fetch-all") {
+        setVisitors(data.visitor);
+        setOpenPrintDrawer(true);
+      } else {
+        setRecentVisit(data.visits);
+        updateReportData("2", data.visits);
+        setOpenPrintDrawer2(true);
+      }
     }
   };
 
-  const updateReportData = (mode) => {
+  const runTimer = (key) => {
+    setLoading(true);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(function () {
+      searchName(key);
+    }, 500);
+  };
+
+  const searchName = async (keyword) => {
+    if (keyword != "" && keyword != null) {
+      let { data } = await axios.get("/api/visitor", {
+        params: {
+          mode: "search-visitor",
+          searchKeyword: keyword,
+        },
+      });
+      if (data.status == 200) {
+        if (data.searchData?.length > 0)
+          setFilter2({
+            ...filters2,
+            specificVisitorId: data.searchData[0]?._id,
+          });
+        setSelectedVisitor(data.searchData[0]);
+        setLoading(false);
+      }
+    }
+  };
+
+  const updateReportData = (mode, extraData) => {
     if (mode == "2") {
       setReportData({
         titleData: {
@@ -161,7 +242,7 @@ const Report = () => {
           labels: [
             {
               label: "TOTAL NUMBER OF VISIT",
-              value: recentVisit.length,
+              value: extraData?.length || recentVisit?.length || 0,
             },
           ],
           signature: {
@@ -175,12 +256,11 @@ const Report = () => {
           tableHeader: {
             header1: "Visitor Name",
             header2: "Visitee Name",
-            header3: "Date",
-            header4: "Check In",
+            header3: "Date Checked In",
             header5: "Expected Check Out",
-            header6: "Checked out",
+            header6: "Date Checked out",
           },
-          data: TableDataParser2(recentVisit),
+          data: TableDataParser2(extraData || recentVisit),
         },
       });
     }
@@ -327,6 +407,14 @@ const Report = () => {
       ),
     },
     {
+      align: "center",
+      title: "Relationship",
+      render: (_, row) => (
+        <Typography style={{ paddingLeft: 10 }}>{row?.row7}</Typography>
+      ),
+    },
+    {
+      align: "center",
       title: (
         <Typography.Text
           editable={{
@@ -372,108 +460,8 @@ const Report = () => {
           </Typography.Link>
         ) : (
           <Typography.Text style={{ paddingLeft: 10 }}>
-            {moment(row?.row3).format("MMM DD, YYYY")}
-          </Typography.Text>
-        ),
-    },
-    {
-      title: (
-        <Typography.Text
-          editable={{
-            triggerType: editMode ? ["icon", "text"] : [],
-            icon: editMode ? false : <></>,
-            onChange: (e) => {
-              setReportData((_) => {
-                return {
-                  ..._,
-                  tableData: {
-                    ..._.tableData,
-                    tableHeader: { ..._.tableData?.tableHeader, header4: e },
-                  },
-                };
-              });
-            },
-          }}
-        >
-          {reportData.tableData?.tableHeader?.header4}
-        </Typography.Text>
-      ),
-      width: 200,
-      render: (_, row, index) =>
-        editMode ? (
-          <Typography.Link>
-            <DatePicker.TimePicker
-              defaultValue={moment(row?.row4)}
-              format="hh:mm a"
-              onChange={(e) => {
-                let arr = reportData.tableData?.data;
-                arr[index].row4 = moment(e);
-                setReportData((_) => {
-                  return {
-                    ..._,
-                    tableData: {
-                      ..._.tableData,
-                      data: arr,
-                    },
-                  };
-                });
-              }}
-            />
-          </Typography.Link>
-        ) : (
-          <Typography.Text style={{ paddingLeft: 10 }}>
+            {moment(row?.row3).format("MMM DD, YYYY")} <br />
             {moment(row?.row4).format("hh:mm a")}
-          </Typography.Text>
-        ),
-    },
-    {
-      title: (
-        <Typography.Text
-          editable={{
-            triggerType: editMode ? ["icon", "text"] : [],
-            icon: editMode ? false : <></>,
-            onChange: (e) => {
-              setReportData((_) => {
-                return {
-                  ..._,
-                  tableData: {
-                    ..._.tableData,
-                    tableHeader: { ..._.tableData?.tableHeader, header5: e },
-                  },
-                };
-              });
-            },
-          }}
-        >
-          {reportData.tableData?.tableHeader?.header5}
-        </Typography.Text>
-      ),
-      width: 200,
-      align: "center",
-      render: (_, row, index) =>
-        editMode ? (
-          <Typography.Link>
-            <DatePicker.TimePicker
-              defaultValue={moment(row?.row5)}
-              format="hh:mm a"
-              onChange={(e) => {
-                let arr = reportData.tableData?.data;
-                arr[index].row5 = moment(e);
-                setReportData((_) => {
-                  return {
-                    ..._,
-                    tableData: {
-                      ..._.tableData,
-                      data: arr,
-                    },
-                  };
-                });
-              }}
-            />
-          </Typography.Link>
-        ) : (
-          <Typography.Text>
-            {moment(row?.row5).format("hh:mm a")}
           </Typography.Text>
         ),
     },
@@ -528,10 +516,13 @@ const Report = () => {
           </Typography.Text>
         ) : moment(row?.row6).format("hh:mm a") != "Invalid date" ? (
           <Typography.Text>
+            {moment(row?.row3).format("MMM DD, YYYY")} <br />
             {moment(row?.row6).format("hh:mm a")}
           </Typography.Text>
         ) : (
-          <Typography.Text>{row?.row6}</Typography.Text>
+          <Typography.Text type="secondary" italic>
+            {row?.row6}
+          </Typography.Text>
         ),
     },
   ];
@@ -609,18 +600,7 @@ const Report = () => {
           bordered
         />
       </Col>
-      <Col span={8} offset={3}>
-        <Typography.Text
-          style={{
-            marginTop: 10,
-            fontWeight: 900,
-            color: "#757575",
-          }}
-        >
-          TOTAL NUMBER OF VISITOR
-        </Typography.Text>
-      </Col>
-      <Col span={13}>{visitors?.length}</Col>
+
       <Col span={8} offset={3}>
         <Typography.Text
           style={{
@@ -649,6 +629,18 @@ const Report = () => {
       <Col span={13}>
         {visitors?.filter((el) => el?.gender == "female").length}
       </Col>
+      <Col span={8} offset={3}>
+        <Typography.Text
+          style={{
+            marginTop: 10,
+            fontWeight: 900,
+            color: "#757575",
+          }}
+        >
+          TOTAL NUMBER OF VISITOR
+        </Typography.Text>
+      </Col>
+      <Col span={13}>{visitors?.length}</Col>
       <Col span={12} offset={3} style={{ marginTop: 100 }}>
         <Typography.Text>Allan Balaba</Typography.Text>
         <br />
@@ -788,7 +780,7 @@ const Report = () => {
           bordered
         />
       </Col>
-      <Col span={8} offset={3}>
+      <Col span={8} offset={1}>
         <Typography.Text
           style={{
             marginTop: 10,
@@ -822,7 +814,7 @@ const Report = () => {
         </Typography.Text>
       </Col>
 
-      <Col span={12} offset={3} style={{ marginTop: 100 }}>
+      <Col span={12} offset={1} style={{ marginTop: 100 }}>
         <Typography.Text
           editable={{
             triggerType: editMode ? ["icon", "text"] : [],
@@ -888,15 +880,6 @@ const Report = () => {
   );
 
   useEffect(() => {
-    (async () => {
-      let res = await axios.get("/api/visit", {
-        params: { mode: "fetch-recent" },
-      });
-      if (res.data.status == 200) setRecentVisit(res.data.data);
-    })();
-  }, []);
-
-  useEffect(() => {
     let filteredRegions = regionObj?.filter(
       (e) => e._id == "614c2580dd90f126474a5e25"
     )[0];
@@ -938,6 +921,11 @@ const Report = () => {
         onCancel={() => {
           setFilterOpened(false);
           setActiveFilter([]);
+          setFilter2({
+            specificVisitorId: "",
+            specificVisiteeName: "",
+            checkinDateRange: { from: null, to: null },
+          });
         }}
       >
         {openFilterId == 1 && (
@@ -1370,6 +1358,193 @@ const Report = () => {
             </Form.Item>
           </Form>
         )}
+        {openFilterId == 2 && (
+          <Form
+            labelCol={{
+              span: 24,
+            }}
+            wrapperCol={{
+              span: 24,
+            }}
+            labelAlign="right"
+            // onFinish={handleLogin}
+          >
+            <Select
+              mode="multiple"
+              style={{ width: "100%" }}
+              value={activeFilter}
+              placeholder="Select a filter......"
+              options={[
+                { value: "specificVisitor", label: "Specific Visitor" },
+                { value: "specificVisitee", label: "Specific Visitee" },
+                { value: "dateChekinRange", label: "Check-In Date Range" },
+              ]}
+              onChange={(e) => {
+                setActiveFilter(e);
+              }}
+              allowClear
+            />
+            {activeFilter.includes("specificVisitor") && (
+              <Card
+                title={
+                  <>
+                    Specific Visitor{" "}
+                    <Tooltip title="Please select after searching otherwise specific selection would not work.">
+                      <InfoCircleOutlined style={{ cursor: "pointer" }} />
+                    </Tooltip>
+                  </>
+                }
+                style={{ marginTop: 10 }}
+                extra={
+                  <CloseOutlined
+                    style={{ fontSize: 20, color: "#f00" }}
+                    onClick={() => {
+                      setActiveFilter(
+                        activeFilter.filter((e) => e != "specificVisitor")
+                      );
+                      setFilter2({ ...filters2, specificVisitorId: "" });
+                      setSelected(false);
+                    }}
+                  />
+                }
+              >
+                <Form.Item>
+                  <AutoComplete
+                    style={{
+                      width: 200,
+                    }}
+                    disabled={selected}
+                    loading={loading}
+                    onSelect={() => {
+                      setSelected(true);
+                    }}
+                    options={[
+                      selectedVisitor &&
+                      Object.keys(selectedVisitor)?.length != 0
+                        ? {
+                            value:
+                              selectedVisitor?.name +
+                              " " +
+                              (selectedVisitor?.middlename != undefined
+                                ? selectedVisitor?.middlename + " "
+                                : "") +
+                              selectedVisitor?.lastname,
+                          }
+                        : {},
+                    ]}
+                    placeholder="Search by Name"
+                    filterOption={(inputValue, option) =>
+                      option.value
+                        ?.toUpperCase()
+                        .indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                    onChange={(_) => {
+                      runTimer(_);
+                      if (_?.length <= 0) {
+                        setSelectedVisitor({});
+                        setFilter2({ ...filters2, specificVisitorId: "" });
+                        setLoading(false);
+                      }
+                    }}
+                    autoFocus
+                  />
+                  <Button
+                    type="text"
+                    onClick={() => setSelected(false)}
+                    disabled={!selected}
+                  >
+                    change
+                  </Button>
+                </Form.Item>
+              </Card>
+            )}
+            {activeFilter.includes("specificVisitee") && (
+              <Card
+                title="Specific Visitee"
+                style={{ marginTop: 10 }}
+                extra={
+                  <CloseOutlined
+                    style={{ fontSize: 20, color: "#f00" }}
+                    onClick={() => {
+                      setActiveFilter(
+                        activeFilter.filter((e) => e != "specificVisitee")
+                      );
+                      setFilter2({ ...filters2, specificVisiteeName: "" });
+                    }}
+                  />
+                }
+              >
+                {/* here */}
+                <Form.Item>
+                  <Input
+                    disabled={applied}
+                    onChange={(e) =>
+                      setFilter2({
+                        ...filters2,
+                        specificVisiteeName: e.target.value,
+                      })
+                    }
+                    suffix={
+                      <Button onClick={() => setApplied(!applied)}>
+                        {applied ? (
+                          <Tooltip title="Change">
+                            <ReloadOutlined />
+                          </Tooltip>
+                        ) : (
+                          "APPLY"
+                        )}
+                      </Button>
+                    }
+                  />
+                </Form.Item>
+              </Card>
+            )}
+            {activeFilter.includes("dateChekinRange") && (
+              <Card
+                title="Check-In Date Range"
+                style={{ marginTop: 10 }}
+                extra={
+                  <CloseOutlined
+                    style={{ fontSize: 20, color: "#f00" }}
+                    onClick={() => {
+                      setActiveFilter(
+                        activeFilter.filter((e) => e != "dateChekinRange")
+                      );
+                      setFilter2({
+                        ...filters2,
+                        checkinDateRange: { from: null, to: null },
+                      });
+                    }}
+                  />
+                }
+              >
+                <Form.Item>
+                  <DatePicker.RangePicker
+                    onCalendarChange={(e) => {
+                      setFilter2({
+                        ...filters2,
+                        checkinDateRange: {
+                          from: e[0],
+                          to: e[1],
+                        },
+                      });
+                    }}
+                  />
+                </Form.Item>
+              </Card>
+            )}
+            <Form.Item noStyle>
+              <Button
+                type="primary"
+                size="large"
+                style={{ width: "100%", marginTop: 20 }}
+                onClick={generatePrint2}
+              >
+                Proceed <ArrowRightOutlined />
+              </Button>
+            </Form.Item>
+          </Form>
+        )}
       </Modal>
       <PageHeader title="Report">
         <Drawer
@@ -1381,6 +1556,11 @@ const Report = () => {
           title="Print Preview"
           placement="bottom"
           height="100%"
+          style={{
+            width: 816,
+            marginLeft: "50%",
+            transform: "translateX(-50%)",
+          }}
           extra={[
             <Space key="1">
               {/* <Checkbox
@@ -1422,7 +1602,11 @@ const Report = () => {
           placement="bottom"
           height="100%"
           title="Print Preview"
-          width="200"
+          style={{
+            width: 816,
+            marginLeft: "50%",
+            transform: "translateX(-50%)",
+          }}
           extra={[
             <Button onClick={handlePrint} key="visit1">
               PRINT
@@ -1447,8 +1631,8 @@ const Report = () => {
             </Button>
             <Button
               onClick={() => {
-                setOpenPrintDrawer2(true);
-                updateReportData("2");
+                setOpenFilterId(2);
+                setFilterOpened(true);
               }}
               style={{ width: 200 }}
               key="log2"

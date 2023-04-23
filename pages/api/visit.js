@@ -63,6 +63,39 @@ export default async function handler(req, res) {
               {
                 $unwind: "$user",
               },
+              // {
+              //   $lookup: {
+              //     from: "regions",
+              //     localField: "user.regionId",
+              //     foreignField: "_id",
+              //     as: "user.regionId",
+              //   },
+              // },
+              // {
+              //   $unwind: "$user.regionId",
+              // },
+              // {
+              //   $lookup: {
+              //     from: "provinces",
+              //     localField: "user.provinceId",
+              //     foreignField: "_id",
+              //     as: "user.provinceId",
+              //   },
+              // },
+              // {
+              //   $unwind: "$user.provinceId",
+              // },
+              // {
+              //   $lookup: {
+              //     from: "citymunicipalities",
+              //     localField: "user.cityId",
+              //     foreignField: "_id",
+              //     as: "user.cityId",
+              //   },
+              // },
+              // {
+              //   $unwind: "$user.cityId",
+              // },
             ])
               .sort({ createdAt: -1 })
               .then((e) => {

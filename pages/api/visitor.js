@@ -158,11 +158,62 @@ export default async function handler(req, res) {
             }
 
             return await Visitor.aggregate(query).then((e) => {
-              console.log(e.length);
               res.json({
                 status: 200,
                 message: "Successfully fetched the data",
                 visitor: e,
+              });
+              resolve();
+            });
+          }
+
+          case "fetch-logs": {
+            const { filters } = req.query;
+            const { specificVisitorId, specificVisiteeName, checkinDateRange } =
+              JSON.parse(filters);
+            console.log(JSON.parse(filters));
+            let _ = [],
+              query = [
+                {
+                  $lookup: {
+                    from: "items",
+                    localField: "_id",
+                    foreignField: "visitId",
+                    as: "depositItems",
+                  },
+                },
+                {
+                  $lookup: {
+                    from: "visitors",
+                    localField: "visitorId",
+                    foreignField: "_id",
+                    as: "user",
+                  },
+                },
+                {
+                  $unwind: "$user",
+                },
+              ];
+
+            if (specificVisitorId != "")
+              _.push({ visitorId: ObjectId(specificVisitorId) });
+            if (specificVisiteeName != "")
+              _.push({ prisonerName: specificVisiteeName });
+            if (checkinDateRange?.from != null && checkinDateRange?.to != null)
+              _.push({
+                timeIn: {
+                  $gte: new Date(checkinDateRange?.from),
+                  $lte: new Date(checkinDateRange?.to),
+                },
+              });
+            if (_.length > 0) query.unshift({ $match: { $and: _ } });
+            console.log(_);
+            return await Visit.aggregate(query).then((e) => {
+              console.log(e.length);
+              res.json({
+                status: 200,
+                message: "Successfully fetched the data",
+                visits: e,
               });
               resolve();
             });
@@ -182,7 +233,6 @@ export default async function handler(req, res) {
               .collation({ locale: "en" })
               .sort({ name: 1 })
               .then((e) => {
-                console.log(e);
                 res.json({ status: 200, searchData: e });
                 resolve();
               })
