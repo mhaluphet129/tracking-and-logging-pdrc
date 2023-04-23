@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isMobile } from "react-device-detect";
 
 export async function middleware(req = NextRequest) {
   const url = req.nextUrl.clone();
