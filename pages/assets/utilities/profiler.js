@@ -17,6 +17,7 @@ import {
   Collapse,
   message,
   theme,
+  Select,
 } from "antd";
 import {
   LoginOutlined,
@@ -59,13 +60,14 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
   const [showFullInfo, setShowFullInfo] = useState(false);
   const [visitHour, setVisitHour] = useState(null);
 
+  const [typeViolation, setTypeViolation] = useState("minor");
+
   const { titleRef } = useContext(SettingsContext);
 
   const { token } = theme.useToken();
 
   const handleFinishRemarks = async (val) => {
-    console.log(openRemarksIndex);
-    val = { ...val, hasViolation };
+    val = { ...val, hasViolation, type: hasViolation ? typeViolation : null };
     let res = await axios.post("/api/visit", {
       payload: {
         ...val,
@@ -77,6 +79,8 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
     if (res.data.status == 200) {
       setOpenRemarks({ show: false, data: null });
       setOpenAddRemarks(false);
+      setHasViolation(false);
+      setTypeViolation("minor");
       message.success(res.data.message);
       setTrigger(trigger + 1);
       if (typeof refresh == "function") refresh((trig) => trig + 1);
@@ -172,6 +176,28 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
     {
       title: "DESCRIPTION",
       render: (_, row) => <Typography>{row?.description}</Typography>,
+    },
+    {
+      title: "TYPE",
+      render: (_, row) => {
+        switch (row?.type) {
+          case "minor": {
+            return <Tag color="#eed202">MINOR</Tag>;
+          }
+          case "moderate": {
+            return <Tag color="#FF5F15">MODERATE</Tag>;
+          }
+          case "high": {
+            return <Tag color="#FF0000">HIGH</Tag>;
+          }
+          default:
+            return (
+              <Typography.Text type="secondary" italic>
+                N/A
+              </Typography.Text>
+            );
+        }
+      },
     },
     {
       title: "DATE ADDED",
@@ -288,37 +314,40 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
         open={openModal}
         footer={null}
         width={1100}
-        onCancel={() => setOpenModal(false)}
+        onCancel={() => {
+          setOpenModal(false);
+          setRefViolation(false);
+        }}
         maskClosable={false}
       >
         <Row>
           <Col span={6}>
             <Space direction="vertical">
-              <div
-                style={{
-                  width: 200,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  background: "#eee",
-                  borderRadius: "5%",
-                }}
+              <Badge.Ribbon
+                text="Has Violation"
+                color="red"
+                style={{ display: refViolation ? "inline-block" : "none" }}
               >
-                {data?.photo != null ? (
-                  <>
-                    {refViolation && (
-                      <Badge.Ribbon text="Has Violation" color="red">
-                        <Image src={data?.photo} />
-                      </Badge.Ribbon>
-                    )}
-                    {!refViolation && <Image src={data?.photo} />}
-                  </>
-                ) : (
-                  <Typography.Title type="secondary" level={3} italic>
-                    No Image
-                  </Typography.Title>
-                )}
-              </div>
+                <div
+                  style={{
+                    width: 200,
+                    height: data?.photo != null ? null : 100,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    background: "#eee",
+                    borderRadius: "5%",
+                  }}
+                >
+                  {data?.photo != null ? (
+                    <Image src={data?.photo} />
+                  ) : (
+                    <Typography.Title type="secondary" level={3} italic>
+                      No Image
+                    </Typography.Title>
+                  )}
+                </div>
+              </Badge.Ribbon>
               {!showFullInfo && (
                 <strong
                   style={{
@@ -635,7 +664,11 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
       </Modal>
       <Modal
         open={openAddRemarks}
-        onCancel={() => setOpenAddRemarks(false)}
+        onCancel={() => {
+          setOpenAddRemarks(false);
+          setHasViolation(false);
+          setTypeViolation("minor");
+        }}
         title="Add Remarks"
         maskClosable={false}
         footer={null}
@@ -669,7 +702,21 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
               {" "}
               <QuestionCircleOutlined />
             </Tooltip>
+            <br />
           </Form.Item>
+          {hasViolation && (
+            <Form.Item label="Type of Violation">
+              <Select
+                style={{ width: 120 }}
+                defaultValue="minor"
+                onSelect={(e) => setTypeViolation(e)}
+              >
+                <Select.Option value="minor">Minor</Select.Option>
+                <Select.Option value="moderate">Moderate</Select.Option>
+                <Select.Option value="high">High</Select.Option>
+              </Select>
+            </Form.Item>
+          )}
           <Form.Item label="Description" name="description">
             <Input.TextArea rows={5} />
           </Form.Item>

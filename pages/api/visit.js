@@ -254,10 +254,11 @@ export default async function handler(req, res) {
               });
           }
           case "new-remarks": {
-            let { id, title, hasViolation, description } = req.body.payload;
+            let { id, title, hasViolation, description, type } =
+              req.body.payload;
             return await Visit.findOneAndUpdate(
               { _id: id },
-              { $push: { remarks: { title, description, hasViolation } } }
+              { $push: { remarks: { title, description, hasViolation, type } } }
             )
               .then(() => {
                 res.json({ status: 200, message: "Successfully Added" });

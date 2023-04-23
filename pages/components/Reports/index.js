@@ -75,6 +75,7 @@ const Report = () => {
 
   const ref = useRef();
   const ref2 = useRef();
+  const ref3 = useRef();
   const [reportData, setReportData] = useState({
     titleData: {},
     footerData: {},
@@ -87,6 +88,10 @@ const Report = () => {
 
   const handlePrint2 = useReactToPrint({
     content: () => ref2.current,
+  });
+
+  const handlePrint3 = useReactToPrint({
+    content: () => ref3.current,
   });
 
   let [regions, setRegion] = useState({});
@@ -116,6 +121,9 @@ const Report = () => {
   const [selected, setSelected] = useState(false);
 
   const [applied, setApplied] = useState(false);
+
+  const [openPrintDrawer3, setOpenPrintDrawer3] = useState(false);
+  const [violators, setViolators] = useState();
 
   const generatePrint = async () => {
     if (!addressOpened[0])
@@ -196,6 +204,19 @@ const Report = () => {
         setOpenPrintDrawer2(true);
       }
     }
+  };
+
+  const fetchViolations = async () => {
+    let { data } = await axios.get("/api/violation", {
+      params: {
+        mode: "get-violators-for-print",
+      },
+    });
+
+    if (data.status == 200) {
+      setViolators(data.data);
+      setOpenPrintDrawer3(true);
+    } else message.error(data.message);
   };
 
   const runTimer = (key) => {
@@ -524,6 +545,29 @@ const Report = () => {
             {row?.row6}
           </Typography.Text>
         ),
+    },
+  ];
+
+  const printColumn3 = [
+    {
+      align: "center",
+      title: "Violator Name",
+      render: (_, row) => row?.violatorName,
+    },
+    {
+      align: "center",
+      title: "Violation Type",
+      render: (_, row) => row?.type?.toUpperCase(),
+    },
+    {
+      align: "center",
+      title: "Date",
+      render: (_, row) =>
+        moment(row?.createdAt).format("MMMM DD, YYYY - hh:mm a"),
+    },
+    {
+      title: "Violation Description",
+      render: (_, row) => row?.description,
     },
   ];
 
@@ -876,6 +920,97 @@ const Report = () => {
           Municipal Agriculturist
         </Typography.Text>
       </Col> */}
+    </Row>
+  );
+
+  const CustomTable3 = () => (
+    <Row>
+      <Col span={7}>
+        <Row justify="space-around">
+          <Col>
+            <Image
+              preview={false}
+              src="/pdrc-logo.png"
+              alt="logo"
+              width={150}
+            />
+          </Col>
+        </Row>
+      </Col>
+      <Col span={10} style={{ marginBottom: 50 }}>
+        <Space
+          style={{
+            width: "100%",
+            alignItems: "center",
+            fontWeight: 900,
+          }}
+          direction="vertical"
+        >
+          <Typography.Text style={{ color: "#757575" }}>
+            Republic of the Philippines
+          </Typography.Text>
+          <Typography.Text style={{ color: "#757575" }}>
+            Malaybalay
+          </Typography.Text>
+          <Typography.Text style={{ marginBottom: 10, color: "#757575" }}>
+            PROVINCE OF BUKIDNON
+          </Typography.Text>
+          <Typography.Text
+            style={{ marginBottom: 15, color: "#757575", fontSize: 12 }}
+          >
+            Provincial Detention and Rehabilitation Center
+          </Typography.Text>
+          <Typography.Text
+            style={{
+              marginBottom: 20,
+              fontWeight: 900,
+              color: "#000",
+              fontSize: "1.5em",
+            }}
+          >
+            List of Violators
+          </Typography.Text>
+        </Space>
+      </Col>
+      <Col span={7}>
+        <Row justify="space-around">
+          <Col>
+            <Image
+              preview={false}
+              src="/pdrc-logo2.png"
+              alt="logo"
+              width={150}
+            />
+          </Col>
+        </Row>
+      </Col>
+      <Col span={20} offset={2}>
+        <p>{column1Title}</p>
+        <Table
+          dataSource={violators}
+          columns={printColumn3}
+          rowKey={(row) => row._id}
+          pagination={false}
+          className="myTable"
+          rowClassName="custom-table"
+          bordered
+        />
+      </Col>
+
+      <Col span={12} offset={2} style={{ marginTop: 100 }}>
+        <Typography.Text>Allan Balaba</Typography.Text>
+        <br />
+        <Typography.Text style={{ borderTop: "1px solid #000" }}>
+          PDRC Warden
+        </Typography.Text>
+      </Col>
+      {/* <Col span={9} style={{ marginTop: 100 }}>
+            <Typography.Text>Coleen C. Ambos</Typography.Text>
+            <br />
+            <Typography.Text style={{ borderTop: "1px solid #000" }}>
+              Municipal Agriculturist
+            </Typography.Text>
+          </Col> */}
     </Row>
   );
 
@@ -1617,6 +1752,29 @@ const Report = () => {
             <CustomTable1 />
           </PDF>
         </Drawer>
+        <Drawer
+          open={openPrintDrawer3}
+          onClose={() => {
+            setOpenPrintDrawer3(false);
+          }}
+          placement="bottom"
+          height="100%"
+          title="Print Preview"
+          style={{
+            width: 816,
+            marginLeft: "50%",
+            transform: "translateX(-50%)",
+          }}
+          extra={[
+            <Button onClick={handlePrint3} key="visit1">
+              PRINT
+            </Button>,
+          ]}
+        >
+          <PDF ref={ref3}>
+            <CustomTable3 />
+          </PDF>
+        </Drawer>
         <Card>
           <Space direction="vertical">
             <Button
@@ -1638,6 +1796,13 @@ const Report = () => {
               key="log2"
             >
               Print Visit Logs
+            </Button>
+            <Button
+              onClick={() => fetchViolations()}
+              style={{ width: 200 }}
+              key="log2"
+            >
+              Print Violations
             </Button>
           </Space>
         </Card>

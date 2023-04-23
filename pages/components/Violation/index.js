@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Space, Card, Table, Typography, Segmented } from "antd";
+import {
+  Row,
+  Col,
+  Space,
+  Card,
+  Table,
+  Typography,
+  Segmented,
+  List,
+  Tag,
+  Badge,
+} from "antd";
 import Cards from "../Dashboard/components/cards";
 import axios from "axios";
 import {
@@ -23,6 +34,20 @@ const Violation = () => {
   const [listViolators, setListViolators] = useState([]);
   const [loader, setLoader] = useState("");
 
+  const evaluateTag = (type) => {
+    switch (type) {
+      case "minor": {
+        return { color: "#eed202", text: "MINOR" };
+      }
+      case "moderate": {
+        return { color: "#FF5F15", text: "MODERATE" };
+      }
+      case "high": {
+        return { color: "#FF0000", text: "HIGH" };
+      }
+    }
+  };
+
   const column = [
     {
       title: "Full Name",
@@ -44,6 +69,7 @@ const Violation = () => {
       width: 150,
       render: (_, row) => moment(row?.createdAt).format("MMMM DD, YYYY"),
     },
+    Table.EXPAND_COLUMN,
   ];
 
   useEffect(() => {
@@ -79,6 +105,33 @@ const Violation = () => {
               dataSource={listViolators}
               loading={loader == "fetch"}
               pagination={{ pageSize: 10 }}
+              expandable={{
+                expandedRowRender: (row) => (
+                  <List
+                    dataSource={row?.remarks.filter((e) => e.hasViolation)}
+                    renderItem={(e, index) => (
+                      <Badge.Ribbon {...evaluateTag(e?.type)}>
+                        <List.Item style={{ padding: 0 }}>
+                          <Typography.Text style={{ fontWeight: 700 }}>
+                            {e?.title}
+                          </Typography.Text>
+                          <br />
+                          <Typography.Text
+                            type="secondary"
+                            style={{ fontSize: ".75em" }}
+                          >
+                            {moment(e?.createdAt).format(
+                              "MMM DD, YYYY - hh:mm a"
+                            )}
+                          </Typography.Text>
+                          <br />
+                          {e?.description}
+                        </List.Item>
+                      </Badge.Ribbon>
+                    )}
+                  />
+                ),
+              }}
             />
           </Col>
           <Col span={6}>

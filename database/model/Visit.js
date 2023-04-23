@@ -17,6 +17,9 @@ let RemarksSchema = new mongoose.Schema(
     title: {
       type: String,
     },
+    type: {
+      type: String, // minor, moderate, high
+    },
     hasViolation: {
       type: Boolean,
     },
