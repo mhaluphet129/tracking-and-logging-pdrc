@@ -144,6 +144,7 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
             </Button>
           )
         }
+        destroyOnClose
       >
         <Form
           form={form}
