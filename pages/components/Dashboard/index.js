@@ -203,12 +203,12 @@ const Dashboard = () => {
                 <Cards
                   color="green"
                   icon={<CalendarOutlined />}
-                  name={`Visit This ${
+                  name={`Visit ${
                     filter == "Monthly"
-                      ? "Month"
+                      ? " This Month"
                       : filter == "Daily"
                       ? "Today"
-                      : "Year"
+                      : "This Year"
                   }`}
                   value={cardData.totalVisitMonth}
                 />
