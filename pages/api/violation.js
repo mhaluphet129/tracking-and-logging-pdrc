@@ -34,6 +34,7 @@ export default async function handler(req, res) {
                 .status(500)
                 .json({ success: false, message: "Error: " + err });
             }
+            break;
           }
           case "get-violators-for-print": {
             try {
@@ -69,6 +70,7 @@ export default async function handler(req, res) {
                 .status(500)
                 .json({ success: false, message: "Error: " + err });
             }
+            break;
           }
         }
       });

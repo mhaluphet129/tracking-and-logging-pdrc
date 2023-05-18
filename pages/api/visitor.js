@@ -209,6 +209,7 @@ export default async function handler(req, res) {
               });
               resolve();
             });
+            break;
           }
 
           case "fetch-logs": {
@@ -260,6 +261,7 @@ export default async function handler(req, res) {
               });
               resolve();
             });
+            break;
           }
           case "search-visitor": {
             const { searchKeyword } = req.query;
@@ -284,6 +286,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
 
           case "get-visitor": {
@@ -334,6 +337,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "check-isTimeIn": {
             const { id } = req.query;
@@ -356,6 +360,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "remove": {
             const { id } = req.query;
@@ -375,6 +380,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "check-validity": {
             const { userId, qrId } = req.query;
@@ -390,6 +396,7 @@ export default async function handler(req, res) {
                     "QR code is already expired. Please generate a new one in the system.",
                 });
             });
+            break;
           }
 
           case "check-inactive-visitor": {
@@ -403,6 +410,7 @@ export default async function handler(req, res) {
             )
               .then(() => true)
               .catch(() => false);
+            break;
           }
         }
       });
@@ -425,6 +433,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "update-visitor": {
             const { id } = req.body.payload;
@@ -447,6 +456,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
 
           case "new-qr-key": {
@@ -468,6 +478,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
         }
       });

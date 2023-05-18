@@ -28,6 +28,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
 
           case "get-items-all": {
@@ -61,6 +62,7 @@ export default async function handler(req, res) {
                 .status(500)
                 .json({ success: false, message: "Error: " + err });
             }
+            break;
           }
 
           case "search-items": {
@@ -123,6 +125,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "delete-item": {
             return await Item.findOneAndDelete({ _id: req.query.id })
@@ -135,6 +138,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
         }
       });
@@ -157,6 +161,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
         }
       });

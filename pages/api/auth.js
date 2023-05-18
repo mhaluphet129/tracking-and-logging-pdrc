@@ -46,6 +46,7 @@ export default async function handler(req, res) {
               .catch(() => {
                 res.status(500).json({ message: "Error in the server." });
               });
+            break;
           }
           case "signup": {
             const { email } = req.body.payload;
@@ -61,6 +62,7 @@ export default async function handler(req, res) {
               .catch(() => {
                 res.status(500).json({ message: "Error in the server." });
               });
+            break;
           }
 
           case "new-user": {
@@ -80,6 +82,7 @@ export default async function handler(req, res) {
               .catch(() => {
                 res.status(500).json({ message: "Error in the server." });
               });
+            break;
           }
         }
       });

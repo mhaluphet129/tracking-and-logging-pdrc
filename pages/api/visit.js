@@ -41,6 +41,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "fetch-recent": {
             return await Visit.aggregate([
@@ -107,6 +108,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
 
           case "visit-out": {
@@ -128,6 +130,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "visit-out-many": {
             return await Visit.updateMany(
@@ -148,6 +151,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "visit-with-timers": {
             return await Visit.find({
@@ -164,6 +168,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "search-visit": {
             const { searchKeyword } = req.query;
@@ -187,6 +192,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "filter-date": {
             const { startDate, endDate } = req.query;
@@ -205,6 +211,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "visitor-has-items": {
             const { id } = req.query;
@@ -221,6 +228,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
         }
       });
@@ -258,6 +266,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "new-remarks": {
             let { id, title, hasViolation, description, type } =
@@ -275,6 +284,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
         }
       });

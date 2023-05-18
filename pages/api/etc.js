@@ -39,6 +39,7 @@ export default async function handler(req, res) {
                 .json({ success: false, message: "Error: " + err });
             }
             resolve();
+            break;
           }
 
           case "check-admin-exist": {
@@ -52,6 +53,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
 
           case "update": {
@@ -73,6 +75,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
 
           case "get-visit-hour": {
@@ -89,6 +92,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
 
           case "get-region": {
@@ -136,6 +140,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
         }
       });
@@ -166,6 +171,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "change-password-admin": {
             const { password } = req.body.payload;
@@ -189,6 +195,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "update-admin": {
             return await Admin.findOneAndUpdate(
@@ -208,6 +215,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
           case "update-visit-time": {
             return await Admin.findOneAndUpdate(
@@ -226,6 +234,7 @@ export default async function handler(req, res) {
                   .status(500)
                   .json({ success: false, message: "Error: " + err });
               });
+            break;
           }
         }
       });
