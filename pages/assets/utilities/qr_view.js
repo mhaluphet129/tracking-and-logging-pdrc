@@ -17,7 +17,7 @@ import axios from "axios";
 
 const { useToken } = theme;
 
-const qrview = ({ open, close, id, data }) => {
+const QRview = ({ open, close, id, data }) => {
   const [size, setSize] = useState(300);
   const [mode, setMode] = useState("hour");
   const [inputData, setInputData] = useState("");

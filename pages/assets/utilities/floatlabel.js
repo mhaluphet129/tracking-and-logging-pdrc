@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function floatLabel(props) {
+export default function FloatLabel(props) {
   const [focus, setFocus] = useState(false);
   const { children, label, value, style, bool } = props;
 

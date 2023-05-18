@@ -340,7 +340,7 @@ const Profiler = ({ openModal, setOpenModal, data, refresh }) => {
                   }}
                 >
                   {data?.photo != null ? (
-                    <Image src={data?.photo} />
+                    <Image src={data?.photo} alt="random_photo_1" />
                   ) : (
                     <Typography.Title type="secondary" level={3} italic>
                       No Image

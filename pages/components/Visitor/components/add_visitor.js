@@ -414,7 +414,7 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
 
               {image != null && image != "" ? (
                 <div>
-                  <Image src={image} />
+                  <Image src={image} alt="random_photo" />
                   <Button
                     style={{ padding: 0, border: "none" }}
                     danger

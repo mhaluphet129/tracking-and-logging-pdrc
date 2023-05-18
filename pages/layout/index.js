@@ -97,7 +97,12 @@ const Sider = ({ selectedIndex }) => {
   return (
     <Affix>
       <Layout.Sider collapsible theme="light">
-        <Image src="pdrc-logo2.png" preview={false} style={{ padding: 20 }} />
+        <Image
+          src="pdrc-logo2.png"
+          preview={false}
+          style={{ padding: 20 }}
+          alt="main_logo"
+        />
         <Menu
           onClick={selectedIndex}
           items={items}

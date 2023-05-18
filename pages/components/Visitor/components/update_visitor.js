@@ -157,7 +157,7 @@ const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
 
               {inputData?.photo != null && inputData?.photo != "" ? (
                 <div>
-                  <Image src={inputData?.photo} /> <br />
+                  <Image src={inputData?.photo} alt="random_photo" /> <br />
                   <Space>
                     <Button
                       style={{ padding: 0, border: "none" }}
