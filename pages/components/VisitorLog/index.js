@@ -113,6 +113,11 @@ const VisitorLog = () => {
             Provincial Detention and Rehabilitation Center
           </Typography.Text>
           <Typography.Text
+            style={{ marginBottom: 15, color: "#757575", fontSize: 12 }}
+          >
+            Natid-asan, Brgy Casisang, Malaybalay, Bukidnon
+          </Typography.Text>
+          <Typography.Text
             style={{
               marginBottom: 20,
               fontWeight: 900,

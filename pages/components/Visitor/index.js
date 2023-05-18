@@ -510,7 +510,6 @@ const VisitorPage = () => {
           }}
           rowKey={(row) => row._id}
           loading={load == "fetch"}
-          // rowClassName={(row) => console.log(row)}
         />
       </Card>
 

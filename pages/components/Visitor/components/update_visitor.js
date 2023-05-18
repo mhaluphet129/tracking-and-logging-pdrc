@@ -58,6 +58,25 @@ const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
     setLoad("");
   };
 
+  const downloadImage = async (url) => {
+    await fetch(url, {
+      method: "GET",
+      headers: {},
+    })
+      .then((response) => {
+        response.arrayBuffer().then(function (buffer) {
+          const url = window.URL.createObjectURL(new Blob([buffer]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "image.png");
+          link.click();
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   // dynamically update input data when data is updated
   useEffect(() => {
     setInputData(data);
@@ -113,32 +132,51 @@ const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
             colon={false}
           >
             <Form.Item label="Profile">
-              <div style={{ width: 255 }}>
-                {inputData?.photo == null || inputData?.photo == "" ? (
-                  <PickerDropPane
-                    apikey={"AKXY0x47MRoyw21abVGzJz"}
-                    onUploadDone={(res) => {
-                      setInputData((_) => {
-                        return { ..._, photo: res?.filesUploaded[0]?.url };
-                      });
-                      setEdited(true);
-                    }}
-                  />
-                ) : null}
+              <div
+                style={{
+                  width: 255,
+                  cursor: "pointer",
+                  display:
+                    inputData?.photo == null || inputData?.photo == ""
+                      ? "block"
+                      : "none",
+                }}
+                id="picker-container"
+              >
+                <PickerDropPane
+                  apikey={"AKXY0x47MRoyw21abVGzJz"}
+                  onUploadDone={(res) => {
+                    setInputData((_) => {
+                      return { ..._, photo: res?.filesUploaded[0]?.url };
+                    });
+                    setEdited(true);
+                  }}
+                  pickerOptions={{ container: "picker-container" }}
+                />
               </div>
 
               {inputData?.photo != null && inputData?.photo != "" ? (
                 <div>
-                  <Image src={inputData?.photo} />
-                  <Button
-                    style={{ padding: 0, border: "none" }}
-                    danger
-                    onClick={() => {
-                      setImage(null);
-                    }}
-                  >
-                    remove
-                  </Button>
+                  <Image src={inputData?.photo} /> <br />
+                  <Space>
+                    <Button
+                      style={{ padding: 0, border: "none" }}
+                      danger
+                      onClick={() => {
+                        setEdited(true);
+                        setInputData({ ...inputData, photo: null });
+                      }}
+                    >
+                      remove
+                    </Button>
+                    <Button
+                      type="text"
+                      style={{ padding: 0, border: "none", color: "#0000ff" }}
+                      onClick={() => downloadImage(inputData?.photo)}
+                    >
+                      download
+                    </Button>
+                  </Space>
                 </div>
               ) : null}
             </Form.Item>

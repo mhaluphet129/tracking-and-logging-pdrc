@@ -124,7 +124,7 @@ export default async function handler(req, res) {
               },
             });
             let items = await Item.find();
-            console.log(totalVisitYear);
+
             res.json({
               status: 200,
               data: {

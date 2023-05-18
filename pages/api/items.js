@@ -1,7 +1,5 @@
 import Item from "../../database/model/Item";
-import Visit from "../../database/model/Visit";
 import dbConnect from "../../database/dbConnect";
-var ObjectId = require("mongodb").ObjectId;
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -32,31 +30,18 @@ export default async function handler(req, res) {
               });
           }
 
-          // case "get-items": {
-          //   let { id } = req.query;
-
-          //   return await Item.find({ ownerId: ObjectId(id) })
-          //     .then((e) => {
-          //       res.json({ status: 200, data: e });
-          //       resolve();
-          //     })
-          //     .catch((err) => {
-          //       res
-          //         .status(500)
-          //         .json({ success: false, message: "Error: " + err });
-          //     });
-          // }
-
           case "get-items-all": {
             try {
               let items = await Item.find().populate("ownerId");
               let total = await Item.countDocuments();
-              let totalClaimed = await Item.countDocuments({ claimed: true });
-              let totalUnclaimed = await Item.countDocuments({
-                claimed: false,
+              let claimed = await Item.countDocuments({
+                status: "claimed",
               });
-              let totalDisposed = await Item.countDocuments({
-                status: { $in: ["DISPOSED"] },
+              let unclaimed = await Item.countDocuments({
+                status: "unclaimed",
+              });
+              let disposed = await Item.countDocuments({
+                status: "disposed",
               });
 
               res.json({
@@ -65,9 +50,9 @@ export default async function handler(req, res) {
                   items,
                   analytics: {
                     total,
-                    totalClaimed,
-                    totalUnclaimed,
-                    totalDisposed,
+                    claimed,
+                    unclaimed,
+                    disposed,
                   },
                 },
               });
@@ -120,17 +105,15 @@ export default async function handler(req, res) {
               .collation({ locale: "en" })
               .sort({ name: 1 })
               .then((e) => {
-                console.log(e);
                 res.json({
                   status: 200,
                   searchData: e,
                   analytics: {
                     total: e?.length,
-                    totalClaimed: e?.filter((_) => _?.claimed)?.length,
-                    totalUnclaimed: e?.filter((_) => !_?.claimed)?.length,
-                    totalDisposed: e?.filter((_) =>
-                      _?.status?.includes("DISPOSED")
-                    )?.length,
+                    claimed: e?.filter((_) => _?.status == "claimed")?.length,
+                    unclaimed: e?.filter((_) => !_?.status == "unclaimed")
+                      ?.length,
+                    disposed: e?.filter((_) => _?.status == "disposed")?.length,
                   },
                 });
                 resolve();

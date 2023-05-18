@@ -30,7 +30,6 @@ const qrview = ({ open, close, id, data }) => {
     const canvas = document.getElementById("myqrcode")?.querySelector("canvas");
     if (canvas) {
       const url = canvas.toDataURL();
-      console.log(url);
       const a = document.createElement("a");
       a.download = "QRCode.png";
       a.href = url;

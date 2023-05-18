@@ -37,12 +37,12 @@ const Inventory = () => {
 
   let formalTabName = {
     total: "All",
-    totalClaimed: "Claimed",
-    totalUnclaimed: "Unclaimed",
-    totalDisposed: "Disposed",
+    claimed: "Claimed",
+    unclaimed: "Unclaimed",
+    disposed: "Disposed",
   };
 
-  let _tabs = ["total", "totalClaimed", "totalUnclaimed", "totalDisposed"];
+  let _tabs = ["total", "claimed", "unclaimed", "disposed"];
 
   const searchName = async (keyword) => {
     setLoader("searching");
@@ -149,14 +149,9 @@ const Inventory = () => {
               setTabKey(key);
               if (key == "total") {
                 setTableData(items);
-              } else if (key == "totalClaimed") {
-                setTableData(() => items.filter((e) => e?.claimed));
-              } else if (key == "totalUnclaimed") {
-                setTableData(() => items.filter((e) => !e?.claimed));
-              } else
-                setTableData(() =>
-                  items.filter((e) => e.status?.includes("DISPOSED"))
-                );
+              } else {
+                setTableData(() => items.filter((e) => e?.status == key));
+              }
             }}
           >
             <Table
@@ -172,8 +167,9 @@ const Inventory = () => {
               columns={[
                 {
                   title: "Tag No.",
+                  align: "center",
                   render: (_, row) => (
-                    <Typography.Link>{IDGen(row?._id, 6)}</Typography.Link>
+                    <Typography.Link>{row?.uniqueId}</Typography.Link>
                   ),
                 },
                 {
@@ -197,7 +193,7 @@ const Inventory = () => {
                   width: 100,
                   render: (_, row) =>
                     row?.status?.length > 0 ? (
-                      <Tag color="cyan">{row?.status[0]}</Tag>
+                      <Tag color="cyan">{row?.status}</Tag>
                     ) : (
                       <Typography.Text type="secondary" italic>
                         No Data

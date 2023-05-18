@@ -2,6 +2,10 @@ let mongoose = require("mongoose");
 
 let ItemsSchema = new mongoose.Schema(
   {
+    uniqueId: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
@@ -22,12 +26,9 @@ let ItemsSchema = new mongoose.Schema(
     depositDate: {
       type: String,
     },
-    claimed: {
-      type: Boolean,
-      default: false,
-    },
     status: {
-      type: [String],
+      type: String,
+      default: "unclaimed",
     },
   },
   { timestamps: true }

@@ -6,6 +6,7 @@ import {
   Input,
   message,
   Modal,
+  Radio,
   Select,
   Space,
   Tag,
@@ -15,14 +16,9 @@ import moment from "moment";
 import axios from "axios";
 
 const EditItems = ({ open, close, data, refresh }) => {
-  const [status, setStatus] = useState([]);
-  const [itemName, setItemName] = useState("");
+  const [status, setStatus] = useState(null);
   const [isChanged, setIsChanged] = useState(false);
   const [form] = Form.useForm();
-
-  useEffect(() => {
-    setStatus(data?.status);
-  }, [data]);
 
   return (
     <Modal
@@ -91,53 +87,25 @@ const EditItems = ({ open, close, data, refresh }) => {
             onChange={() => setIsChanged(true)}
           />
         </Form.Item>
-        <Form.Item label="Status" name="status" style={{ marginBottom: 0 }}>
-          <Space direction="vertical">
-            <Space>
-              <Select
-                options={[{ label: "Disposed", value: "dispose" }]}
-                style={{ width: 120 }}
-                onChange={(e) => {
-                  setItemName(e);
-                  setIsChanged(true);
-                }}
-              />
-              <Button
-                onClick={() => {
-                  if (!status?.includes(itemName) && itemName != "")
-                    setStatus((e) => [itemName, ...e]);
-                }}
-              >
-                Add Status
-              </Button>
+        <Form.Item
+          label="Status"
+          name="status"
+          style={{ marginBottom: 0 }}
+          initialValue={data?.status}
+        >
+          <Radio.Group
+            value={status != null ? status : data?.status}
+            onChange={(e) => {
+              setIsChanged(true);
+              setStatus(e.target.value);
+            }}
+          >
+            <Space direction="vertical">
+              <Radio value="claimed">CLAIM</Radio>
+              <Radio value="unclaimed">UNCLAIM</Radio>
+              <Radio value="disposed">DISPOSE</Radio>
             </Space>
-            <Space
-              direction="vertical"
-              style={{
-                overflowY: "auto",
-                maxHeight: "calc(100vh - 200px)",
-                maxHeight: 200,
-              }}
-            >
-              {status?.map((e, i) => (
-                <div key={e + i} style={{ fontSize: 15, width: 300 }}>
-                  <MinusCircleOutlined
-                    style={{
-                      color: "red",
-                      marginRight: 10,
-                      cursor: "pointer",
-                      fontSize: 20,
-                    }}
-                    onClick={() => {
-                      setStatus((_) => _?.filter((__) => __ != e));
-                      setIsChanged(true);
-                    }}
-                  />
-                  <Tag>{e}</Tag>
-                </div>
-              ))}
-            </Space>
-          </Space>
+          </Radio.Group>
         </Form.Item>
       </Form>
     </Modal>

@@ -231,11 +231,17 @@ export default async function handler(req, res) {
         switch (mode) {
           case "new-visit": {
             let { items } = req.body.payload.data;
-            console.log(req.body.payload.data);
+            let lastUniqueId = await Item.count();
             let newVisit = Visit(req.body.payload.data);
-            items = items.map((e) => {
-              return { ...e, visitId: newVisit._id, depositDate: moment() };
+            items = items.map((e, i) => {
+              return {
+                ...e,
+                uniqueId: lastUniqueId + i + 1,
+                visitId: newVisit._id,
+                depositDate: moment(),
+              };
             });
+
             return await newVisit
               .save()
               .then(async () => {

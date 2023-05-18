@@ -399,11 +399,15 @@ const AddVisitor = ({ open, close, refresh, regionObj }) => {
           )}
           {verifyContinue && (
             <Form.Item label="Profile" style={{ marginTop: 20 }}>
-              <div style={{ width: 255, cursor: "pointer" }}>
+              <div
+                style={{ width: 255, cursor: "pointer" }}
+                id="picker-container"
+              >
                 {image == null || image == "" ? (
                   <PickerDropPane
                     apikey={"AKXY0x47MRoyw21abVGzJz"}
                     onUploadDone={(res) => setImage(res?.filesUploaded[0]?.url)}
+                    pickerOptions={{ container: "picker-container" }}
                   />
                 ) : null}
               </div>

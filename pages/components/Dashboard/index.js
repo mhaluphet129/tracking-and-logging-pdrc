@@ -13,12 +13,9 @@ import {
 } from "chart.js";
 import { Card, Col, Row, Segmented, Space } from "antd";
 import { Line, Pie } from "react-chartjs-2";
-import {
-  UserOutlined,
-  ImportOutlined,
-  BlockOutlined,
-  CalendarOutlined,
-} from "@ant-design/icons";
+import { HiUserGroup } from "react-icons/hi";
+import { CgCalendarNext } from "react-icons/cg";
+import { RiUserReceived2Line, RiInboxArchiveLine } from "react-icons/ri";
 import Cards from "./components/cards";
 import jayson from "../../assets/json/index.json";
 import axios from "axios";
@@ -190,20 +187,20 @@ const Dashboard = () => {
               >
                 <Cards
                   color="cyan"
-                  icon={<UserOutlined />}
-                  name="Total Visitor"
+                  icon={<HiUserGroup />}
+                  name="Total Visitors"
                   value={cardData.totalVisitor}
                 />
                 <Cards
                   color="orange"
-                  icon={<ImportOutlined />}
+                  icon={<RiUserReceived2Line />}
                   name="Total Visits"
                   value={cardData.totalVisit}
                 />
                 <Cards
                   color="green"
-                  icon={<CalendarOutlined />}
-                  name={`Visit ${
+                  icon={<CgCalendarNext />}
+                  name={`Visits ${
                     filter == "Monthly"
                       ? " This Month"
                       : filter == "Daily"
@@ -215,7 +212,7 @@ const Dashboard = () => {
                 <Cards
                   name="Total Deposited Items"
                   color="blue"
-                  icon={<BlockOutlined />}
+                  icon={<RiInboxArchiveLine />}
                   value={pieData.total}
                 />
                 <div>
