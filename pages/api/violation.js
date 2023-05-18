@@ -1,7 +1,7 @@
 import Visitor from "../../database/model/Visitor";
 import Visit from "../../database/model/Visit";
 import dbConnect from "../../database/dbConnect";
-import { autoCap } from "../assets/utilities";
+import { autoCap } from "../../assets/utilities";
 var ObjectId = require("mongodb").ObjectId;
 
 export default async function handler(req, res) {

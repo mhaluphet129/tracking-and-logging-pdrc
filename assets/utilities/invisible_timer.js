@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Typography, Table, message, notification } from "antd";
 import { WarningOutlined } from "@ant-design/icons";
-import { SettingsContext } from "../../context";
+import { SettingsContext } from "../../pages/context";
 import axios from "axios";
 import Timer from "./timer";
 import changeTitle from "./title";

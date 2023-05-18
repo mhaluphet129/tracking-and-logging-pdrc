@@ -22,7 +22,7 @@ import {
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import moment from "moment";
-import { InvisibleTimer, autoCap } from "../../assets/utilities";
+import { InvisibleTimer, autoCap } from "../../../assets/utilities";
 import { PageHeader } from "@ant-design/pro-layout";
 
 ChartJS.register(ArcElement, Tooltip, Legend);

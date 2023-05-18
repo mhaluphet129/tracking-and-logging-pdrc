@@ -13,7 +13,7 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import axios from "axios";
 
 import { AddAdmin, UpdateAdmin } from "./components";
-import { InvisibleTimer, autoCap } from "../../assets/utilities";
+import { InvisibleTimer, autoCap } from "../../../assets/utilities";
 import { PageHeader } from "@ant-design/pro-layout";
 
 const AdminPage = () => {

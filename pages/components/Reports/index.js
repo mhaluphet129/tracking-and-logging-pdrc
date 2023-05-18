@@ -25,7 +25,7 @@ import {
   Tag,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
-import { autoCap, Floatlabel } from "../../assets/utilities";
+import { autoCap, Floatlabel } from "../../../assets/utilities";
 import {
   ArrowRightOutlined,
   CloseOutlined,

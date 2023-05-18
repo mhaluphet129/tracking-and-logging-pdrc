@@ -1,6 +1,6 @@
-import { Server } from "Socket.IO";
+import { Server } from "socket.io";
 import { v4 } from "uuid";
-import { IDGen } from "../assets/utilities";
+import { IDGen } from "../../assets/utilities";
 
 /*        //==============/================/===================/==================//
               WEBSOCKETS handles end to end communications without pulling an API 

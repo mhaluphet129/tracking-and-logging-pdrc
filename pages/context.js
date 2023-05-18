@@ -4,7 +4,7 @@ import io from "socket.io-client";
 import Cookies from "js-cookie";
 import { message } from "antd";
 import { isBrowser } from "react-device-detect";
-import { Profiler, Settings } from "./assets/utilities";
+import { Profiler, Settings } from "../assets/utilities";
 
 let socket;
 

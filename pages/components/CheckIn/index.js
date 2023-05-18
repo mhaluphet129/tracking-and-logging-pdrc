@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Table, Typography, Space, Button, Card, message } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
-import { autoCap, Timer } from "../../assets/utilities";
+import { autoCap, Timer } from "../../../assets/utilities";
 import axios from "axios";
 import moment from "moment";
 

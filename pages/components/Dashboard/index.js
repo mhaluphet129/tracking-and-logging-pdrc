@@ -17,9 +17,9 @@ import { HiUserGroup } from "react-icons/hi";
 import { CgCalendarNext } from "react-icons/cg";
 import { RiUserReceived2Line, RiInboxArchiveLine } from "react-icons/ri";
 import Cards from "./components/cards";
-import jayson from "../../assets/json/index.json";
+import jayson from "../../../assets/json/index.json";
 import axios from "axios";
-import { InvisibleTimer } from "../../assets/utilities";
+import { InvisibleTimer } from "../../../assets/utilities";
 
 ChartJS.register(
   CategoryScale,

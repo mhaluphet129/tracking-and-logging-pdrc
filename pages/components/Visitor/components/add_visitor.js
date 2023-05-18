@@ -15,7 +15,7 @@ import {
 } from "antd";
 import axios from "axios";
 import moment from "moment";
-import { Floatlabel } from "../../../assets/utilities";
+import { Floatlabel } from "../../../../assets/utilities";
 import {
   ArrowRightOutlined,
   CheckCircleOutlined,

@@ -14,8 +14,8 @@ import {
 } from "antd";
 import { MobileView, BrowserView } from "react-device-detect";
 import { UserOutlined } from "@ant-design/icons";
-import { QRCamera } from "../assets/utilities";
-import Jason from "../assets/json/index.json";
+import { QRCamera } from "../../assets/utilities";
+import Jason from "../../assets/json/index.json";
 import axios from "axios";
 
 const Login = () => {

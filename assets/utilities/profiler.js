@@ -30,8 +30,8 @@ import {
 import moment from "moment";
 import axios from "axios";
 
-import { SettingsContext } from "../../context";
-import { VisitForm } from "../../components/Visitor/components";
+import { SettingsContext } from "../../pages/context";
+import { VisitForm } from "../../pages/components/Visitor/components";
 import CheckLister from "./item_checklist_verifier";
 import ItemChecklist from "./items-checklist";
 import QRViewer from "./qr_view";

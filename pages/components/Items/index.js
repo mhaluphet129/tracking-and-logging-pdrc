@@ -15,7 +15,7 @@ import {
   Tooltip,
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { IDGen, InvisibleTimer } from "../../assets/utilities";
+import { IDGen, InvisibleTimer } from "../../../assets/utilities";
 import EditItems from "./components/EditItems";
 import axios from "axios";
 import moment from "moment";

@@ -16,7 +16,7 @@ import {
 import axios from "axios";
 import moment from "moment";
 import dayjs from "dayjs";
-import { InvisibleTimer, autoCap } from "../../assets/utilities";
+import { InvisibleTimer, autoCap } from "../../../assets/utilities";
 import { PageHeader } from "@ant-design/pro-layout";
 
 const VisitorLog = () => {

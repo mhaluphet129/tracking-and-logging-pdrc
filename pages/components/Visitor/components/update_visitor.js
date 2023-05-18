@@ -16,9 +16,9 @@ import {
 import moment from "moment";
 import axios from "axios";
 import { PickerDropPane } from "filestack-react";
-import { Floatlabel } from "../../../assets/utilities";
+import { Floatlabel } from "../../../../assets/utilities";
 
-const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
+const UpdateSenior = ({ open, close, data, refresh, regionObj = [] }) => {
   const [edited, setEdited] = useState(false);
   const [inputData, setInputData] = useState({
     name: "",
@@ -290,7 +290,7 @@ const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
                       ? [
                           ...regionObj
                             .filter((e) => e._id == regions._id)[0]
-                            ?.provinces.map((e) => {
+                            ?.provinces?.map((e) => {
                               return {
                                 label: e.name,
                                 value: e._id,
@@ -326,7 +326,7 @@ const UpdateSenior = ({ open, close, data, refresh, regionObj }) => {
                           ...regionObj
                             .filter((e) => e._id == regions._id)[0]
                             ?.provinces.filter((e) => e._id == province._id)[0]
-                            ?.citymunicipalities.map((e) => {
+                            ?.citymunicipalities?.map((e) => {
                               return {
                                 label: e.name,
                                 value: e._id,

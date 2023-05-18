@@ -24,7 +24,7 @@ import {
 } from "@ant-design/icons";
 
 import { AddVisitor, UpdateVisitor, VisitForm } from "./components";
-import { InvisibleTimer, Profiler, autoCap } from "../../assets/utilities";
+import { InvisibleTimer, Profiler, autoCap } from "../../../assets/utilities";
 import axios from "axios";
 import moment from "moment";
 import { PageHeader } from "@ant-design/pro-layout";
