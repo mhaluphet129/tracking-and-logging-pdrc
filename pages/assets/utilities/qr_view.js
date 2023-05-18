@@ -239,4 +239,4 @@ const QRview = ({ open, close, id, data }) => {
   );
 };
 
-export default qrview;
+export default QRview;
