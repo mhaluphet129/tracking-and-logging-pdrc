@@ -87,15 +87,17 @@ const Dashboard = () => {
           filter,
         },
       });
-      const newState = [...dashbardNumericalData];
+      const newState = [];
 
       if (data.status == 200) {
         if (filter == "Monthly") {
           for (let i = 0; i < data.data?.graphValue.length; i++) {
             if (data.data?.graphValue[i].count > max)
               setMax(Math.ceil(data.data?.graphValue[i].count / 10) * 10);
+
             newState[data.data?.graphValue[i]._id - 1] =
               data.data?.graphValue[i].count;
+
             setDashbardNumericalData(newState);
           }
           setCardData({

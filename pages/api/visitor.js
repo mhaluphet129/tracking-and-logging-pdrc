@@ -3,6 +3,7 @@ import Visit from "../../database/model/Visit";
 import dbConnect from "../../database/dbConnect";
 import Province from "../../database/model/Province";
 import CityMunicipality from "../../database/model/CityMunicipality";
+import moment from "moment";
 var ObjectId = require("mongodb").ObjectId;
 
 export default async function handler(req, res) {
@@ -17,8 +18,9 @@ export default async function handler(req, res) {
         switch (mode) {
           case "fetch-all": {
             const { startDate, endDate, filters } = req.query;
-            const { dateRegistered, gender, age, address } =
+            const { dateRegistered, gender, age, address, month, year } =
               JSON.parse(filters);
+
             let query = [
               {
                 $lookup: {
@@ -155,6 +157,48 @@ export default async function handler(req, res) {
                   },
                 });
               }
+            }
+
+            if (month != null) {
+              query.unshift({
+                $match: {
+                  $expr: {
+                    $and: [
+                      {
+                        $eq: [
+                          {
+                            $month: "$createdAt",
+                          },
+                          moment(month).month() + 1,
+                        ],
+                      },
+                      {
+                        $eq: [
+                          {
+                            $year: "$createdAt",
+                          },
+                          moment(month).year(),
+                        ],
+                      },
+                    ],
+                  },
+                },
+              });
+            }
+
+            if (year != null) {
+              query.unshift({
+                $match: {
+                  $expr: {
+                    $eq: [
+                      {
+                        $year: "$createdAt",
+                      },
+                      moment(year).year(),
+                    ],
+                  },
+                },
+              });
             }
 
             return await Visitor.aggregate(query).then((e) => {

@@ -22,6 +22,7 @@ import {
   InputNumber,
   AutoComplete,
   Tooltip,
+  Tag,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import { autoCap, Floatlabel } from "../../assets/utilities";
@@ -104,6 +105,8 @@ const Report = () => {
     gender: "",
     age: { min: 0, max: 100 },
     address: { cityId: null, provinceId: null, regionId: null, barangay: "" },
+    month: null,
+    year: null,
   });
   let [filters2, setFilter2] = useState({
     specificVisitorId: "",
@@ -159,6 +162,20 @@ const Report = () => {
           regions.name.split("–")[0]
         }`
       );
+    }
+
+    if (
+      addressOpened.filter((e) => e == true).length == 0 &&
+      (activeFilter.includes("month") || activeFilter.includes("year"))
+    ) {
+      if (activeFilter.includes("month")) {
+        setColumn1Title(
+          `${moment(filters.month).format("MMMM")} - ${moment(
+            filters.month
+          ).year()}`
+        );
+      } else if (activeFilter.includes("year"))
+        setColumn1Title(moment(filters.year).year());
     }
 
     await fetchVisitor("fetch-all", filters);
@@ -639,7 +656,7 @@ const Report = () => {
         </Row>
       </Col>
       <Col span={18} offset={3}>
-        <p>{column1Title}</p>
+        <strong>{column1Title}</strong>
         <Table
           dataSource={visitors}
           columns={printColumn1}
@@ -1092,6 +1109,9 @@ const Report = () => {
           >
             <Select
               mode="multiple"
+              tagRender={({ label, value, disabled, closable, onClose }) => (
+                <Tag>{label}</Tag>
+              )}
               style={{ width: "100%" }}
               value={activeFilter}
               placeholder="Select a filter......"
@@ -1100,29 +1120,13 @@ const Report = () => {
                 { value: "gender", label: "Gender" },
                 { value: "ageRange", label: "Age Range" },
                 { value: "address", label: "Address" },
+                { value: "month", label: "Month" },
+                { value: "year", label: "Year" },
               ]}
               onChange={(e) => {
                 setActiveFilter(e);
-                if (!e.includes("dateRegistered"))
-                  setFilter({
-                    ...filters,
-                    dateRegistered: { from: null, to: null },
-                  });
-                if (!e.includes("gender"))
-                  setFilter({ ...filters, gender: "" });
-                if (!e.includes("ageRange"))
-                  setFilter({ ...filters, age: { min: 0, max: 100 } });
-                if (!e.includes("address"))
-                  setFilter({
-                    ...filters,
-                    address: {
-                      cityId: null,
-                      provinceId: null,
-                      regionId: null,
-                      barangay: "",
-                    },
-                  });
-                else
+
+                if (e.includes("address"))
                   setFilter({
                     ...filters,
                     address: {
@@ -1142,11 +1146,15 @@ const Report = () => {
                 extra={
                   <CloseOutlined
                     style={{ fontSize: 20, color: "#f00" }}
-                    onClick={() =>
+                    onClick={() => {
                       setActiveFilter(
                         activeFilter.filter((e) => e != "dateRegistered")
-                      )
-                    }
+                      );
+                      setFilter({
+                        ...filters,
+                        dateRegistered: { from: null, to: null },
+                      });
+                    }}
                   />
                 }
               >
@@ -1172,9 +1180,12 @@ const Report = () => {
                 extra={
                   <CloseOutlined
                     style={{ fontSize: 20, color: "#f00" }}
-                    onClick={() =>
-                      setActiveFilter(activeFilter.filter((e) => e != "gender"))
-                    }
+                    onClick={() => {
+                      setActiveFilter(
+                        activeFilter.filter((e) => e != "gender")
+                      );
+                      setFilter({ ...filters, gender: "" });
+                    }}
                   />
                 }
               >
@@ -1195,11 +1206,12 @@ const Report = () => {
                 extra={
                   <CloseOutlined
                     style={{ fontSize: 20, color: "#f00" }}
-                    onClick={() =>
+                    onClick={() => {
                       setActiveFilter(
                         activeFilter.filter((e) => e != "ageRange")
-                      )
-                    }
+                      );
+                      setFilter({ ...filters, age: { min: 0, max: 100 } });
+                    }}
                   />
                 }
               >
@@ -1265,11 +1277,21 @@ const Report = () => {
                 extra={
                   <CloseOutlined
                     style={{ fontSize: 20, color: "#f00" }}
-                    onClick={() =>
+                    onClick={() => {
                       setActiveFilter(
                         activeFilter.filter((e) => e != "address")
-                      )
-                    }
+                      );
+                      setFilter({
+                        ...filters,
+                        address: {
+                          cityId: null,
+                          provinceId: null,
+                          regionId: null,
+                          barangay: "",
+                        },
+                      });
+                      setAddressOpened([false, false, false]);
+                    }}
                   />
                 }
               >
@@ -1494,6 +1516,50 @@ const Report = () => {
                       </div>
                     </Floatlabel>
                   )}
+                </Form.Item>
+              </Card>
+            )}
+            {activeFilter.includes("month") && (
+              <Card
+                title="Month (with year)"
+                style={{ marginTop: 10 }}
+                extra={
+                  <CloseOutlined
+                    style={{ fontSize: 20, color: "#f00" }}
+                    onClick={() => {
+                      setActiveFilter(activeFilter.filter((e) => e != "month"));
+                      setFilter({ ...filters, month: null });
+                    }}
+                  />
+                }
+              >
+                <Form.Item>
+                  <DatePicker
+                    onChange={(e) => setFilter({ ...filters, month: e })}
+                    picker="month"
+                  />
+                </Form.Item>
+              </Card>
+            )}
+            {activeFilter.includes("year") && (
+              <Card
+                title="Year"
+                style={{ marginTop: 10 }}
+                extra={
+                  <CloseOutlined
+                    style={{ fontSize: 20, color: "#f00" }}
+                    onClick={() => {
+                      setActiveFilter(activeFilter.filter((e) => e != "year"));
+                      setFilter({ ...filters, year: null });
+                    }}
+                  />
+                }
+              >
+                <Form.Item>
+                  <DatePicker
+                    onChange={(e) => setFilter({ ...filters, year: e })}
+                    picker="year"
+                  />
                 </Form.Item>
               </Card>
             )}
@@ -1809,7 +1875,7 @@ const Report = () => {
                 setFilterOpened(true);
               }}
               style={{ width: 200 }}
-              key="log2"
+              key="log1"
             >
               Print Visit Logs
             </Button>
